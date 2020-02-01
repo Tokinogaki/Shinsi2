@@ -44,6 +44,7 @@ class ListVC: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "title_icon"))
         if traitCollection.forceTouchCapability == .available {
             registerForPreviewing(with: self, sourceView: collectionView)
@@ -69,7 +70,6 @@ class ListVC: BaseViewController {
         }
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
-        searchController.hidesNavigationBarDuringPresentation = false
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
         searchController.searchBar.showsCancelButton = false
@@ -283,7 +283,6 @@ class ListVC: BaseViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: self)
         if segue.identifier == "showSetting" {
-            segue.destination.hero.modalAnimationType = .selectBy(presenting: .cover(direction: .up), dismissing: .uncover(direction: .down))
         }
     }
 }

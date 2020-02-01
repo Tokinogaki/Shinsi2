@@ -48,8 +48,6 @@ class LoginVC: UIViewController {
         let vc = storyboard?.instantiateViewController(withIdentifier: "WebVC") as! WebVC
         vc.url = Defaults.URL.login
         let nvc = UINavigationController(rootViewController: vc)
-        nvc.hero.isEnabled = true
-        nvc.hero.modalAnimationType = .selectBy(presenting: .cover(direction: .up), dismissing: .uncover(direction: .down))
         navigationController?.present(nvc, animated: true, completion: nil)
     }
     

@@ -12,11 +12,10 @@ extension Notification.Name {
 class SettingVC: BaseViewController {
     
     let stackView = AloeStackView()
-    private var backGesture: InteractiveBackGesture?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        backGesture = InteractiveBackGesture(viewController: self, toView: stackView, mode: .modal, isSimultaneously: true)
+        
         navigationController?.navigationBar.barTintColor = UIColor(white: 0, alpha: 0.5)
         
         view.addSubview(stackView)
@@ -221,8 +220,6 @@ class SettingVC: BaseViewController {
         let vc = storyboard?.instantiateViewController(withIdentifier: "WebVC") as! WebVC
         vc.url = url
         let nvc = UINavigationController(rootViewController: vc)
-        nvc.hero.isEnabled = true
-        nvc.hero.modalAnimationType = .selectBy(presenting: .cover(direction: .up), dismissing: .uncover(direction: .down))
         parent.dismiss(animated: true, completion: {
             parent.present(nvc, animated: true, completion: nil)
         })

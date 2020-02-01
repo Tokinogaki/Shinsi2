@@ -206,8 +206,6 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showTag",
             let nv = segue.destination as? UINavigationController,
             let vc = nv.viewControllers.first as? TagVC {
-            segue.destination.hero.modalAnimationType = .selectBy(presenting: .cover(direction: .up),
-                                                                  dismissing: .uncover(direction: .down))
             vc.doujinshi = doujinshi
             vc.clickBlock = { [unowned self, unowned vc] tag in
                 vc.dismiss(animated: true, completion: {
@@ -220,8 +218,6 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showComment",
             let nv = segue.destination as? UINavigationController,
             let vc = nv.viewControllers.first as? CommentVC {
-            segue.destination.hero.modalAnimationType = .selectBy(presenting: .cover(direction: .up),
-                                                                  dismissing: .uncover(direction: .down))
             vc.doujinshi = doujinshi
             vc.delegate = self
         }
@@ -334,9 +330,6 @@ extension GalleryVC: CommentVCDelegate {
                     let webVC = self.storyboard?.instantiateViewController(withIdentifier: "WebVC") as! WebVC
                     webVC.url = url
                     let nvc = UINavigationController(rootViewController: webVC)
-                    nvc.hero.isEnabled = true
-                    nvc.hero.modalAnimationType = .selectBy(presenting: .cover(direction: .up),
-                                                            dismissing: .uncover(direction: .down))
                     self.navigationController?.present(nvc, animated: true, completion: nil)
                 }
             }
@@ -406,6 +399,7 @@ UICollectionViewDataSourcePrefetching {
             let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
             vc.selectedIndexPath = indexPath
             vc.doujinshi = doujinshi
+            vc.modalPresentationStyle = .fullScreen
             present(vc, animated: true)
         } else {
             let c = collectionView.cellForItem(at: indexPath) as! ImageCell
