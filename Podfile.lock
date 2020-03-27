@@ -1,13 +1,13 @@
 PODS:
   - Alamofire (4.7.3)
   - AloeStackView (1.0.1)
-  - Hero (1.4.0)
+  - Hero (1.5.0)
   - Kanna (4.0.2)
-  - Realm (3.16.2):
-    - Realm/Headers (= 3.16.2)
-  - Realm/Headers (3.16.2)
-  - RealmSwift (3.16.2):
-    - Realm (= 3.16.2)
+  - Realm (4.4.0):
+    - Realm/Headers (= 4.4.0)
+  - Realm/Headers (4.4.0)
+  - RealmSwift (4.4.0):
+    - Realm (= 4.4.0)
   - SDWebImage (4.4.2):
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
@@ -17,36 +17,37 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - AloeStackView
-  - Hero
+  - Hero (~> 1.5.0)
   - Kanna
-  - RealmSwift (~> 3.16.2)
+  - RealmSwift (> 3.16.2)
   - SDWebImage
   - SVProgressHUD
   - SwiftLint
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - AloeStackView
-    - Hero
     - Kanna
-    - Realm
-    - RealmSwift
     - SDWebImage
     - SVProgressHUD
     - SwiftLint
+  trunk:
+    - Hero
+    - Realm
+    - RealmSwift
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   AloeStackView: d22c006da4510db5e220968234174654b5ed6ea5
-  Hero: bac92350d7201a1a940003e0767c7b52ce7c99a1
+  Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   Kanna: c60b61d72554bf04ed1ee074f9b379855cab4892
-  Realm: 0e73b4edeb5b6a90da3d83206883b2e34e00eb38
-  RealmSwift: a81e650171ef0a5f999df1ed8d39ba8d6fce88a4
+  Realm: e125f464884cda953ebefe70c671b75b03b81b9b
+  RealmSwift: 33656a42bd300959a081fc13347376bc478071af
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftLint: a54bf1fe12b55c68560eb2a7689dfc81458508f7
 
-PODFILE CHECKSUM: 0b563a37e2d512af9896f20fcb453d0bec72bb9e
+PODFILE CHECKSUM: 2076eb3e4584b0b016e330c328591fcde2f0d2f9
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.9.1

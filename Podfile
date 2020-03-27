@@ -8,7 +8,7 @@ target 'Shinsi2' do
     pod 'Kanna'
     pod 'SDWebImage'
     pod 'SVProgressHUD'
-    pod 'Hero'
+    pod 'Hero', '~> 1.5.0' 
     pod 'AloeStackView'
     pod 'SwiftLint'
 end
