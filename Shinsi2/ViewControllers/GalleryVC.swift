@@ -22,8 +22,8 @@ class GalleryVC: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = doujinshi.gdata?.getTitle() ?? doujinshi.title
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
         
         backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinch(ges:)))
@@ -371,8 +371,7 @@ UICollectionViewDataSourcePrefetching {
             }
         }
         cell.imageView.hero.id = "image_\(doujinshi.id)_\(indexPath.item)"
-        cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
-        cell.imageView.isOpaque = true
+        cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1
         
         cell.layer.shouldRasterize = true

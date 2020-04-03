@@ -299,7 +299,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let doujinshi = items[indexPath.item]
         cell.imageView.hero.id = "image_\(doujinshi.id)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
-        cell.imageView.isOpaque = true
+        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade,.source(heroID: "image_\(doujinshi.id)_0")]
         
         if doujinshi.isDownloaded {
             if let image = UIImage(contentsOfFile: documentURL.appendingPathComponent(doujinshi.coverUrl).path) {
@@ -346,8 +346,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
-        let item = items[indexPath.item]
-        vc.doujinshi = item
+        vc.doujinshi = items[indexPath.item]
         navigationController?.pushViewController(vc, animated: true)
     }
     
