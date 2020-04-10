@@ -88,6 +88,8 @@ class ListVC: BaseViewController {
         super.viewWillAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(settingChanged(notification:)), name: .settingChanged, object: nil)
         collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+        view.layoutIfNeeded()
+        collectionView.collectionViewLayout.invalidateLayout()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -100,7 +102,6 @@ class ListVC: BaseViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         let indexPath = collectionView.indexPathsForVisibleItems.first
-        super.viewWillTransition(to: size, with: coordinator)
         collectionView?.collectionViewLayout.invalidateLayout()
         coordinator.animate(alongsideTransition: { _ in
             if let indexPath = indexPath {
@@ -299,7 +300,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let doujinshi = items[indexPath.item]
         cell.imageView.hero.id = "image_\(doujinshi.id)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
-        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade,.source(heroID: "image_\(doujinshi.id)_0")]
+        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(doujinshi.id)_0")]
         
         if doujinshi.isDownloaded {
             if let image = UIImage(contentsOfFile: documentURL.appendingPathComponent(doujinshi.coverUrl).path) {

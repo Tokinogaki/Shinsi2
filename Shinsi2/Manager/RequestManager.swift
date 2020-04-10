@@ -61,7 +61,7 @@ class RequestManager {
                 }
                 block?(items)
                 if cacheFavoritesTitles {
-                    DispatchQueue.global(qos: .background).async {
+                    DispatchQueue.global(qos: .userInteractive).async {
                         let favTitles = doc.xpath("//option [contains(@value, 'fav')]").filter { $0.text != nil }.map { $0.text! }
                         if favTitles.count == 10 { Defaults.List.favoriteTitles = favTitles }
                     }
@@ -145,7 +145,7 @@ class RequestManager {
         let totalCount = keywords.count
         var completedCount = 0
         for (index, keyword) in keywords.enumerated() {
-            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + .milliseconds(333 * index) ) {
+            DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + .milliseconds(333 * index) ) {
                 RequestManager.shared.getList(page: 0, search: keyword, completeBlock: { (books) in
                     results.append(contentsOf: books)
                     completedCount += 1

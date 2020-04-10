@@ -127,7 +127,7 @@ class SettingVC: BaseViewController {
         addTitle("Cache")
         let cacheSizeLable = createSubTitleLabel("size: counting...")
         stackView.addRow(cacheSizeLable)
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .userInteractive).async {
             let cacheSize = Double(SDImageCache.shared().getSize()) / 1024 / 1024
             DispatchQueue.main.async { [weak self, weak cacheSizeLable] in
                 guard let self = self, let cacheSizeLable = cacheSizeLable else {return}

@@ -4,11 +4,11 @@ inhibit_all_warnings!
 use_modular_headers!
 target 'Shinsi2' do
     pod 'RealmSwift', '> 3.16.2'
-    pod 'Alamofire'
+    pod 'Alamofire', '~> 4' 
     pod 'Kanna'
-    pod 'SDWebImage'
+    pod 'SDWebImage', '~> 4' 
     pod 'SVProgressHUD'
-    pod 'Hero', '~> 1.5.0' 
+    pod 'Hero'
     pod 'AloeStackView'
     pod 'SwiftLint'
 end
