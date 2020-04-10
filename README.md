@@ -1,6 +1,6 @@
 # Shinsi2
 
-An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS devices. Written in Swift 4.2.
+An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS devices. Written in Swift 5.0
 
 
 ![](Screenshots/top.jpg)
@@ -23,6 +23,7 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS d
 * `keyword p:10` to skip 10 pages
 * `artist1, artist2, artist3` to search multiple keywords (Only get first page result)
 * `favorites` to get all favorites, or `favorites0~9` to get specific favorite folder
+* `popular` to show popular galleries 
 * `download` to get downloaded galleries
 * Swipe left to delete history
 
@@ -54,9 +55,16 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS d
 ### More
 
 * View comments
+* Comment's links supported
 * Pich in/out to change thumbnile size
 * 3D touch support, quick preview galleries
 * Quick scroll 
+
+## Enviroment
+
+* XCode 11.4
+* Swift 5
+* Cocoapods
 
 ## Install
 
@@ -81,6 +89,9 @@ You can ask me questions in English/Chinese.
 If you can help me check my gramma and spell, It will be very helpful.
 
 ## Change log
+* **ver 1.3** 2020/4/3
+        * iOS 13 support
+	* Bug fix
 
 * **ver 1.1** 2018/11/14
 	* Comment links
