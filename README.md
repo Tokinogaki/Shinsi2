@@ -56,7 +56,7 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS d
 
 * View comments
 * Comment's links supported
-* Pich in/out to change thumbnile size
+* Pinch in/out to change thumbnile size
 * 3D touch support, quick preview galleries
 * Quick scroll 
 
@@ -90,8 +90,8 @@ If you can help me check my gramma and spell, It will be very helpful.
 
 ## Change log
 * **ver 1.3** 2020/4/3
-        * iOS 13 support
-	* Bug fix
+  * iOS 13 support
+  * Bug fix
 
 * **ver 1.1** 2018/11/14
 	* Comment links
