@@ -6,9 +6,9 @@ import SVProgressHUD
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     private(set) lazy var searchController: UISearchController = {
-        return UISearchController(searchResultsController: historyVC)
+        return UISearchController(searchResultsController: searchHistoryVC)
     }()
-    private lazy var historyVC: SearchHistoryVC = {
+    private lazy var searchHistoryVC: SearchHistoryVC = {
         return self.storyboard!.instantiateViewController(withIdentifier: "SearchHistoryVC") as! SearchHistoryVC
     }()
     private var items: [Doujinshi] = []
@@ -62,8 +62,8 @@ class ListVC: BaseViewController {
             Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
             backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         }
-        historyVC.searchController = searchController
-        historyVC.selectBlock = {[unowned self] text in
+        searchHistoryVC.searchController = searchController
+        searchHistoryVC.selectBlock = {[unowned self] text in
             self.searchController.isActive = false
             self.searchController.searchBar.text = text
             self.reloadData()
