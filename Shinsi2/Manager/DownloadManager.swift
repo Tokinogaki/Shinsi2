@@ -82,7 +82,7 @@ class DownloadManager: NSObject {
     var queues: [OperationQueue] = []
     var books: [String: Doujinshi] = [:]
     
-    func download(doujinshi: Doujinshi!) {
+    func download(doujinshi: Doujinshi) {
         guard let gdata = doujinshi.gdata, doujinshi.pages.count != 0 else {return}
         let folderName = gdata.gid
         let path = documentURL.appendingPathComponent(folderName).path
