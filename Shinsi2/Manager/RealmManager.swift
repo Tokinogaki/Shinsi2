@@ -19,6 +19,35 @@ class RealmManager {
         return self.realm.objects(Doujinshi.self).sorted(byKeyPath: "date", ascending: false)
     }()
     
+    func browsingHistory(for doujinshi: Doujinshi) -> BrowsingHistory? {
+        return realm.objects(BrowsingHistory.self).filter("id == %d", doujinshi.id).first
+    }
+    
+    func createBrowsingHistory(for doujinshi: Doujinshi) {
+        try! realm.write {
+            realm.create(BrowsingHistory.self, value: ["doujinshi": doujinshi, "id": doujinshi.id], update: .modified)
+        }
+    }
+    
+    func updateBrowsingHistory(_ browsingHistory: BrowsingHistory, currentPage: Int) {
+        try! realm.write {
+            browsingHistory.updatedAt = Date()
+            browsingHistory.currentPage = currentPage
+        }
+    }
+    
+    var browsedDoujinshi: [Doujinshi] {
+        let hs = realm.objects(BrowsingHistory.self).sorted(byKeyPath: "updatedAt", ascending: false)
+        var results: [Doujinshi] = []
+        let maxHistory = min(30, hs.count)
+        for i in 0..<maxHistory {
+            if let d = hs[i].doujinshi {
+                results.append(Doujinshi(value: d))
+            }
+        }
+        return results
+    }
+    
     func saveSearchHistory(text: String?) {
         guard let text = text else {return}
         guard text.replacingOccurrences(of: " ", with: "").count != 0 else {return}

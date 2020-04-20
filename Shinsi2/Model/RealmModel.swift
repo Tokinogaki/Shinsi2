@@ -1,6 +1,18 @@
 import Foundation
 import RealmSwift
 
+class BrowsingHistory: Object {
+    @objc dynamic var doujinshi: Doujinshi?
+    @objc dynamic var currentPage: Int = 0
+    @objc dynamic var id: Int = 999999999
+    @objc dynamic var createdAt: Date = Date()
+    @objc dynamic var updatedAt: Date = Date()
+    
+    override static func primaryKey() -> String? {
+        return "id"
+    }
+}
+
 class Doujinshi: Object {
     @objc dynamic var coverUrl = ""
     @objc dynamic var title = ""
