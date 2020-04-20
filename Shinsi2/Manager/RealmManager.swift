@@ -16,7 +16,7 @@ class RealmManager {
     }()
     
     lazy var downloaded: Results<Doujinshi> = {
-        return self.realm.objects(Doujinshi.self).sorted(byKeyPath: "date", ascending: false)
+        return self.realm.objects(Doujinshi.self).filter("isDownloaded == true").sorted(byKeyPath: "date", ascending: false)
     }()
     
     func browsingHistory(for doujinshi: Doujinshi) -> BrowsingHistory? {
