@@ -1,3 +1,5 @@
+[![Build Status](https://app.bitrise.io/app/e86f4f4671dc9fef/status.svg?token=QvpljE9s8D1RLn5wjrCdyQ&branch=master)](https://app.bitrise.io/app/e86f4f4671dc9fef)
+
 # Shinsi2
 
 An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS devices. Written in Swift 5.0
