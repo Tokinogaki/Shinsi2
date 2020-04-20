@@ -34,6 +34,10 @@ class SearchHistoryVC: UITableViewController {
         notificationToken?.invalidate()
     }
     
+    @IBAction private func shortcutButtonDidClick(sender: UIButton) {
+        selectBlock?(sender.titleLabel?.text ?? "")
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return results.count
     }

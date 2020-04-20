@@ -3,7 +3,7 @@
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -448,13 +448,52 @@
         <scene sceneID="cRk-4G-maY">
             <objects>
                 <tableViewController storyboardIdentifier="SearchHistoryVC" id="cgZ-7u-mhr" customClass="SearchHistoryVC" customModule="Shinsi2" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="Dqz-rY-oy3">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="Dqz-rY-oy3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <view key="tableHeaderView" contentMode="scaleToFill" id="Bgv-Nd-h2W" userLabel="Shortcut Content View">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="1QJ-Wb-amb">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hR6-1x-6jN">
+                                            <rect key="frame" x="0.0" y="0.0" width="122.33333333333333" height="44"/>
+                                            <state key="normal" title="Popular"/>
+                                            <connections>
+                                                <action selector="shortcutButtonDidClickWithSender:" destination="cgZ-7u-mhr" eventType="touchUpInside" id="hsW-0I-RXZ"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J39-wn-0sb">
+                                            <rect key="frame" x="126.33333333333334" y="0.0" width="122.33333333333334" height="44"/>
+                                            <state key="normal" title="Watched"/>
+                                            <connections>
+                                                <action selector="shortcutButtonDidClickWithSender:" destination="cgZ-7u-mhr" eventType="touchUpInside" id="4uL-aW-AGa"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyY-p5-9Iu">
+                                            <rect key="frame" x="252.66666666666666" y="0.0" width="122.33333333333334" height="44"/>
+                                            <state key="normal" title="History"/>
+                                            <connections>
+                                                <action selector="shortcutButtonDidClickWithSender:" destination="cgZ-7u-mhr" eventType="touchUpInside" id="WWA-PW-8nz"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                </stackView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="1QJ-Wb-amb" secondAttribute="bottom" id="9Lw-Jo-7rh"/>
+                                <constraint firstAttribute="trailing" secondItem="1QJ-Wb-amb" secondAttribute="trailing" id="aTW-ur-bbF"/>
+                                <constraint firstItem="1QJ-Wb-amb" firstAttribute="top" secondItem="Bgv-Nd-h2W" secondAttribute="top" id="oiL-eY-qrx"/>
+                                <constraint firstItem="1QJ-Wb-amb" firstAttribute="leading" secondItem="Bgv-Nd-h2W" secondAttribute="leading" id="qlV-gR-WWJ"/>
+                            </constraints>
+                        </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" indentationWidth="10" reuseIdentifier="cell" textLabel="2DZ-xf-vNg" style="IBUITableViewCellStyleDefault" id="8Ti-3S-auA">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8Ti-3S-auA" id="XRJ-xJ-5jX">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>

@@ -6,7 +6,7 @@ class RequestManager {
     static let shared = RequestManager()
 
     func getList(page: Int, search keyword: String? = nil, completeBlock block: (([Doujinshi]) -> Void)?) {
-        print(#function)
+        
         let categoryFilters = Defaults.Search.categories.map {"f_\($0)=\(UserDefaults.standard.bool(forKey: $0) ? 1 : 0)"}.joined(separator: "&")
         var url = Defaults.URL.host + "/?"
         url += "\(categoryFilters)&f_apply=Apply+Filter" //Apply category filters
@@ -14,7 +14,7 @@ class RequestManager {
         url += "&inline_set=dm_t" //Set mode to Thumbnail View
         
         var cacheFavoritesTitles = false
-        if var keyword = keyword {
+        if var keyword = keyword?.lowercased() {
             if keyword.contains("favorites") {
                 url = Defaults.URL.host + "/favorites.php?page=\(page)"
                 if let number = Int(keyword.replacingOccurrences(of: "favorites", with: "")) {
