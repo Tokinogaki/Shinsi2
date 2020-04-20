@@ -109,6 +109,12 @@ class SettingVC: BaseViewController {
         galleryFavSwitch.addTarget(self, action: #selector(galleryFavoriteSwitchVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(createStackView([galleryFavLabel, galleryFavSwitch]))
         
+        let autoScrollLabel = createSubTitleLabel("Continue Reading")
+        let autoScrollSwitch = UISwitch()
+        autoScrollSwitch.isOn = Defaults.Gallery.isAutomaticallyScrollToHistory
+        autoScrollSwitch.addTarget(self, action: #selector(galleryAutoScrollToHistorySwitchVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(createStackView([autoScrollLabel, autoScrollSwitch]))
+        
         let quickScrollLabel = createSubTitleLabel("Show Quick Scroll")
         let quickScrollSwitch = UISwitch()
         quickScrollSwitch.isOn = Defaults.Gallery.isShowQuickScroll
@@ -209,6 +215,10 @@ class SettingVC: BaseViewController {
     
     @objc func galleryFavoriteSwitchVauleChanged(sender: UISwitch) {
         Defaults.Gallery.isShowFavoriteList = sender.isOn
+    }
+    
+    @objc func galleryAutoScrollToHistorySwitchVauleChanged(sender: UISwitch) {
+        Defaults.Gallery.isAutomaticallyScrollToHistory = sender.isOn
     }
     
     @objc func viewerModeSegmentedControlVauleChanged(sender: UISegmentedControl) {

@@ -165,6 +165,7 @@ class GalleryVC: BaseViewController {
     }
     
     private func scrollToLastReadingPage() {
+        guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
         guard let readingPage = browsingHistory?.currentPage,
             readingPage < doujinshi.pages.count,
             didScrollToHistory == false else { return }
