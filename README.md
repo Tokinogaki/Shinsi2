@@ -90,6 +90,14 @@ You can ask me questions in English/Chinese.
 If you can help me check my gramma and spell, It will be very helpful.
 
 ## Change log
+
+* **ver 1.4.1** 2020/4/20
+  * Bug fix
+
+* **ver 1.4** 2020/4/20
+  * Reading History
+  * Add shortcut
+
 * **ver 1.3** 2020/4/3
   * iOS 13 support
   * Bug fix
