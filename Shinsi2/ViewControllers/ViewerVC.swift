@@ -19,6 +19,9 @@ class ViewerVC: UICollectionViewController {
     }
     private var _selectedIndexPath: IndexPath?
     weak var doujinshi: Doujinshi!
+    private lazy var browsingHistory: BrowsingHistory? = {
+        return RealmManager.shared.browsingHistory(for: doujinshi)
+    }()
     var pages: [Page] {
         var ps = Array(doujinshi.pages)
         if Defaults.Gallery.isAppendBlankPage { ps.insert(Page.blankPage(), at: 0) }
@@ -68,10 +71,21 @@ class ViewerVC: UICollectionViewController {
         
         setNeedsUpdateOfHomeIndicatorAutoHidden()
         NotificationCenter.default.addObserver(self, selector: #selector(handleSKPhotoLoadingDidEndNotification(notification:)), name: .photoLoaded, object: nil)
+        
+        if #available(iOS 13.0, *) {
+            NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIScene.willDeactivateNotification, object: nil)
+        } else {
+            NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+        }
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        updateBrowsingHistory()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -160,6 +174,16 @@ class ViewerVC: UICollectionViewController {
                 Hero.shared.cancel()
             }
         }
+    }
+    
+    @objc func willResignActive(_ notification: Notification) {
+        updateBrowsingHistory()
+    }
+    
+    private func updateBrowsingHistory() {
+        guard let browsingHistory = browsingHistory, let currentPage = selectedIndexPath?.item else { return }
+        RealmManager.shared.updateBrowsingHistory(browsingHistory, currentPage: currentPage)
+        print("currentPage: \(currentPage)")
     }
 }
 

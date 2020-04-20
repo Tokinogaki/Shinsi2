@@ -23,11 +23,14 @@ class ListVC: BaseViewController {
         case download = "download"
         case favorite = "favorites"
         case news = "news"
+        case history = "history"
     }
     private var mode: Mode {
         let text = searchController.searchBar.text?.lowercased() ?? ""
         if text == Mode.download.rawValue {
             return .download
+        } else if text == Mode.history.rawValue {
+            return .history
         } else if text.contains("favorites") {
             return .favorite
         } else if text.contains(",") {
@@ -118,7 +121,6 @@ class ListVC: BaseViewController {
             let scale = ges.scale - 1
             let dx = initCellWidth * scale
             let width = min(max(initCellWidth + dx, 80), view.bounds.width)
-            print("\(width)")
             if width != Defaults.List.cellWidth {
                 Defaults.List.cellWidth = width
                 collectionView.performBatchUpdates({
@@ -132,6 +134,10 @@ class ListVC: BaseViewController {
         if mode == .download {
             loadingView.hide()
             items = RealmManager.shared.downloaded.map { $0 }
+            collectionView.reloadData()
+        } else if mode == .history {
+            loadingView.hide()
+            items = RealmManager.shared.browsedDoujinshi
             collectionView.reloadData()
         } else {
             guard loadingPage != currentPage + 1 else {return}
@@ -425,9 +431,15 @@ extension ListVC: UISearchBarDelegate, UISearchControllerDelegate {
 
 extension ListVC: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard mode != .download else {return}
-        if let indexPath = collectionView.indexPathsForVisibleItems.sorted().last, indexPath.item > items.count - max(rowCount * 2, 10) {
-            loadNextPage()
+        switch mode {
+        case .favorite, .normal:
+            if let indexPath = collectionView.indexPathsForVisibleItems.sorted().last,
+                indexPath.item > items.count - max(rowCount * 2, 10) {
+                loadNextPage()
+            }
+        default:
+            break
         }
+        
     }
 } 

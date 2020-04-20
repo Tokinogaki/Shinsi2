@@ -6,6 +6,8 @@ import SafariServices
 
 class GalleryVC: BaseViewController {
     var doujinshi: Doujinshi!
+    private var browsingHistory: BrowsingHistory?
+    private var didScrollToHistory = false
     private var currentPage = 0
     private var backGesture: InteractiveBackGesture!
     private var isPartDownloading = false { didSet { handlePartDownload() } }
@@ -24,6 +26,12 @@ class GalleryVC: BaseViewController {
         title = doujinshi.gdata?.getTitle() ?? doujinshi.title
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
+        
+        browsingHistory = RealmManager.shared.browsingHistory(for: doujinshi)
+        if browsingHistory == nil {
+            RealmManager.shared.createBrowsingHistory(for: doujinshi)
+            browsingHistory = RealmManager.shared.browsingHistory(for: doujinshi)
+        }
         
         backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinch(ges:)))
@@ -88,14 +96,17 @@ class GalleryVC: BaseViewController {
         }
     }
     
-    func checkGData() {
+    private func checkGData() {
         updateNavigationItems()
         if doujinshi.isDownloaded, doujinshi.gdata != nil {
             loadingView.hide()
+            scrollToLastReadingPage()
         } else if let gdata = doujinshi.gdata, doujinshi.pages.count == gdata.filecount {
             loadingView.hide()
+            scrollToLastReadingPage()
         } else if doujinshi.gdata != nil, doujinshi.pages.count > 0, let perPageCount = doujinshi.perPageCount {
             loadingView.hide()
+            scrollToLastReadingPage()
             currentPage = doujinshi.pages.count / perPageCount
             loadPages()
         } else {
@@ -146,8 +157,21 @@ class GalleryVC: BaseViewController {
                 self.currentPage += 1
                 self.loadPages()
             } else {
+                // All pages feteched
                 self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(doujinshi: self.doujinshi)
             }
+            self.scrollToLastReadingPage()
+        }
+    }
+    
+    private func scrollToLastReadingPage() {
+        guard let readingPage = browsingHistory?.currentPage,
+            readingPage < doujinshi.pages.count,
+            didScrollToHistory == false else { return }
+        didScrollToHistory = true
+        // Scroll after collectionView loaded
+        DispatchQueue.main.async {
+            self.collectionView.scrollToItem(at: IndexPath(row: readingPage, section: 0), at: .top, animated: true)
         }
     }
     

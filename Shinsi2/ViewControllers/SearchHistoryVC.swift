@@ -9,6 +9,7 @@ class SearchHistoryVC: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         notificationToken = results.observe { [weak self] (changes: RealmCollectionChange) in
             guard let tableView = self?.tableView else { return }
             switch changes {
@@ -24,6 +25,7 @@ class SearchHistoryVC: UITableViewController {
                 fatalError("\(error)")
             }
         }
+        
         let blurview = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         tableView.backgroundView = blurview
     }
