@@ -21,7 +21,6 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully support any sizes of iOS d
 ### Search / Search History
 * Support category filter
 * `keyword p:10` to skip 10 pages
-* `artist1, artist2, artist3` to search multiple keywords (Only get first page result)
 * `favorites` to get all favorites, or `favorites0~9` to get specific favorite folder
 * `popular` to show popular galleries 
 * `download` to get downloaded galleries

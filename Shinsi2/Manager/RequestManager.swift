@@ -30,13 +30,6 @@ class RequestManager {
                 }
             } else if keyword.contains("watched") {
                  url = Defaults.URL.host + "/watched?page=\(page)"
-            } else if keyword.contains(",") {
-                if page == 0 {
-                    getNewList(with: keyword.components(separatedBy: ","), completeBlock: block)
-                } else {
-                    block?([])
-                }
-                return
             } else {
                 var skipPage = 0
                 if let s = keyword.matches(for: "p:[0-9]+").first, let p = Int(s.replacingOccurrences(of: "p:", with: "")) {

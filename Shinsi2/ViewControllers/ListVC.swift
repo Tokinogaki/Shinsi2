@@ -22,7 +22,6 @@ class ListVC: BaseViewController {
         case normal = "normal"
         case download = "download"
         case favorite = "favorites"
-        case news = "news"
         case history = "history"
     }
     private var mode: Mode {
@@ -33,8 +32,6 @@ class ListVC: BaseViewController {
             return .history
         } else if text.contains("favorites") {
             return .favorite
-        } else if text.contains(",") {
-            return .news
         } else {
             return .normal
         }
