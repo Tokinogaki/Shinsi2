@@ -260,17 +260,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
         guard let photo = notification.object as? SSPhoto else { return }
         if photo.underlyingImage != nil {
-            reloadVisibleCell(photo: photo)
-        }
-    }
-    
-    func reloadVisibleCell(photo: SSPhoto) {
-        for indexPath in collectionView!.indexPathsForVisibleItems {
-            let page = getPage(for: indexPath)
-            if page.photo.urlString == photo.urlString, let image = photo.underlyingImage, let cell = collectionView?.cellForItem(at: indexPath) as? ScrollingImageCell {
-                cell.image = image
-                break
-            }
+            collectionView.reloadData()
         }
     }
     
