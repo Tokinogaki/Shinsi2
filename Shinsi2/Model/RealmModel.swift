@@ -1,5 +1,6 @@
 import Foundation
 import RealmSwift
+import UIKit
 
 class BrowsingHistory: Object {
     @objc dynamic var doujinshi: Doujinshi?

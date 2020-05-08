@@ -3,7 +3,6 @@ platform :ios, '10.0'
 inhibit_all_warnings!
 use_modular_headers!
 target 'Shinsi2' do
-    pod 'RealmSwift', '> 3.16.2'
     pod 'Alamofire', '~> 4' 
     pod 'Kanna'
     pod 'SDWebImage', '~> 4' 

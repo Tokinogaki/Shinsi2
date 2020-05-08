@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -32,6 +32,8 @@
 		5466639A1F1DE516003B9E36 /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663811F1DE44D003B9E36 /* Const.swift */; };
 		5466639C1F1DE67B003B9E36 /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466639B1F1DE67B003B9E36 /* RealmManager.swift */; };
 		547AF17C20DE4538003D2AF3 /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 547AF17B20DE4538003D2AF3 /* ImageManager.swift */; };
+		5493D1FE246508AE006E18A0 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 5493D1FD246508AE006E18A0 /* Realm */; };
+		5493D200246508AE006E18A0 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5493D1FF246508AE006E18A0 /* RealmSwift */; };
 		54AA5F482192B03C003E0FAD /* QuickScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */; };
 		54E1DADF1F1F38E00096A6D3 /* DownloadBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */; };
 		6E9C4A59AB28844C2C9D07BE /* libPods-Shinsi2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62AF745A0A1136C849776EB2 /* libPods-Shinsi2.a */; };
@@ -66,6 +68,7 @@
 		5466638C1F1DE44D003B9E36 /* RealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmModel.swift; sourceTree = "<group>"; };
 		5466639B1F1DE67B003B9E36 /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
 		547AF17B20DE4538003D2AF3 /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
+		5493D1FB2464FF5D006E18A0 /* Shinsi2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Shinsi2.entitlements; sourceTree = "<group>"; };
 		54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickScrollBar.swift; sourceTree = "<group>"; };
 		54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadBubble.swift; sourceTree = "<group>"; };
 		62AF745A0A1136C849776EB2 /* libPods-Shinsi2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Shinsi2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +80,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5493D200246508AE006E18A0 /* RealmSwift in Frameworks */,
+				5493D1FE246508AE006E18A0 /* Realm in Frameworks */,
 				6E9C4A59AB28844C2C9D07BE /* libPods-Shinsi2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -122,6 +127,7 @@
 		5466636B1F1DE3B8003B9E36 /* Shinsi2 */ = {
 			isa = PBXGroup;
 			children = (
+				5493D1FB2464FF5D006E18A0 /* Shinsi2.entitlements */,
 				546663701F1DE3B8003B9E36 /* Main.storyboard */,
 				5466636C1F1DE3B8003B9E36 /* AppDelegate.swift */,
 				546663811F1DE44D003B9E36 /* Const.swift */,
@@ -205,6 +211,10 @@
 			dependencies = (
 			);
 			name = Shinsi2;
+			packageProductDependencies = (
+				5493D1FD246508AE006E18A0 /* Realm */,
+				5493D1FF246508AE006E18A0 /* RealmSwift */,
+			);
 			productName = Shinsi2;
 			productReference = 546663691F1DE3B8003B9E36 /* Shinsi2.app */;
 			productType = "com.apple.product-type.application";
@@ -234,6 +244,9 @@
 				Base,
 			);
 			mainGroup = 546663601F1DE3B8003B9E36;
+			packageReferences = (
+				5493D1FC246508AE006E18A0 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
+			);
 			productRefGroup = 5466636A1F1DE3B8003B9E36 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -468,7 +481,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -478,13 +492,18 @@
 			baseConfigurationReference = 84200A16D7CCE139324C1CC5 /* Pods-Shinsi2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Shinsi2/Shinsi2.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2DM9265XNV;
 				INFOPLIST_FILE = Shinsi2/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shinsi.Shinsi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -495,13 +514,18 @@
 			baseConfigurationReference = 07CE087BB77CAC2F3F8A5D79 /* Pods-Shinsi2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Shinsi2/Shinsi2.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2DM9265XNV;
 				INFOPLIST_FILE = Shinsi2/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shinsi.Shinsi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -529,6 +553,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5493D1FC246508AE006E18A0 /* XCRemoteSwiftPackageReference "realm-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5493D1FD246508AE006E18A0 /* Realm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5493D1FC246508AE006E18A0 /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			productName = Realm;
+		};
+		5493D1FF246508AE006E18A0 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5493D1FC246508AE006E18A0 /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 546663611F1DE3B8003B9E36 /* Project object */;
 }
