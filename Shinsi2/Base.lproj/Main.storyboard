@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fD2-PE-NKt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fD2-PE-NKt">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -19,7 +19,7 @@
                             <textField opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="752" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="User" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Dh8-ge-teW">
                                 <rect key="frame" x="47.666666666666657" y="148" width="280" height="34"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="280" id="XTQ-ZR-gLO"/>
+                                    <constraint firstAttribute="width" constant="280" id="AxR-oO-AUK"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" textContentType="username"/>
@@ -29,17 +29,11 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES" textContentType="password"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FX1-HI-TIc">
-                                <rect key="frame" x="47.666666666666657" y="256" width="280" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="I5Y-sN-i5Y"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
-                                <state key="normal" title="Login"/>
-                                <connections>
-                                    <action selector="loginWithSender:" destination="ex9-dI-nnx" eventType="touchUpInside" id="st5-KA-TLY"/>
-                                </connections>
-                            </button>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Exkey" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ag4-b7-hAz">
+                                <rect key="frame" x="47.666666666666657" y="268" width="280" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" textContentType="password"/>
+                            </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qd0-bu-Vb8">
                                 <rect key="frame" x="69" y="749" width="237" height="29"/>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
@@ -48,25 +42,39 @@
                                     <action selector="webLoginButtonDidClick:" destination="ex9-dI-nnx" eventType="touchUpInside" id="igh-j6-lFR"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FX1-HI-TIc">
+                                <rect key="frame" x="47.666666666666657" y="334" width="280" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="6pC-bx-jxN"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                <state key="normal" title="Login"/>
+                                <connections>
+                                    <action selector="loginWithSender:" destination="ex9-dI-nnx" eventType="touchUpInside" id="st5-KA-TLY"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="9nB-eV-or4" firstAttribute="trailing" secondItem="Dh8-ge-teW" secondAttribute="trailing" id="3aN-9G-qA6"/>
+                            <constraint firstItem="FX1-HI-TIc" firstAttribute="leading" secondItem="ag4-b7-hAz" secondAttribute="leading" id="2Cv-zs-Qmy"/>
                             <constraint firstItem="qd0-bu-Vb8" firstAttribute="centerX" secondItem="mRJ-Cj-5Rp" secondAttribute="centerX" id="4nn-sC-ssZ"/>
-                            <constraint firstItem="FX1-HI-TIc" firstAttribute="leading" secondItem="9nB-eV-or4" secondAttribute="leading" id="Ibd-p3-Yi6"/>
-                            <constraint firstItem="Dh8-ge-teW" firstAttribute="top" secondItem="mRJ-Cj-5Rp" secondAttribute="top" constant="60" id="L1a-V3-9ST"/>
-                            <constraint firstItem="FX1-HI-TIc" firstAttribute="top" secondItem="9nB-eV-or4" secondAttribute="bottom" constant="20" id="VEa-ed-F5c"/>
-                            <constraint firstItem="Dh8-ge-teW" firstAttribute="centerX" secondItem="mRJ-Cj-5Rp" secondAttribute="centerX" id="YUj-NP-srS"/>
+                            <constraint firstItem="ag4-b7-hAz" firstAttribute="trailing" secondItem="9nB-eV-or4" secondAttribute="trailing" id="CoM-We-3Hx"/>
+                            <constraint firstItem="9nB-eV-or4" firstAttribute="top" secondItem="Dh8-ge-teW" secondAttribute="bottom" constant="20" id="EpY-xS-d4D"/>
+                            <constraint firstItem="ag4-b7-hAz" firstAttribute="leading" secondItem="9nB-eV-or4" secondAttribute="leading" id="KLl-Og-h1p"/>
+                            <constraint firstItem="ag4-b7-hAz" firstAttribute="top" secondItem="9nB-eV-or4" secondAttribute="bottom" constant="32" id="Phs-KD-osz"/>
+                            <constraint firstItem="FX1-HI-TIc" firstAttribute="trailing" secondItem="ag4-b7-hAz" secondAttribute="trailing" id="TAb-mh-cu4"/>
+                            <constraint firstItem="Dh8-ge-teW" firstAttribute="top" secondItem="mRJ-Cj-5Rp" secondAttribute="top" constant="60" id="WJA-Yo-7ov"/>
+                            <constraint firstItem="9nB-eV-or4" firstAttribute="trailing" secondItem="Dh8-ge-teW" secondAttribute="trailing" id="Wn2-du-wnA"/>
                             <constraint firstItem="mRJ-Cj-5Rp" firstAttribute="bottom" secondItem="qd0-bu-Vb8" secondAttribute="bottom" id="feU-VA-Cpp"/>
-                            <constraint firstItem="9nB-eV-or4" firstAttribute="leading" secondItem="Dh8-ge-teW" secondAttribute="leading" id="lWr-mc-rcq"/>
-                            <constraint firstItem="FX1-HI-TIc" firstAttribute="trailing" secondItem="9nB-eV-or4" secondAttribute="trailing" id="ld4-Yb-zx0"/>
-                            <constraint firstItem="FX1-HI-TIc" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="9LE-qL-jNW" secondAttribute="leading" constant="20" symbolic="YES" id="nmW-BU-D38"/>
-                            <constraint firstItem="9nB-eV-or4" firstAttribute="top" secondItem="Dh8-ge-teW" secondAttribute="bottom" constant="20" id="pKY-h8-jYu"/>
+                            <constraint firstItem="Dh8-ge-teW" firstAttribute="centerX" secondItem="mRJ-Cj-5Rp" secondAttribute="centerX" id="hF2-EP-QwA"/>
+                            <constraint firstItem="FX1-HI-TIc" firstAttribute="top" secondItem="ag4-b7-hAz" secondAttribute="bottom" constant="32" id="ux3-xS-OFQ"/>
+                            <constraint firstItem="9nB-eV-or4" firstAttribute="leading" secondItem="Dh8-ge-teW" secondAttribute="leading" id="wvX-hl-GNC"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="mRJ-Cj-5Rp"/>
                     </view>
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="fDN-6a-miK"/>
                     <connections>
+                        <outlet property="exkeyField" destination="ag4-b7-hAz" id="rba-x9-VhI"/>
                         <outlet property="loginButton" destination="FX1-HI-TIc" id="ef6-n2-V13"/>
                         <outlet property="passwordField" destination="9nB-eV-or4" id="Shf-B3-2m8"/>
                         <outlet property="userNameField" destination="Dh8-ge-teW" id="l1G-Ca-Gd3"/>
@@ -76,7 +84,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fON-Ep-9ap" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="85.599999999999994" y="122.78860569715144"/>
+            <point key="canvasLocation" x="85.599999999999994" y="122.66009852216749"/>
         </scene>
         <!--ListVC-->
         <scene sceneID="tne-QT-ifu">
