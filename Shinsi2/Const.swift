@@ -30,6 +30,9 @@ let kUDGalleryAutomaticallyScrollToHistory = "kUDGalleryAutomaticallyScrollToHis
 
 let kUDViewerMode = "kUDViewerMode"
 
+let kUDSettingUseBiometrics = "kUDSettingUseBiometrics"
+let kUDSettingUsePasscpde = "kUDSettingUsePasswcode"
+
 //Color
 let kMainColor = UIApplication.shared.keyWindow?.tintColor ?? #colorLiteral(red: 0.8459790349, green: 0.2873021364, blue: 0.2579272389, alpha: 1)
 
@@ -105,6 +108,16 @@ class Defaults {
         static var mode: ViewerVC.ViewerMode {
             get { return ViewerVC.ViewerMode(rawValue: UserDefaults.standard.integer(forKey: kUDViewerMode))! }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: kUDViewerMode) }
+        }
+    }
+    class Setting {
+        static var isUseBiometrics: Bool {
+            get { return UserDefaults.standard.bool(forKey: kUDSettingUseBiometrics) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDSettingUseBiometrics) }
+        }
+        static var isUsePasscode: Bool {
+            get { return UserDefaults.standard.bool(forKey: kUDSettingUsePasscpde) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDSettingUsePasscpde) }
         }
     }
     
