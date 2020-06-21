@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard Defaults.Setting.isUseBiometrics else {
             return
         }
-        BiometricsHelper.isLock = true
+        BiometricsManager.isLock = true
         window?.isHidden = true
     }
     
@@ -35,14 +35,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window?.makeKeyAndVisible()
             return
         }
-        if BiometricsHelper.isLock {
-            BiometricsHelper.refresh()
+        if BiometricsManager.isLock {
+            BiometricsManager.refresh()
         }
         window?.isHidden = true
-        BiometricsHelper.authenticate(for: "Please unlock~") { (success) in
+        BiometricsManager.authenticate(for: "Please unlock~") { (success) in
             if success {
                 self.window?.isHidden = false
-                BiometricsHelper.isLock = false
+                BiometricsManager.isLock = false
             }
         }
     }

@@ -131,18 +131,20 @@ class SettingVC: BaseViewController {
         viewerModeSeg.addTarget(self, action: #selector(viewerModeSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(viewerModeSeg)
         
-        addTitle("Settings")
-        let touchLabel = createSubTitleLabel(BiometricsHelper.getBiometryType())
-        let touchSwitch = UISwitch()
-        touchSwitch.isOn = Defaults.Setting.isUseBiometrics
-        touchSwitch.addTarget(self, action: #selector(listTouchSwitchVauleChanged(sender:)), for: .valueChanged)
-        stackView.addRow(createStackView([touchLabel, touchSwitch]))
-        
-        let passcodeLabel = createSubTitleLabel("Passcode Fallback")
-        passcodeSwitch.isOn = Defaults.Setting.isUsePasscode
-        passcodeSwitch.isEnabled = Defaults.Setting.isUseBiometrics
-        passcodeSwitch.addTarget(self, action: #selector(listPasscodeSwitchVauleChanged(sender:)), for: .valueChanged)
-        stackView.addRow(createStackView([passcodeLabel, passcodeSwitch]))
+        if BiometricsManager.context.biometryType != .none {
+            addTitle("Settings")
+            let touchLabel = createSubTitleLabel(BiometricsManager.getBiometryType())
+            let touchSwitch = UISwitch()
+            touchSwitch.isOn = Defaults.Setting.isUseBiometrics
+            touchSwitch.addTarget(self, action: #selector(listTouchSwitchVauleChanged(sender:)), for: .valueChanged)
+            stackView.addRow(createStackView([touchLabel, touchSwitch]))
+            
+            let passcodeLabel = createSubTitleLabel("Passcode Fallback")
+            passcodeSwitch.isOn = Defaults.Setting.isUsePasscode
+            passcodeSwitch.isEnabled = Defaults.Setting.isUseBiometrics
+            passcodeSwitch.addTarget(self, action: #selector(listPasscodeSwitchVauleChanged(sender:)), for: .valueChanged)
+            stackView.addRow(createStackView([passcodeLabel, passcodeSwitch]))
+        }
         
         //Cache+
         addTitle("Cache")

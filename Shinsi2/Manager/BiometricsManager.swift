@@ -1,5 +1,5 @@
 //
-//  BiometricsHelper.swift
+//  BiometricsManager.swift
 //  Shinsi2
 //
 //  Created by Tokinogaki on 14/6/20.
@@ -9,11 +9,11 @@
 import UIKit
 import LocalAuthentication
 
-class BiometricsHelper: NSObject {
+class BiometricsManager: NSObject {
     
     public static var isLock = true
     
-    private static var context = LAContext()
+    public static var context = LAContext()
     
     static func refresh() {
         self.context = LAContext()
@@ -87,19 +87,15 @@ class BiometricsHelper: NSObject {
     }
     
     static func getBiometryType() -> String {
-        if #available(iOS 11, *) {
-            switch context.biometryType {
-            case .faceID:
-                return "Face ID"
-            case .touchID:
-                return "Touch ID"
-            case .none:
-                return "None"
-            default:
-                return "None"
-            }
+        switch context.biometryType {
+        case .faceID:
+            return "Face ID"
+        case .touchID:
+            return "Touch ID"
+        case .none:
+            return "None"
+        default:
+            return "None"
         }
-
-        return "TouchID"
     }
 }

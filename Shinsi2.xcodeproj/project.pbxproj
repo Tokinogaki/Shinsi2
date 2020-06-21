@@ -35,6 +35,7 @@
 		54AA5F482192B03C003E0FAD /* QuickScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */; };
 		54E1DADF1F1F38E00096A6D3 /* DownloadBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */; };
 		6E9C4A59AB28844C2C9D07BE /* libPods-Shinsi2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62AF745A0A1136C849776EB2 /* libPods-Shinsi2.a */; };
+		7C8ECE722495D9EC006D92CC /* BiometricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8ECE712495D9EC006D92CC /* BiometricsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,7 @@
 		54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickScrollBar.swift; sourceTree = "<group>"; };
 		54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadBubble.swift; sourceTree = "<group>"; };
 		62AF745A0A1136C849776EB2 /* libPods-Shinsi2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Shinsi2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C8ECE712495D9EC006D92CC /* BiometricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricsManager.swift; sourceTree = "<group>"; };
 		84200A16D7CCE139324C1CC5 /* Pods-Shinsi2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shinsi2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Shinsi2/Pods-Shinsi2.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -173,6 +175,7 @@
 				547AF17B20DE4538003D2AF3 /* ImageManager.swift */,
 				5466639B1F1DE67B003B9E36 /* RealmManager.swift */,
 				5466637E1F1DE44D003B9E36 /* DownloadManager.swift */,
+				7C8ECE712495D9EC006D92CC /* BiometricsManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -333,6 +336,7 @@
 				546663961F1DE511003B9E36 /* Cells.swift in Sources */,
 				546663951F1DE511003B9E36 /* ViewerVC.swift in Sources */,
 				5466638F1F1DE511003B9E36 /* GalleryVC.swift in Sources */,
+				7C8ECE722495D9EC006D92CC /* BiometricsManager.swift in Sources */,
 				5466639A1F1DE516003B9E36 /* Const.swift in Sources */,
 				542362F521940916004619F3 /* BsaeViewController.swift in Sources */,
 				542362F721945C49004619F3 /* WebVC.swift in Sources */,
