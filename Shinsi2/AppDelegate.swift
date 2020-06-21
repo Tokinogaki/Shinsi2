@@ -21,6 +21,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+
+    func applicationWillResignActive(_ application: UIApplication) {
+        guard Defaults.Setting.isUseBiometrics else {
+            return
+        }
+        BiometricsManager.isLock = true
+        window?.isHidden = true
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        guard Defaults.Setting.isUseBiometrics else {
+            window?.makeKeyAndVisible()
+            return
+        }
+        if BiometricsManager.isLock {
+            BiometricsManager.refresh()
+        }
+        window?.isHidden = true
+        BiometricsManager.authenticate(for: "Please unlock~") { (success) in
+            if success {
+                self.window?.isHidden = false
+                BiometricsManager.isLock = false
+            }
+        }
+    }
     
     func setDefaultAppearance() {
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]

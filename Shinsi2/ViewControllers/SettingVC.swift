@@ -12,6 +12,8 @@ extension Notification.Name {
 class SettingVC: BaseViewController {
     
     let stackView = AloeStackView()
+    
+    let passcodeSwitch = UISwitch()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -129,6 +131,21 @@ class SettingVC: BaseViewController {
         viewerModeSeg.addTarget(self, action: #selector(viewerModeSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(viewerModeSeg)
         
+        if BiometricsManager.context.biometryType != .none {
+            addTitle("Settings")
+            let touchLabel = createSubTitleLabel(BiometricsManager.getBiometryType())
+            let touchSwitch = UISwitch()
+            touchSwitch.isOn = Defaults.Setting.isUseBiometrics
+            touchSwitch.addTarget(self, action: #selector(listTouchSwitchVauleChanged(sender:)), for: .valueChanged)
+            stackView.addRow(createStackView([touchLabel, touchSwitch]))
+            
+            let passcodeLabel = createSubTitleLabel("Passcode Fallback")
+            passcodeSwitch.isOn = Defaults.Setting.isUsePasscode
+            passcodeSwitch.isEnabled = Defaults.Setting.isUseBiometrics
+            passcodeSwitch.addTarget(self, action: #selector(listPasscodeSwitchVauleChanged(sender:)), for: .valueChanged)
+            stackView.addRow(createStackView([passcodeLabel, passcodeSwitch]))
+        }
+        
         //Cache+
         addTitle("Cache")
         let cacheSizeLable = createSubTitleLabel("size: counting...")
@@ -203,6 +220,15 @@ class SettingVC: BaseViewController {
     @objc func listTitleSwitchVauleChanged(sender: UISwitch) {
         Defaults.List.isHideTitle = sender.isOn
         NotificationCenter.default.post(name: .settingChanged, object: nil)
+    }
+    
+    @objc func listTouchSwitchVauleChanged(sender: UISwitch) {
+        Defaults.Setting.isUseBiometrics = sender.isOn
+        passcodeSwitch.isEnabled = Defaults.Setting.isUseBiometrics
+    }
+    
+    @objc func listPasscodeSwitchVauleChanged(sender: UISwitch) {
+        Defaults.Setting.isUsePasscode = sender.isOn
     }
     
     @objc func listFavoriteSwitchVauleChanged(sender: UISwitch) {
