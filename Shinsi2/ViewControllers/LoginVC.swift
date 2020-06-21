@@ -84,8 +84,7 @@ class LoginVC: UIViewController {
     func copyCookiesForEx(overwrite: Bool = true) {
         let exCookies = HTTPCookieStorage.shared.cookies(for: Defaults.URL.exHentai) ?? []
         guard overwrite || exCookies.count == 0 else {return}
-        let eCookies = HTTPCookieStorage.shared.cookies(for: Defaults.URL.eHentai) ?? []
-        eCookies.forEach {
+        HTTPCookieStorage.shared.cookies(for: Defaults.URL.eHentai)?.forEach {
             if var properties = $0.properties {
                 properties[HTTPCookiePropertyKey.domain] = ".exhentai.org"
                 if let newCookie = HTTPCookie(properties: properties) {
