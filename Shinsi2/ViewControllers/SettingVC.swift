@@ -62,6 +62,12 @@ class SettingVC: BaseViewController {
             }
         })
         
+        addSubTitle("Minimum Rating")
+        let ratingSeg = UISegmentedControl(items: ["All", "2", "3", "4", "5"])
+        ratingSeg.selectedSegmentIndex = Defaults.Search.rating
+        ratingSeg.addTarget(self, action: #selector(ratingSegmentedControlVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(ratingSeg)
+        
         // Settings
         addTitle("My Settings")
         
@@ -193,6 +199,10 @@ class SettingVC: BaseViewController {
     
     @objc func hostSegmentedControlVauleChanged(sender: UISegmentedControl) {
         Defaults.URL.host = sender.selectedSegmentIndex == 0 ? kHostEHentai : kHostExHentai
+    }
+    
+    @objc func ratingSegmentedControlVauleChanged(sender: UISegmentedControl) {
+        Defaults.Search.rating = sender.selectedSegmentIndex
     }
     
     @objc func listTagSwitchVauleChanged(sender: UISwitch) {

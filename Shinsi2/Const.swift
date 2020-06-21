@@ -21,6 +21,7 @@ let kUDListHideTag = "kUDListHideTag"
 let kUDListHideTitle = "kUDListHideTitle"
 let kUDListFavoriteTitles = "kUDListFavoriteTitles"
 let kUDListFavoriteList = "kUDListFavoriteList"
+let kUDSearchRating = "kUDSearchRating"
 
 let kUDGalleryCellWidth = "kUDGalleryCellWidth"
 let kUDGalleryQuickScroll = "kUDGalleryQuickScroll"
@@ -50,6 +51,10 @@ class Defaults {
     }
     class Search {
         static var categories: [String] = ["doujinshi", "manga", "artistcg", "gamecg", "western", "non-h", "imageset", "cosplay", "asianporn", "misc"]
+        static var rating: Int {
+            get { return UserDefaults.standard.integer(forKey: kUDSearchRating) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDSearchRating) }
+        }
     }
     class List {
         static var isHideTitle: Bool {
