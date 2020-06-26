@@ -47,10 +47,8 @@ class RequestManager {
             guard let html = response.result.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
                 var items: [Doujinshi] = []
-                for link in doc.xpath("//div [@class='gl3t'] //a") {
-                    if let url = link["href"], let imgNode = link.at_css("img"), let imgUrl = imgNode["src"], let title = imgNode["title"] {
-                        items.append(Doujinshi(value: ["coverUrl": imgUrl, "title": title, "url": url]))
-                    }
+                for element in doc.xpath("//div [@class='gl1t']") {
+                    items.append(Doujinshi.`init`(element: element))
                 }
                 block?(items)
                 if cacheFavoritesTitles {
@@ -87,7 +85,6 @@ class RequestManager {
                 }
                 
                 if page == 0 {
-                    doujinshi.isFavorite = doc.xpath("//div [@class='i']").count != 0
                     //Parse comments
                     let commentDateFormatter = DateFormatter()
                     commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"
@@ -207,7 +204,7 @@ class RequestManager {
 
     func addDoujinshiToFavorite(doujinshi: Doujinshi, category: Int = 0) {
         guard doujinshi.isIdTokenValide else {return}
-        doujinshi.isFavorite = true
+        doujinshi.favorite = .favorite0
         let url = Defaults.URL.host + "/gallerypopups.php?gid=\(doujinshi.id)&t=\(doujinshi.token)&act=addfav"
         let parameters: [String: String] = ["favcat": "\(category)", "favnote": "", "apply": "Add to Favorites", "update": "1"]
         Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
