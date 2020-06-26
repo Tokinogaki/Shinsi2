@@ -312,27 +312,23 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             }
         } else {
             cell.imageView.sd_setImage(with: URL(string: doujinshi.coverUrl), placeholderImage: nil, options: [.handleCookies], completed: { (image, _, _, _) in
-                guard let image = image else {return}
-                cell.imageView.contentMode = image.preferContentMode
+                if nil == image {return}
+                cell.imageView.contentMode = .scaleAspectFill
             })
         }
-        
-        if let language = doujinshi.title.language {
-            cell.languageLabel.isHidden = Defaults.List.isHideTag
-            cell.languageLabel.text = language.capitalized
-            cell.languageLabel.layer.cornerRadius = cell.languageLabel.bounds.height/2
-        } else {
-            cell.languageLabel.isHidden = true
-        }
 
-        if let convent = doujinshi.title.conventionName {
-            cell.conventionLabel.isHidden = Defaults.List.isHideTag
-            cell.conventionLabel.text = convent
-            cell.conventionLabel.layer.cornerRadius = cell.conventionLabel.bounds.height/2
-        } else {
-            cell.conventionLabel.isHidden = true
-        }
+        var infoText = doujinshi.category.text
+        infoText += "\n\(doujinshi.lastUpdateTime)"
+        infoText += "\n\(doujinshi.rating)"
+        infoText += "\n\(doujinshi.filecount)"
         
+        if doujinshi.favorite != .none {
+            cell.infoLabel.layer.borderWidth = 2
+            cell.infoLabel.layer.borderColor = doujinshi.favorite.color.cgColor
+            cell.infoLabel.backgroundColor = doujinshi.favorite.color.withAlphaComponent(0.3)
+        }
+    
+        cell.infoLabel.text = infoText
         cell.titleLabel?.text = doujinshi.title
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
@@ -368,9 +364,6 @@ extension ListVC: UIViewControllerPreviewingDelegate {
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
         let item = items[indexPath.item]
         vc.doujinshi = item
-        if mode == .favorite {
-            vc.doujinshi.isFavorite = true 
-        }
         vc.delegate = self
         return vc
     }

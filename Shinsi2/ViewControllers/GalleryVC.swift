@@ -122,7 +122,7 @@ class GalleryVC: BaseViewController {
                 guard let gdata = gdata, let self = self else { return }
                 self.loadingView.hide()
                 self.doujinshi.pages.removeAll()
-                self.doujinshi.gdata = gdata
+                self.doujinshi.setGData(gdata: gdata)
                 self.updateNavigationItems()
                 self.loadPages()
             }
@@ -133,14 +133,14 @@ class GalleryVC: BaseViewController {
         tagButton.isEnabled = doujinshi.gdata != nil
         downloadButton.isEnabled = doujinshi.canDownload
         commentButton.isEnabled = doujinshi.comments.count > 0
-        favoriteButton.isEnabled = !doujinshi.isFavorite && doujinshi.pages.count > 1
+        favoriteButton.isEnabled = doujinshi.favorite == .none && doujinshi.pages.count > 1
         title = doujinshi.gdata?.getTitle() ?? doujinshi.title
     }
     
     func loadPages() {
         RequestManager.shared.getDoujinshi(doujinshi: doujinshi, at: currentPage) { [weak self] pages in
             guard let self = self, pages.count > 0 else { return }
-            self.favoriteButton.isEnabled = !self.doujinshi.isFavorite
+            self.favoriteButton.isEnabled = self.doujinshi.favorite == .none
             self.commentButton.isEnabled = self.doujinshi.comments.count > 0
             let isTempCover = self.doujinshi.pages.count == 0 && self.collectionView.numberOfItems(inSection: 0) == 1
             self.doujinshi.pages.append(objectsIn: pages)
@@ -292,7 +292,7 @@ class GalleryVC: BaseViewController {
                 return
         }
         let new = Doujinshi(value: doujinshi!)
-        new.gdata = GData(value: doujinshi.gdata!)
+        new.setGData(gdata: GData(value: doujinshi.gdata!))
         new.pages.removeAll()
         for i in selectedIndexPaths {
             new.pages.append(Page(value: doujinshi.pages[i.item]))
@@ -319,7 +319,7 @@ class GalleryVC: BaseViewController {
                 self.delegate?.galleryDidSelectTag(text: "\(circle)" )
             })
         }
-        if !doujinshi.isDownloaded && !doujinshi.isFavorite {
+        if !doujinshi.isDownloaded && doujinshi.favorite == .none {
             actions.append( UIPreviewAction(title: "♥", style: .default) { (_, _) -> Void in 
                 RequestManager.shared.addDoujinshiToFavorite(doujinshi: self.doujinshi)
                 SVProgressHUD.show("♥".toIcon(), status: nil)

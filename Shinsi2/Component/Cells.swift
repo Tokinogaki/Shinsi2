@@ -11,8 +11,7 @@ class ImageCell: UICollectionViewCell {
 }
 
 class ListCell: ImageCell {
-    @IBOutlet weak var languageLabel: UILabel!
-    @IBOutlet weak var conventionLabel: UILabel!
+    @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var containerView: UIView!
 }

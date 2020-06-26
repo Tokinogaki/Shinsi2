@@ -97,7 +97,7 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="fdW-OE-AIe">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="n9M-f1-qub">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="3" minimumInteritemSpacing="3" id="n9M-f1-qub">
                                     <size key="itemSize" width="132" height="137"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -111,16 +111,16 @@
                                             <rect key="frame" x="0.0" y="0.0" width="132" height="137"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Evj-hg-gfT">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Evj-hg-gfT">
                                                     <rect key="frame" x="0.0" y="0.0" width="132" height="137"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                                 <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lWs-RE-DKd" userLabel="Container View">
                                                     <rect key="frame" x="0.0" y="0.0" width="132" height="137"/>
                                                     <subviews>
-                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Chinese　" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hDY-7k-p70" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
-                                                            <rect key="frame" x="4" y="4" width="49.666666666666664" height="12"/>
-                                                            <color key="backgroundColor" red="0.80000000000000004" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="9999" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZTW-EI-t44" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
+                                                            <rect key="frame" x="106" y="0.0" width="26" height="12"/>
+                                                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29999999999999999" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <nil key="highlightedColor"/>
@@ -139,31 +139,10 @@
                                                                 </userDefinedRuntimeAttribute>
                                                             </userDefinedRuntimeAttributes>
                                                         </label>
-                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="C86" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZTW-EI-t44" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
-                                                            <rect key="frame" x="107.66666666666667" y="4" width="20.333333333333329" height="12"/>
-                                                            <color key="backgroundColor" red="0.80000000000000004" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                            <nil key="highlightedColor"/>
-                                                            <userDefinedRuntimeAttributes>
-                                                                <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
-                                                                    <real key="value" value="3"/>
-                                                                </userDefinedRuntimeAttribute>
-                                                                <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
-                                                                    <real key="value" value="3"/>
-                                                                </userDefinedRuntimeAttribute>
-                                                                <userDefinedRuntimeAttribute type="number" keyPath="bottomInset">
-                                                                    <real key="value" value="2"/>
-                                                                </userDefinedRuntimeAttribute>
-                                                                <userDefinedRuntimeAttribute type="number" keyPath="topInset">
-                                                                    <real key="value" value="2"/>
-                                                                </userDefinedRuntimeAttribute>
-                                                            </userDefinedRuntimeAttributes>
-                                                        </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptR-dm-vYh" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="middleTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptR-dm-vYh" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
                                                             <rect key="frame" x="0.0" y="123.66666666666667" width="132" height="13.333333333333329"/>
-                                                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <fontDescription key="fontDescription" type="system" weight="thin" pointSize="11"/>
+                                                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                             <size key="shadowOffset" width="0.0" height="0.0"/>
@@ -172,12 +151,9 @@
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="bottom" secondItem="ptR-dm-vYh" secondAttribute="bottom" id="0l3-hh-54M"/>
-                                                        <constraint firstItem="hDY-7k-p70" firstAttribute="leading" secondItem="lWs-RE-DKd" secondAttribute="leading" constant="4" id="1vF-oK-ooZ"/>
                                                         <constraint firstItem="ptR-dm-vYh" firstAttribute="leading" secondItem="lWs-RE-DKd" secondAttribute="leading" id="3Bd-Gl-Zsc"/>
-                                                        <constraint firstItem="ZTW-EI-t44" firstAttribute="top" secondItem="lWs-RE-DKd" secondAttribute="top" constant="4" id="8zo-xx-JZr"/>
-                                                        <constraint firstAttribute="trailing" secondItem="ZTW-EI-t44" secondAttribute="trailing" constant="4" id="9Ey-gj-GgY"/>
-                                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hDY-7k-p70" secondAttribute="trailing" constant="20" symbolic="YES" id="MCJ-cW-LKA"/>
-                                                        <constraint firstItem="hDY-7k-p70" firstAttribute="top" secondItem="lWs-RE-DKd" secondAttribute="top" constant="4" id="QZJ-pT-b1y"/>
+                                                        <constraint firstItem="ZTW-EI-t44" firstAttribute="top" secondItem="lWs-RE-DKd" secondAttribute="top" id="8zo-xx-JZr"/>
+                                                        <constraint firstAttribute="trailing" secondItem="ZTW-EI-t44" secondAttribute="trailing" id="9Ey-gj-GgY"/>
                                                         <constraint firstAttribute="trailing" secondItem="ptR-dm-vYh" secondAttribute="trailing" id="ZGY-4L-agJ"/>
                                                         <constraint firstItem="ZTW-EI-t44" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="lWs-RE-DKd" secondAttribute="leading" constant="20" symbolic="YES" id="rm4-G9-vaZ"/>
                                                     </constraints>
@@ -193,9 +169,8 @@
                                         </constraints>
                                         <connections>
                                             <outlet property="containerView" destination="lWs-RE-DKd" id="O8i-7w-7ZA"/>
-                                            <outlet property="conventionLabel" destination="ZTW-EI-t44" id="WWe-1l-Wxu"/>
                                             <outlet property="imageView" destination="Evj-hg-gfT" id="nQk-gt-Oee"/>
-                                            <outlet property="languageLabel" destination="hDY-7k-p70" id="Wfk-Bp-28T"/>
+                                            <outlet property="infoLabel" destination="ZTW-EI-t44" id="WWe-1l-Wxu"/>
                                             <outlet property="titleLabel" destination="ptR-dm-vYh" id="u5x-eN-fD8"/>
                                         </connections>
                                     </collectionViewCell>
