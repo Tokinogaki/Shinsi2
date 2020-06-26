@@ -137,7 +137,7 @@ class SettingVC: BaseViewController {
         viewerModeSeg.addTarget(self, action: #selector(viewerModeSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(viewerModeSeg)
         
-        if BiometricsManager.context.biometryType != .none {
+        if BiometricsManager.canSupported() {
             addTitle("Settings")
             let touchLabel = createSubTitleLabel(BiometricsManager.getBiometryType())
             let touchSwitch = UISwitch()
