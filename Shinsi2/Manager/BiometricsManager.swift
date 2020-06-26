@@ -13,7 +13,7 @@ class BiometricsManager: NSObject {
     
     public static var isLock = true
     
-    public static var context = LAContext()
+    private static var context = LAContext()
     
     static func refresh() {
         self.context = LAContext()
