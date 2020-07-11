@@ -5,7 +5,7 @@ import SVProgressHUD
 import SafariServices
 
 class GalleryVC: BaseViewController {
-    var doujinshi: Doujinshi!
+    var doujinshi: GalleryPage!
     private var browsingHistory: BrowsingHistory?
     private var didScrollToHistory = false
     private var currentPage = 0
@@ -23,7 +23,7 @@ class GalleryVC: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = doujinshi.gdata?.getTitle() ?? doujinshi.title
+        title = doujinshi.title
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
         
@@ -98,13 +98,13 @@ class GalleryVC: BaseViewController {
     
     private func checkGData() {
         updateNavigationItems()
-        if doujinshi.isDownloaded, doujinshi.gdata != nil {
+        if doujinshi.isDownloaded, doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue {
             loadingView.hide()
             scrollToLastReadingPage()
-        } else if let gdata = doujinshi.gdata, doujinshi.pages.count == gdata.filecount {
+        } else if doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue && doujinshi.pages.count == doujinshi.filecount {
             loadingView.hide()
             scrollToLastReadingPage()
-        } else if doujinshi.gdata != nil, doujinshi.pages.count > 0, let perPageCount = doujinshi.perPageCount {
+        } else if doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue, doujinshi.pages.count > 0, let perPageCount = doujinshi.perPageCount {
             loadingView.hide()
             scrollToLastReadingPage()
             currentPage = doujinshi.pages.count / perPageCount
@@ -113,7 +113,7 @@ class GalleryVC: BaseViewController {
             //Temp cover
             doujinshi.pages.removeAll()
             if !doujinshi.coverUrl.isEmpty {
-                let coverPage = Page()
+                let coverPage = ShowPage()
                 coverPage.thumbUrl = doujinshi.coverUrl
                 doujinshi.pages.append(coverPage)
             }
@@ -122,7 +122,7 @@ class GalleryVC: BaseViewController {
                 guard let gdata = gdata, let self = self else { return }
                 self.loadingView.hide()
                 self.doujinshi.pages.removeAll()
-                self.doujinshi.setGData(gdata: gdata)
+                // TODO: self.doujinshi.setGData(gdata: gdata)
                 self.updateNavigationItems()
                 self.loadPages()
             }
@@ -130,11 +130,11 @@ class GalleryVC: BaseViewController {
     }
     
     func updateNavigationItems() {
-        tagButton.isEnabled = doujinshi.gdata != nil
+        // TODO: tagButton.isEnabled = doujinshi.gdata != nil
         downloadButton.isEnabled = doujinshi.canDownload
         commentButton.isEnabled = doujinshi.comments.count > 0
         favoriteButton.isEnabled = doujinshi.favorite == .none && doujinshi.pages.count > 1
-        title = doujinshi.gdata?.getTitle() ?? doujinshi.title
+        // TODO: title = doujinshi.gdata?.getTitle() ?? doujinshi.title
     }
     
     func loadPages() {
@@ -153,7 +153,7 @@ class GalleryVC: BaseViewController {
                 self.collectionView.insertItems(at: new)
             }, completion: nil)
             
-            if self.doujinshi.pages.count < self.doujinshi.gdata!.filecount {
+            if self.doujinshi.pages.count < self.doujinshi.filecount {
                 self.currentPage += 1
                 self.loadPages()
             } else {
@@ -291,14 +291,14 @@ class GalleryVC: BaseViewController {
                 isPartDownloading = false
                 return
         }
-        let new = Doujinshi(value: doujinshi!)
-        new.setGData(gdata: GData(value: doujinshi.gdata!))
+        let new = GalleryPage(value: doujinshi!)
+        // TODO: new.setGData(gdata: GPage(value: doujinshi.gdata!))
         new.pages.removeAll()
         for i in selectedIndexPaths {
-            new.pages.append(Page(value: doujinshi.pages[i.item]))
+            new.pages.append(ShowPage(value: doujinshi.pages[i.item]))
         }
-        new.gdata!.gid = new.gdata!.gid + String(Date().timeIntervalSince1970)
-        new.gdata!.filecount = selectedIndexPaths.count
+        // TODO: new.gdata!.gid = new.gdata!.gid + String(Date().timeIntervalSince1970)
+        // TODO: new.gdata!.filecount = selectedIndexPaths.count
         new.coverUrl = new.pages.first!.thumbUrl
         DownloadManager.shared.download(doujinshi: new)
         DownloadBubble.shared.show(on: navigationController!)
@@ -335,7 +335,7 @@ extension GalleryVC: CommentVCDelegate {
             if url.absoluteString.contains(Defaults.URL.host+"/g/"), url.absoluteString != doujinshi.url {
                 //Gallery
                 vc.dismiss(animated: true) {
-                    let d = Doujinshi(value: ["url": url.absoluteString])
+                    let d = GalleryPage(value: ["url": url.absoluteString])
                     let vc = self.storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
                     vc.doujinshi = d
                     self.navigationController?.pushViewController(vc, animated: true)
@@ -395,7 +395,7 @@ UICollectionViewDataSourcePrefetching {
                 cell.loadingView?.show(animated: false)
             }
         }
-        cell.imageView.hero.id = "image_\(doujinshi.id)_\(indexPath.item)"
+        cell.imageView.hero.id = "image_\(doujinshi.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1
         

@@ -18,7 +18,6 @@
 		546663741F1DE3B8003B9E36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 546663731F1DE3B8003B9E36 /* Assets.xcassets */; };
 		546663771F1DE3B8003B9E36 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 546663751F1DE3B8003B9E36 /* LaunchScreen.storyboard */; };
 		5466638D1F1DE509003B9E36 /* RequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663801F1DE44D003B9E36 /* RequestManager.swift */; };
-		5466638E1F1DE50C003B9E36 /* RealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466638C1F1DE44D003B9E36 /* RealmModel.swift */; };
 		5466638F1F1DE511003B9E36 /* GalleryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663831F1DE44D003B9E36 /* GalleryVC.swift */; };
 		546663901F1DE511003B9E36 /* ListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663841F1DE44D003B9E36 /* ListVC.swift */; };
 		546663911F1DE511003B9E36 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663851F1DE44D003B9E36 /* LoginVC.swift */; };
@@ -28,7 +27,6 @@
 		546663951F1DE511003B9E36 /* ViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663891F1DE44D003B9E36 /* ViewerVC.swift */; };
 		546663961F1DE511003B9E36 /* Cells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466638B1F1DE44D003B9E36 /* Cells.swift */; };
 		546663971F1DE511003B9E36 /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466637E1F1DE44D003B9E36 /* DownloadManager.swift */; };
-		546663981F1DE511003B9E36 /* SSPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466638A1F1DE44D003B9E36 /* SSPhoto.swift */; };
 		546663991F1DE514003B9E36 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466637F1F1DE44D003B9E36 /* Helper.swift */; };
 		5466639A1F1DE516003B9E36 /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546663811F1DE44D003B9E36 /* Const.swift */; };
 		5466639C1F1DE67B003B9E36 /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5466639B1F1DE67B003B9E36 /* RealmManager.swift */; };
@@ -36,6 +34,9 @@
 		54AA5F482192B03C003E0FAD /* QuickScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */; };
 		54E1DADF1F1F38E00096A6D3 /* DownloadBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */; };
 		7C69AD6E24A5E7E20016839E /* BiometricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C69AD6D24A5E7E20016839E /* BiometricsManager.swift */; };
+		7CF71FE024B9A1AF00733B9C /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF71FDF24B9A1AF00733B9C /* History.swift */; };
+		7CF71FE224B9A1D100733B9C /* GalleryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF71FE124B9A1D100733B9C /* GalleryPage.swift */; };
+		7CF71FE424B9A1FC00733B9C /* ShowPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF71FE324B9A1FC00733B9C /* ShowPage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,14 +63,15 @@
 		546663871F1DE44D003B9E36 /* SettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVC.swift; sourceTree = "<group>"; };
 		546663881F1DE44D003B9E36 /* TagVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagVC.swift; sourceTree = "<group>"; };
 		546663891F1DE44D003B9E36 /* ViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerVC.swift; sourceTree = "<group>"; };
-		5466638A1F1DE44D003B9E36 /* SSPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSPhoto.swift; sourceTree = "<group>"; };
 		5466638B1F1DE44D003B9E36 /* Cells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cells.swift; sourceTree = "<group>"; };
-		5466638C1F1DE44D003B9E36 /* RealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmModel.swift; sourceTree = "<group>"; };
 		5466639B1F1DE67B003B9E36 /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
 		547AF17B20DE4538003D2AF3 /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickScrollBar.swift; sourceTree = "<group>"; };
 		54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadBubble.swift; sourceTree = "<group>"; };
 		7C69AD6D24A5E7E20016839E /* BiometricsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BiometricsManager.swift; sourceTree = "<group>"; };
+		7CF71FDF24B9A1AF00733B9C /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
+		7CF71FE124B9A1D100733B9C /* GalleryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryPage.swift; sourceTree = "<group>"; };
+		7CF71FE324B9A1FC00733B9C /* ShowPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPage.swift; sourceTree = "<group>"; };
 		84200A16D7CCE139324C1CC5 /* Pods-Shinsi2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shinsi2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Shinsi2/Pods-Shinsi2.debug.xcconfig"; sourceTree = "<group>"; };
 		A10805BDD40FA9FA8CA5E220 /* Pods_Shinsi2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Shinsi2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -97,8 +99,9 @@
 		54405C932197182F00D613BD /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				5466638C1F1DE44D003B9E36 /* RealmModel.swift */,
-				5466638A1F1DE44D003B9E36 /* SSPhoto.swift */,
+				7CF71FDF24B9A1AF00733B9C /* History.swift */,
+				7CF71FE124B9A1D100733B9C /* GalleryPage.swift */,
+				7CF71FE324B9A1FC00733B9C /* ShowPage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -337,16 +340,16 @@
 				547AF17C20DE4538003D2AF3 /* ImageManager.swift in Sources */,
 				546663931F1DE511003B9E36 /* SettingVC.swift in Sources */,
 				546663941F1DE511003B9E36 /* TagVC.swift in Sources */,
+				7CF71FE224B9A1D100733B9C /* GalleryPage.swift in Sources */,
 				546663901F1DE511003B9E36 /* ListVC.swift in Sources */,
 				54433ECA21992FA1008313D4 /* CommentVC.swift in Sources */,
 				54E1DADF1F1F38E00096A6D3 /* DownloadBubble.swift in Sources */,
-				546663981F1DE511003B9E36 /* SSPhoto.swift in Sources */,
 				546663911F1DE511003B9E36 /* LoginVC.swift in Sources */,
-				5466638E1F1DE50C003B9E36 /* RealmModel.swift in Sources */,
 				546663921F1DE511003B9E36 /* SearchHistoryVC.swift in Sources */,
 				540D1FED20DA3EB60044EC55 /* InsetLabel.swift in Sources */,
 				54AA5F482192B03C003E0FAD /* QuickScrollBar.swift in Sources */,
 				5466639C1F1DE67B003B9E36 /* RealmManager.swift in Sources */,
+				7CF71FE024B9A1AF00733B9C /* History.swift in Sources */,
 				546663971F1DE511003B9E36 /* DownloadManager.swift in Sources */,
 				5466638D1F1DE509003B9E36 /* RequestManager.swift in Sources */,
 				546663961F1DE511003B9E36 /* Cells.swift in Sources */,
@@ -354,6 +357,7 @@
 				7C69AD6E24A5E7E20016839E /* BiometricsManager.swift in Sources */,
 				5466638F1F1DE511003B9E36 /* GalleryVC.swift in Sources */,
 				5466639A1F1DE516003B9E36 /* Const.swift in Sources */,
+				7CF71FE424B9A1FC00733B9C /* ShowPage.swift in Sources */,
 				542362F521940916004619F3 /* BsaeViewController.swift in Sources */,
 				542362F721945C49004619F3 /* WebVC.swift in Sources */,
 				54405C922196888F00D613BD /* LoadingView.swift in Sources */,

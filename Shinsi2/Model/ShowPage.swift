@@ -1,24 +1,45 @@
 import Foundation
+import RealmSwift
+import Kanna
+import UIColor_Hex_Swift
 import SDWebImage
 
 public extension Notification.Name {
     static let photoLoaded = Notification.Name("SSPHOTO_LOADING_DID_END_NOTIFICATION")
 }
 
-class SSPhoto: NSObject {
+class ShowPage: Object {
+    @objc dynamic var thumbUrl = ""
+    @objc dynamic var url = ""
+    @objc dynamic var size = CGSize.zero
+    @objc dynamic var thumbSize = CGSize.zero
     
     var underlyingImage: UIImage?
-    var urlString: String
     var isLoading = false
     let imageCache = SDWebImageManager.shared().imageCache!
     
-    init(URL url: String) {
-        urlString = url
-        super.init()
+    var imageRatio: CGFloat {
+        if self.thumbSize != CGSize.zero {
+            return self.thumbSize.width / self.thumbSize.height
+        }
+        if self.size != CGSize.zero {
+            return self.size.width / self.size.height
+        }
+        return 0.0
     }
-
+    
+    var urlString: String {
+        get {
+            self.thumbUrl
+        }
+    }
+    
+    required init() {
+        fatalError("init() has not been implemented")
+    }
+    
     func loadUnderlyingImageAndNotify() {
-        guard isLoading == false, underlyingImage == nil else { return } 
+        guard isLoading == false, underlyingImage == nil else { return }
         isLoading = true
         
         RequestManager.shared.getPageImageUrl(url: urlString) { [weak self] url in
@@ -56,5 +77,26 @@ class SSPhoto: NSObject {
     func imageLoadComplete() {
         isLoading = false
         NotificationCenter.default.post(name: .photoLoaded, object: self)
+    }
+    
+    var aspectRatio: Float {
+        if self.size != CGSize.zero {
+            return Float(self.size.width / self.size.height)
+        }
+        if self.thumbSize != CGSize.zero {
+            return Float(self.thumbSize.width / self.thumbSize.height)
+        }
+        return 1.0
+    }
+    
+    var localUrl: URL {
+        return documentURL.appendingPathComponent(thumbUrl)
+    }
+    var localImage: UIImage? {
+        return UIImage(contentsOfFile: localUrl.path)
+    }
+    static func blankPage() -> ShowPage {
+        let p = ShowPage()
+        return p
     }
 }

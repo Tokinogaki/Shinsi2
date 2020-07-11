@@ -11,7 +11,7 @@ class ListVC: BaseViewController {
     private lazy var searchHistoryVC: SearchHistoryVC = {
         return self.storyboard!.instantiateViewController(withIdentifier: "SearchHistoryVC") as! SearchHistoryVC
     }()
-    private var items: [Doujinshi] = []
+    private var items: [GalleryPage] = []
     private var currentPage = -1
     private var loadingPage = -1
     private var backGesture: InteractiveBackGesture?
@@ -140,7 +140,7 @@ class ListVC: BaseViewController {
             guard loadingPage != currentPage + 1 else {return}
             loadingPage = currentPage + 1
             if loadingPage == 0 { loadingView.show() }
-            RequestManager.shared.getList(page: loadingPage, search: searchController.searchBar.text) {[weak self] books in
+            RequestManager.shared.getIndexPage(page: loadingPage, search: searchController.searchBar.text) {[weak self] books in
                 guard let self = self else {return}
                 self.loadingView.hide()
                 guard books.count > 0 else {return}
@@ -301,9 +301,9 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ListCell
         
         let doujinshi = items[indexPath.item]
-        cell.imageView.hero.id = "image_\(doujinshi.id)_0"
+        cell.imageView.hero.id = "image_\(doujinshi.gid)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
-        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(doujinshi.id)_0")]
+        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(doujinshi.gid)_0")]
         
         if doujinshi.isDownloaded {
             if let image = UIImage(contentsOfFile: documentURL.appendingPathComponent(doujinshi.coverUrl).path) {

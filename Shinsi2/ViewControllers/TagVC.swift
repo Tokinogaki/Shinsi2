@@ -3,7 +3,7 @@ import Hero
 import AloeStackView
 
 class TagVC: BaseViewController {
-    weak var doujinshi: Doujinshi!
+    weak var doujinshi: GalleryPage!
     var clickBlock: ((String) -> Void)?
     struct TagItem {
         var title: String
@@ -18,12 +18,12 @@ class TagVC: BaseViewController {
         super.viewDidLoad()
         navigationController?.navigationBar.barTintColor = UIColor(white: 0, alpha: 0.5)
         
-        let gTag = doujinshi.gdata!.gTag
-        let keys = gTag.allProperties().keys
-        for key in keys where gTag[key].count != 0 {
-            let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.firstIndex(of: key) ?? 999)
-            items.append(item)
-        }
+        // TODO: let gTag = doujinshi.tags
+        // TODO: let keys = gTag.allProperties().keys
+        // TODO: for key in keys where gTag[key].count != 0 {
+         // TODO:    let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.firstIndex(of: key) ?? 999)
+         // TODO:    items.append(item)
+        // TODO: }
         items = items.sorted {$0.sortNumber < $1.sortNumber}
         
         view.addSubview(stackView)

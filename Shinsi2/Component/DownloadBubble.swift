@@ -157,7 +157,7 @@ class DownloadBubble: UIView {
             let doujinshi = DownloadManager.shared.books[queue.name!]
             else {return}
         
-        circleLayer.strokeEnd = 1 - CGFloat(count) / CGFloat(doujinshi.gdata!.filecount)
+        circleLayer.strokeEnd = 1 - CGFloat(count) / CGFloat(doujinshi.filecount)
         
         if count == 0 {
             queue.removeObserver(self, forKeyPath: "operationCount")

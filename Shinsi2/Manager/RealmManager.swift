@@ -15,17 +15,17 @@ class RealmManager {
         return self.realm.objects(SearchHistory.self).sorted(byKeyPath: "date", ascending: false)
     }()
     
-    lazy var downloaded: Results<Doujinshi> = {
-        return self.realm.objects(Doujinshi.self).filter("isDownloaded == true").sorted(byKeyPath: "date", ascending: false)
+    lazy var downloaded: Results<GalleryPage> = {
+        return self.realm.objects(GalleryPage.self).filter("isDownloaded == true").sorted(byKeyPath: "date", ascending: false)
     }()
     
-    func browsingHistory(for doujinshi: Doujinshi) -> BrowsingHistory? {
-        return realm.objects(BrowsingHistory.self).filter("id == %d", doujinshi.id).first
+    func browsingHistory(for doujinshi: GalleryPage) -> BrowsingHistory? {
+        return realm.objects(BrowsingHistory.self).filter("id == %d", doujinshi.gid).first
     }
     
-    func createBrowsingHistory(for doujinshi: Doujinshi) {
+    func createBrowsingHistory(for doujinshi: GalleryPage) {
         try! realm.write {
-            realm.create(BrowsingHistory.self, value: ["doujinshi": doujinshi, "id": doujinshi.id], update: .modified)
+            realm.create(BrowsingHistory.self, value: ["doujinshi": doujinshi, "id": doujinshi.gid], update: .modified)
         }
     }
     
@@ -36,13 +36,13 @@ class RealmManager {
         }
     }
     
-    var browsedDoujinshi: [Doujinshi] {
+    var browsedDoujinshi: [GalleryPage] {
         let hs = realm.objects(BrowsingHistory.self).sorted(byKeyPath: "updatedAt", ascending: false)
-        var results: [Doujinshi] = []
+        var results: [GalleryPage] = []
         let maxHistory = min(30, hs.count)
         for i in 0..<maxHistory {
             if let d = hs[i].doujinshi {
-                results.append(Doujinshi(value: d))
+                results.append(GalleryPage(value: d))
             }
         }
         return results
@@ -76,18 +76,18 @@ class RealmManager {
         }
     }
     
-    func saveDownloadedDoujinshi(book: Doujinshi) {
+    func saveDownloadedDoujinshi(book: GalleryPage) {
         book.pages.removeAll()
-        for i in 0..<book.gdata!.filecount {
-            let p = Page()
-            p.thumbUrl = String(format: book.gdata!.gid + "/%04d.jpg", i)
+        for i in 0..<book.filecount {
+            let p = ShowPage()
+            p.thumbUrl = String(format: String(book.gid) + "/%04d.jpg", i)
             book.pages.append(p)
         }
         if let first = book.pages.first {
             book.coverUrl = first.thumbUrl
         }
         book.isDownloaded = true
-        book.date = Date()
+        book.updatedAt = Date()
         
         DispatchQueue.main.async {
             try! self.realm.write {
@@ -96,13 +96,13 @@ class RealmManager {
         }
     }
     
-    func deleteDoujinshi(book: Doujinshi) {
+    func deleteDoujinshi(book: GalleryPage) {
         try! realm.write {
             realm.delete(book)
         }
     }
     
-    func isDounjinshiDownloaded(doujinshi: Doujinshi) -> Bool {
-        return downloaded.filter("gdata.gid = '\(doujinshi.gdata!.gid)'").count != 0
+    func isDounjinshiDownloaded(doujinshi: GalleryPage) -> Bool {
+        return downloaded.filter("gdata.gid = '\(doujinshi.gid)'").count != 0
     }
 }

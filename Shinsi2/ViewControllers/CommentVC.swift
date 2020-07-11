@@ -6,7 +6,7 @@ protocol CommentVCDelegate: class {
 
 class CommentVC: BaseViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
     
-    weak var doujinshi: Doujinshi!
+    weak var doujinshi: GalleryPage!
     @IBOutlet weak var tableView: UITableView!
     weak var delegate: CommentVCDelegate?
     

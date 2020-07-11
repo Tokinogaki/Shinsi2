@@ -2,123 +2,105 @@ import Foundation
 import RealmSwift
 import Kanna
 import UIColor_Hex_Swift
+import SDWebImage
 
-class BrowsingHistory: Object {
-    @objc dynamic var doujinshi: Doujinshi?
-    @objc dynamic var currentPage: Int = 0
-    @objc dynamic var id: Int = 999999999
-    @objc dynamic var createdAt: Date = Date()
-    @objc dynamic var updatedAt: Date = Date()
-    
-    override static func primaryKey() -> String? {
-        return "id"
-    }
-}
-
-class Doujinshi: Object {
-    @objc dynamic var coverUrl = ""
+class GalleryPage: Object {
+    @objc dynamic var gid: Int = 0
+    @objc dynamic var token = ""
     @objc dynamic var title = ""
-    @objc dynamic var url = ""
-    @objc dynamic var gid = ""
+    @objc dynamic var title_jpn = ""
+    @objc dynamic var coverUrl = ""
     @objc dynamic var filecount = 0
     @objc dynamic var rating: Float = 0.0
-    @objc dynamic var title_jpn = ""
-    @objc dynamic var isDownloaded = false
     @objc dynamic var lastUpdateTime = ""
-    @objc dynamic var date = Date()
-    @objc dynamic var gdata: GData?
+    @objc dynamic var isDownloaded = false
+    @objc dynamic var readPage: UInt = 0
+    @objc dynamic var createdAt: Date = Date()
+    @objc dynamic var updatedAt: Date = Date()
+    @objc private dynamic var _url = ""
+    @objc private dynamic var _category = CategoryOptions.none.rawValue
+    @objc private dynamic var _favorite = FavoriteEnum.none.rawValue
+    @objc private dynamic var _status = StatusEnum.none.rawValue
     
-    dynamic var category: CategoryOptions = .none
-    dynamic var favorite: FavoriteEnum = .none
-    
-    func setGData(gdata: GData?) {
-        self.gid = gdata?.gid ?? ""
-        self.filecount = gdata?.filecount ?? 0
-        self.rating = gdata?.rating ?? 0.0
-        self.title = gdata?.title ?? ""
-        self.title_jpn = gdata?.title_jpn ?? ""
-        self.coverUrl = gdata?.coverUrl ?? ""
-        self.tags = gdata?.tags ?? List<Tag>()
-        self.gdata = gdata
-    }
-    
-    let pages = List<Page>()
+    let tags = List<Tag>()
+    let pages = List<ShowPage>()
+    let comments = List<Comment>()
     var perPageCount: Int?
-    var comments: [Comment] = []   //Won't store
-    var element: XMLElement? {
+    
+    var url: String {
         get {
-            return nil
+            return self._url
         }
         set {
-            var node = newValue?.at_css("div.gl3t a")
-            let imgNode = node?.at_css("img")
-            self.url = node?["href"] ?? ""
-            self.title = imgNode?["title"] ?? ""
-            self.coverUrl = imgNode?["src"] ?? ""
-            
-            node = newValue?.at_css("div[class*='cs']")
-            self.category = CategoryOptions.`init`(with: node?.text ?? "")
-            
-            node = newValue?.at_css("div[id*='posted_']")
-            let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
-            self.lastUpdateTime = node?.text ?? ""
-            self.favorite = FavoriteEnum(hexColor: hexColor)
-            
-            node = newValue?.at_css("div.ir")
-            let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
-            self.rating = Doujinshi.getRating(with: style)
-            
-            node = newValue?.css("div.gl5t>div>div")[3]
-            self.filecount = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
-        }
-    }
-    
-    public static func `init`(element: XMLElement) -> Doujinshi {
-        let doujinshi = Doujinshi()
-        doujinshi.element = element
-        return doujinshi
-    }
-    
-    func getTitle() -> String {
-        return title_jpn.isEmpty ? title : title_jpn
-    }
-    
-    var tags = List<Tag>()
-    lazy var gTag: GTag = {
-        var g = GTag()
-        let keys = g.allProperties().keys
-        tags.forEach {
-            if $0.name.contains(":"), let key = $0.name.components(separatedBy: ":").first, keys.contains(key) {
-                g[key].append($0.name.replacingOccurrences(of: "\(key):", with: ""))
-            } else {
-                g["misc"].append($0.name)
+            if let url = URL(string: newValue) {
+                self.gid = url.pathComponents.indices.contains(2) ? Int(url.pathComponents[2]) ?? 0 : 0
+                self.token = url.pathComponents.indices.contains(3) ? url.pathComponents[3] : ""
             }
         }
-        return g
-    }()
+    }
     
-    //Computed property
-    var id: Int { 
-        guard let u = URL(string: url), u.pathComponents.indices.contains(2), let d = Int(u.pathComponents[2]) else {return 999999999}
-        return d
+    var category: CategoryOptions {
+        get {
+            return CategoryOptions(rawValue: self._category)
+        }
+        set {
+            self._category = newValue.rawValue
+        }
     }
-    var token: String {
-        guard let u = URL(string: url), u.pathComponents.indices.contains(3) else {return "invalid_token"}
-        return u.pathComponents[3]
+    
+    var favorite: FavoriteEnum {
+        get {
+            return FavoriteEnum(rawValue: self._favorite) ?? .none
+        }
+        set {
+            self._favorite = newValue.rawValue
+        }
     }
+    
+    var status: StatusEnum {
+        get {
+            return StatusEnum(rawValue: self._status) ?? .none
+        }
+        set {
+            self._status = newValue.rawValue
+        }
+    }
+    
     var isIdTokenValide: Bool {
-        return id != 999999999 && token != "invalid_token"
+        return self.gid == 0 && token != ""
     }
+
     var canDownload: Bool {
         if isDownloaded {
             return false
-        } else if let gdata = gdata, gdata.filecount == pages.count {
+        }
+        else if self.filecount == self.pages.count {
+            return true
+        }
+        else if self.status.rawValue >= StatusEnum.galleryEnd.rawValue {
             return true
         }
         return false
     }
+
+    override static func primaryKey() -> String? {
+        return "gid"
+    }
     
-    public static func getRating(with style: String?) -> Float {
+    static func gPage(iPageItem element: XMLElement?) -> GalleryPage {
+        let gPage = GalleryPage(iPageItem: element)
+        return gPage
+    }
+    
+    static func gPageList(iPage doc: HTMLDocument?) -> List<GalleryPage> {
+        let gPageList = List<GalleryPage>()
+        for element in doc!.xpath("//div [@class='gl1t']") {
+            gPageList.append(gPage(iPageItem: element))
+        }
+        return gPageList
+    }
+    
+    static func getRating(with style: String?) -> Float {
         switch style {
         case "-80px -1px":
             return 0.0
@@ -147,67 +129,69 @@ class Doujinshi: Object {
         }
     }
     
-    override static func ignoredProperties() -> [String] {
-        return ["comments", "commentScrollPosition", "perPageCount", "gTag"]
+    required init() {
+        super.init()
     }
-}
-
-class Page: Object {
-    @objc dynamic var thumbUrl = ""
-    @objc dynamic var url = ""
-    var photo: SSPhoto!
-    var localUrl: URL {
-        return documentURL.appendingPathComponent(thumbUrl)
+    
+    init(iPageItem element: XMLElement?) {
+        super.init()
+        var node = element?.at_css("div.gl3t a")
+        let imgNode = node?.at_css("img")
+        self.url = node?["href"] ?? ""
+        self.title = imgNode?["title"] ?? ""
+        self.coverUrl = imgNode?["src"] ?? ""
+        
+        node = element?.at_css("div[class*='cs']")
+        self.category = CategoryOptions.category(with: node?.text ?? "")
+        
+        node = element?.at_css("div[id*='posted_']")
+        let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
+        self.lastUpdateTime = node?.text ?? ""
+        self.favorite = FavoriteEnum(hexColor: hexColor)
+        
+        node = element?.at_css("div.ir")
+        let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
+        self.rating = GalleryPage.getRating(with: style)
+        
+        node = element?.css("div.gl5t>div>div")[3]
+        self.filecount = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
     }
-    var localImage: UIImage? {
-        return UIImage(contentsOfFile: localUrl.path)
-    }
-    static func blankPage() -> Page {
-        let p = Page()
-        p.photo = SSPhoto(URL: "")
-        return p
-    }
-}
-
-class GData: Object {
-    @objc dynamic var gid = ""
-    @objc dynamic var filecount = 0
-    @objc dynamic var rating: Float = 0.0
-    @objc dynamic var title = ""
-    @objc dynamic var title_jpn = ""
+    
     func getTitle() -> String {
         return title_jpn.isEmpty ? title : title_jpn
     }
-    @objc dynamic var coverUrl = ""
-    let tags = List<Tag>()
-    lazy var gTag: GTag = {
-        var g = GTag()
-        let keys = g.allProperties().keys
-        tags.forEach {
-            if $0.name.contains(":"), let key = $0.name.components(separatedBy: ":").first, keys.contains(key) {
-                g[key].append($0.name.replacingOccurrences(of: "\(key):", with: ""))
-            } else {
-                g["misc"].append($0.name)
-            }
-        }
-        return g
-    }()
     
-    override static func ignoredProperties() -> [String] {
-        return ["gTag"]
+    func setTags(with element: XMLElement?) {
+        self.tags.removeAll()
+        
+    }
+    
+    func setComments(with element: XMLElement?) {
+        self.comments.removeAll()
+    }
+    
+    func setPage(sPage element: XMLElement?) {
+        if self.pages.count == self.filecount {
+            return;
+        }
+    }
+    
+}
+
+class Tag : Object {
+    @objc dynamic var name = ""
+    let values = List<String>()
+    
+    init(_ element: XMLElement?) {
+        super.init()
+    }
+    
+    required init() {
+        super.init()
     }
 }
 
-class Tag: Object {
-    @objc dynamic var name = ""
-}
-
-class SearchHistory: Object {
-    @objc dynamic var text: String = ""
-    @objc dynamic var date: Date = Date()
-}
-
-struct Comment {
+class Comment: Object {
     var author: String
     var date: Date
     var text: String
@@ -218,70 +202,16 @@ struct Comment {
         self.text = text
         self.htmlAttributedText = text.htmlAttribute
     }
-}
-
-struct GTag: PropertyLoopable {
-    var language: [String] = []
-    var artist: [String] = []
-    var group: [String] = []
-    var parody: [String] = []
-    var character: [String] = []
-    var male: [String] = []
-    var female: [String] = []
-    var misc: [String] = []
     
-    subscript(key: String) -> [String] {
-        get {
-            switch key {
-            case "language":
-                return language
-            case "artist":
-                return artist
-            case "group":
-                return group
-            case "parody":
-                return parody
-            case "character":
-                return character
-            case "male":
-                return male
-            case "female":
-                return female
-            case "misc":
-                return misc
-            default:
-                return []
-            }
-        }
-        set(newValue) {
-            switch key {
-            case "language":
-                language = newValue
-            case "artist":
-                artist = newValue
-            case "group":
-                group = newValue
-            case "parody":
-                parody = newValue
-            case "character":
-                character = newValue
-            case "male":
-                male = newValue
-            case "female":
-                female = newValue
-            case "misc":
-                misc = newValue
-            default:
-                break
-            }
-        }
+    required init() {
+        fatalError("init() has not been implemented")
     }
 }
 
 struct CategoryOptions : OptionSet {
     let rawValue: Int
     
-    static func `init`(with stringValue: String) -> CategoryOptions {
+    static func category(with stringValue: String) -> CategoryOptions {
         var string = stringValue.lowercased()
         let regex = try! NSRegularExpression(pattern: "[ -]+", options: NSRegularExpression.Options.caseInsensitive)
         let range = NSMakeRange(0, string.count)
@@ -380,7 +310,7 @@ struct CategoryOptions : OptionSet {
     }
 }
 
-enum FavoriteEnum {
+enum FavoriteEnum : Int {
     case none, favorite0, favorite1, favorite2, favorite3, favorite4, favorite5, favorite6, favorite7, favorite8, favorite9
     
     init(text stringValue: String) {
@@ -406,7 +336,7 @@ enum FavoriteEnum {
         case "favorites 9":
             self = .favorite9
         default:
-            self = .favorite0
+            self = .none
         }
     }
     
@@ -438,7 +368,7 @@ enum FavoriteEnum {
         case FavoriteEnum.favorite9.color.hexString():
             self = .favorite9
         default:
-            self = .favorite0
+            self = .none
         }
     }
     
@@ -468,4 +398,8 @@ enum FavoriteEnum {
             return UIColor("#fff")
         }
     }
+}
+
+enum StatusEnum : Int {
+    case none, indexStart, indexEnd, galleryStart, galleryEnd, showStart, showEnd, downloadStart, downloadEnd
 }

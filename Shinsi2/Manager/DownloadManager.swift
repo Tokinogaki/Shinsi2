@@ -80,19 +80,19 @@ class PageDownloadOperation: SSOperation {
 class DownloadManager: NSObject {
     static let shared = DownloadManager()
     var queues: [OperationQueue] = []
-    var books: [String: Doujinshi] = [:]
+    var books: [String: GalleryPage] = [:]
     
-    func download(doujinshi: Doujinshi) {
-        guard let gdata = doujinshi.gdata, doujinshi.pages.count != 0 else {return}
-        let folderName = gdata.gid
+    func download(doujinshi: GalleryPage) {
+        guard doujinshi.pages.count != 0 else {return}
+        let folderName = String(doujinshi.gid)
         let path = documentURL.appendingPathComponent(folderName).path
         
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 3
         queue.isSuspended = queues.count != 0
-        queue.name = gdata.gid
+        queue.name = folderName
         queues.append(queue)
-        books[gdata.gid] = doujinshi
+        books[folderName] = doujinshi
         
         for (i, p) in doujinshi.pages.enumerated() {
             let o = PageDownloadOperation(url: p.url, folderPath: path, pageNumber: i)
@@ -113,8 +113,8 @@ class DownloadManager: NSObject {
         books.removeAll()
     }
     
-    func deleteDownloaded(doujinshi: Doujinshi) {
-        try? FileManager.default.removeItem(at: documentURL.appendingPathComponent(doujinshi.gdata!.gid))
+    func deleteDownloaded(doujinshi: GalleryPage) {
+        try? FileManager.default.removeItem(at: documentURL.appendingPathComponent(String(doujinshi.gid)))
         RealmManager.shared.deleteDoujinshi(book: doujinshi)
     }
     

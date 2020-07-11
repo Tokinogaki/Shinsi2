@@ -1,12 +1,12 @@
 import Alamofire
+import RealmSwift
 import Kanna
 
 class RequestManager {
     
     static let shared = RequestManager()
 
-    func getList(page: Int, search keyword: String? = nil, completeBlock block: (([Doujinshi]) -> Void)?) {
-        
+    func getIndexPage(page: Int, search keyword: String? = nil, completeBlock block: ((List<GalleryPage>) -> Void)?) {
         let categoryFilters = Defaults.Search.categories.map {"f_\($0)=\(UserDefaults.standard.bool(forKey: $0) ? 1 : 0)"}.joined(separator: "&")
         var url = Defaults.URL.host + "/?"
         url += "\(categoryFilters)&f_apply=Apply+Filter" //Apply category filters
@@ -17,19 +17,17 @@ class RequestManager {
             url += "&f_sr=on&f_srdd=\(String(Defaults.Search.rating + 1))"
         }
         
-        var cacheFavoritesTitles = false
         if var keyword = keyword?.lowercased() {
             if keyword.contains("favorites") {
                 url = Defaults.URL.host + "/favorites.php?page=\(page)"
                 if let number = Int(keyword.replacingOccurrences(of: "favorites", with: "")) {
                     url += "&favcat=\(number)"
                 }
-                cacheFavoritesTitles = page == 0
             } else if keyword.contains("popular") {
                 if page == 0 {
                     url = Defaults.URL.host + "/popular"
                 } else {
-                    block?([])
+                    block?(List())
                     return
                 }
             } else if keyword.contains("watched") {
@@ -48,41 +46,32 @@ class RequestManager {
         }
         
         Alamofire.request(url, method: .get).responseString { response in
-            guard let html = response.result.value else { block?([]); return }
+            guard let html = response.result.value else { block?(List()); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
-                var items: [Doujinshi] = []
-                for element in doc.xpath("//div [@class='gl1t']") {
-                    items.append(Doujinshi.`init`(element: element))
-                }
+                let items = GalleryPage.gPageList(iPage: doc)
                 block?(items)
-                if cacheFavoritesTitles {
-                    DispatchQueue.global(qos: .userInteractive).async {
-                        let favTitles = doc.xpath("//option [contains(@value, 'fav')]").filter { $0.text != nil }.map { $0.text! }
-                        if favTitles.count == 10 { Defaults.List.favoriteTitles = favTitles }
-                    }
-                }
             } else {
-                block?([])
+                block?(List())
             }
         }
     }
     
-    func getDoujinshi(doujinshi: Doujinshi, at page: Int, completeBlock block: (([Page]) -> Void)?) {
+    func getDoujinshi(doujinshi: GalleryPage, at page: Int, completeBlock block: (([ShowPage]) -> Void)?) {
         print(#function)
         var url = doujinshi.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
-        Alamofire.request(url, method: .get).responseString { response in
+        let queue = DispatchQueue(label: doujinshi.url, qos: .background, attributes: .concurrent)
+        Alamofire.request(url, method: .get).responseString(queue: queue) { response in
             guard let html = response.result.value else {
                 block?([])
                 return
             }
             if let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
-                var pages: [Page] = []
+                var pages: [ShowPage] = []
                 for link in doc.xpath("//div [@class='gdtl'] //a") {
                     if let url = link["href"] {
                         if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
-                            let page = Page(value: ["thumbUrl": thumbUrl, "url": url])
-                            page.photo = SSPhoto(URL: url)
+                            let page = ShowPage(value: ["thumbUrl": thumbUrl, "url": url])
                             pages.append(page)
                         }
                     }
@@ -129,36 +118,36 @@ class RequestManager {
         }
     }
     
-    private func getNewList(with keywords: [String], completeBlock block: (([Doujinshi]) -> Void)?) {
+    private func getNewList(with keywords: [String], completeBlock block: (([GalleryPage]) -> Void)?) {
         print(#function)
         guard keywords.count > 0 else {
             block?([])
             return
         }
-        var results: [Doujinshi] = []
+        var results: [GalleryPage] = []
         let totalCount = keywords.count
         var completedCount = 0
         for (index, keyword) in keywords.enumerated() {
             DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + .milliseconds(333 * index) ) {
-                RequestManager.shared.getList(page: 0, search: keyword, completeBlock: { (books) in
+                RequestManager.shared.getIndexPage(page: 0, search: keyword, completeBlock: { (books) in
                     results.append(contentsOf: books)
                     completedCount += 1
                     if completedCount == totalCount {
-                        block?(results.sorted(by: { $0.id > $1.id }))
+                        block?(results.sorted(by: { $0.gid > $1.gid }))
                     }
                 })
             }
         }
     }
 
-    func getGData( doujinshi: Doujinshi, completeBlock block: ((GData?) -> Void)? ) {
+    func getGData( doujinshi: GalleryPage, completeBlock block: ((GalleryPage?) -> Void)? ) {
         print(#function)
         //Api http://ehwiki.org/wiki/API
         guard doujinshi.isIdTokenValide else { block?(nil); return}
         
         let p: [String: Any] = [
             "method": "gdata",
-            "gidlist": [ [ doujinshi.id, doujinshi.token ] ],
+            "gidlist": [ [ doujinshi.gid, doujinshi.token ] ],
             "namespace": 1
         ]
         
@@ -173,7 +162,7 @@ class RequestManager {
                             let tags = metadata["tags"] as? [String],
                             let thumb = metadata["thumb"] as? String,
                             let gid = metadata["gid"] as? Int {
-                            let gdata = GData(value: ["filecount": Int(count)!, "rating": Float(rating)!, "title": title.isEmpty ? doujinshi.title : title, "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn, "coverUrl": thumb, "gid": String(gid)])
+                            let gdata = GalleryPage(value: ["filecount": Int(count)!, "rating": Float(rating)!, "title": title.isEmpty ? doujinshi.title : title, "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn, "coverUrl": thumb, "gid": String(gid)])
                             for t in tags {
                                 gdata.tags.append(Tag(value: ["name": t]))
                             }
@@ -206,28 +195,28 @@ class RequestManager {
         }
     }
 
-    func addDoujinshiToFavorite(doujinshi: Doujinshi, category: Int = 0) {
+    func addDoujinshiToFavorite(doujinshi: GalleryPage, category: Int = 0) {
         guard doujinshi.isIdTokenValide else {return}
         doujinshi.favorite = .favorite0
-        let url = Defaults.URL.host + "/gallerypopups.php?gid=\(doujinshi.id)&t=\(doujinshi.token)&act=addfav"
+        let url = Defaults.URL.host + "/gallerypopups.php?gid=\(doujinshi.gid)&t=\(doujinshi.token)&act=addfav"
         let parameters: [String: String] = ["favcat": "\(category)", "favnote": "", "apply": "Add to Favorites", "update": "1"]
         Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
         }
     }
 
-    func deleteFavorite(doujinshi: Doujinshi) {
+    func deleteFavorite(doujinshi: GalleryPage) {
         guard doujinshi.isIdTokenValide else {return}
         let url = Defaults.URL.host + "/favorites.php"
-        let parameters: [String: Any] = ["ddact": "delete", "modifygids[]": doujinshi.id, "apply": "Apply"]
+        let parameters: [String: Any] = ["ddact": "delete", "modifygids[]": doujinshi.gid, "apply": "Apply"]
         Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
         }
     }
     
-    func moveFavorite(doujinshi: Doujinshi, to catogory: Int) {
+    func moveFavorite(doujinshi: GalleryPage, to catogory: Int) {
         guard 0...9 ~= catogory else {return}
         guard doujinshi.isIdTokenValide else {return}
         let url = Defaults.URL.host + "/favorites.php"
-        let parameters: [String: Any] = ["ddact": "fav\(catogory)", "modifygids[]": doujinshi.id, "apply": "Apply"]
+        let parameters: [String: Any] = ["ddact": "fav\(catogory)", "modifygids[]": doujinshi.gid, "apply": "Apply"]
         Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
         }
     }

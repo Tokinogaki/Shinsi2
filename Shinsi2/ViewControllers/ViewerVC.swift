@@ -18,14 +18,14 @@ class ViewerVC: UICollectionViewController {
         }
     }
     private var _selectedIndexPath: IndexPath?
-    weak var doujinshi: Doujinshi!
+    weak var doujinshi: GalleryPage!
     private lazy var browsingHistory: BrowsingHistory? = {
         return RealmManager.shared.browsingHistory(for: doujinshi)
     }()
-    var pages: [Page] {
+    var pages: [ShowPage] {
         var ps = Array(doujinshi.pages)
-        if Defaults.Gallery.isAppendBlankPage { ps.insert(Page.blankPage(), at: 0) }
-        if ps.count % 2 != 0 { ps.append(Page.blankPage()) } // Fix 
+        if Defaults.Gallery.isAppendBlankPage { ps.insert(ShowPage.blankPage(), at: 0) }
+        if ps.count % 2 != 0 { ps.append(ShowPage.blankPage()) } // Fix 
         return ps
     }
     var mode: ViewerMode {
@@ -39,7 +39,7 @@ class ViewerVC: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if !doujinshi.isDownloaded {
-            pages.forEach { $0.photo.checkCache() }
+            // TODO: pages.forEach { $0.photo.checkCache() }
         }
         view.layoutIfNeeded()
         collectionView?.reloadData()
@@ -120,8 +120,8 @@ class ViewerVC: UICollectionViewController {
         let p = ges.location(in: collectionView)
         if let indexPath = collectionView!.indexPathForItem(at: p) {
             let item = getPage(for: indexPath)
-            if !doujinshi.isDownloaded && item.photo.underlyingImage == nil {return}
-            let image = doujinshi.isDownloaded ? item.localImage! : item.photo.underlyingImage!
+            if !doujinshi.isDownloaded && item.underlyingImage == nil {return}
+            let image = doujinshi.isDownloaded ? item.localImage! : item.underlyingImage!
             
             let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
             let ok = UIAlertAction(title: "OK", style: .default) { _ in
@@ -203,7 +203,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         if doujinshi.isDownloaded {
             cell.image = page.localImage
         } else {
-            let photo = page.photo!
+            let photo = page
             if let image = photo.underlyingImage {
                 cell.image = image
             } else {
@@ -220,9 +220,12 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         let pageIndex = indexPath.item
         for i in 1...5 {
             if i + pageIndex > doujinshi.pages.count - 1 { break }
-            if let nextPhoto = doujinshi.pages[i + pageIndex].photo, nextPhoto.underlyingImage == nil {
-                nextPhoto.loadUnderlyingImageAndNotify()
-                ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[i + pageIndex].thumbUrl)!])
+            if doujinshi.pages.count > i + pageIndex {
+                let nextPhoto = doujinshi.pages[i + pageIndex]
+                if nextPhoto.underlyingImage == nil {
+                    nextPhoto.loadUnderlyingImageAndNotify()
+                    ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[i + pageIndex].thumbUrl)!])
+                }
             }
         }
         
@@ -240,10 +243,10 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
 
     func heroID(for indexPath: IndexPath) -> String {
         let index = convertIndexPath(from: indexPath).item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0)
-        return "image_\(doujinshi.id)_\(index)"
+        return "image_\(doujinshi.gid)_\(index)"
     }
 
-    func getPage(for indexPath: IndexPath) -> Page {
+    func getPage(for indexPath: IndexPath) -> ShowPage {
         return pages[convertIndexPath(from: indexPath).item]
     }
     
@@ -258,7 +261,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     }
     
     @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
-        guard let photo = notification.object as? SSPhoto else { return }
+        guard let photo = notification.object as? ShowPage else { return }
         if photo.underlyingImage != nil {
             collectionView.reloadData()
         }
