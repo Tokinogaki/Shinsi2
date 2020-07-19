@@ -37,6 +37,8 @@
 		7CF71FE024B9A1AF00733B9C /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF71FDF24B9A1AF00733B9C /* History.swift */; };
 		7CF71FE224B9A1D100733B9C /* GalleryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF71FE124B9A1D100733B9C /* GalleryPage.swift */; };
 		7CF71FE424B9A1FC00733B9C /* ShowPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF71FE324B9A1FC00733B9C /* ShowPage.swift */; };
+		6E9C4A59AB28844C2C9D07BE /* libPods-Shinsi2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62AF745A0A1136C849776EB2 /* libPods-Shinsi2.a */; };
+		7C24BB9C24B1D10A00C2E072 /* CustomeCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C24BB9B24B1D10A00C2E072 /* CustomeCollectionViewFlowLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +74,8 @@
 		7CF71FDF24B9A1AF00733B9C /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		7CF71FE124B9A1D100733B9C /* GalleryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryPage.swift; sourceTree = "<group>"; };
 		7CF71FE324B9A1FC00733B9C /* ShowPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPage.swift; sourceTree = "<group>"; };
+		62AF745A0A1136C849776EB2 /* libPods-Shinsi2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Shinsi2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C24BB9B24B1D10A00C2E072 /* CustomeCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomeCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		84200A16D7CCE139324C1CC5 /* Pods-Shinsi2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shinsi2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Shinsi2/Pods-Shinsi2.debug.xcconfig"; sourceTree = "<group>"; };
 		A10805BDD40FA9FA8CA5E220 /* Pods_Shinsi2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Shinsi2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -167,6 +171,7 @@
 				54E1DADE1F1F38E00096A6D3 /* DownloadBubble.swift */,
 				54AA5F472192B03C003E0FAD /* QuickScrollBar.swift */,
 				54405C912196888F00D613BD /* LoadingView.swift */,
+				7C24BB9B24B1D10A00C2E072 /* CustomeCollectionViewFlowLayout.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -342,6 +347,7 @@
 				546663941F1DE511003B9E36 /* TagVC.swift in Sources */,
 				7CF71FE224B9A1D100733B9C /* GalleryPage.swift in Sources */,
 				546663901F1DE511003B9E36 /* ListVC.swift in Sources */,
+				7C24BB9C24B1D10A00C2E072 /* CustomeCollectionViewFlowLayout.swift in Sources */,
 				54433ECA21992FA1008313D4 /* CommentVC.swift in Sources */,
 				54E1DADF1F1F38E00096A6D3 /* DownloadBubble.swift in Sources */,
 				546663911F1DE511003B9E36 /* LoginVC.swift in Sources */,
