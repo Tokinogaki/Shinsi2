@@ -318,14 +318,17 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         }
 
         var infoText = doujinshi.category.text
-        infoText += "\n\(doujinshi.lastUpdateTime)"
+        infoText += "\n\(doujinshi.posted)"
         infoText += "\n\(doujinshi.rating)"
-        infoText += "\n\(doujinshi.filecount)"
+        infoText += "\n\(doujinshi.`length`)"
         
         if doujinshi.favorite != .none {
             cell.infoLabel.layer.borderWidth = 2
             cell.infoLabel.layer.borderColor = doujinshi.favorite.color.cgColor
             cell.infoLabel.backgroundColor = doujinshi.favorite.color.withAlphaComponent(0.3)
+        }
+        else {
+            cell.infoLabel.layer.borderWidth = 0
         }
     
         cell.infoLabel.text = infoText
