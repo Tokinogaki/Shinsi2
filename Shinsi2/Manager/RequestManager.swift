@@ -5,6 +5,20 @@ import Kanna
 class RequestManager {
     
     static let shared = RequestManager()
+    
+    func login(username name: String, password pw: String, completeBlock block: (() -> Void)? ) {
+        let url = Defaults.URL.login.absoluteString + "&CODE=01"
+        let parameters: [String: String] = [
+            "CookieDate": "1",
+            "b": "d",
+            "bt": "1-1",
+            "UserName": name,
+            "PassWord": pw,
+            "ipb_login_submit": "Login!"]
+        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+            block?()
+        }
+    }
 
     func getIndexPage(page: Int, search keyword: String? = nil, completeBlock block: ((List<GalleryPage>) -> Void)?) {
         let categoryFilters = Defaults.Search.categories.map {"f_\($0)=\(UserDefaults.standard.bool(forKey: $0) ? 1 : 0)"}.joined(separator: "&")
@@ -56,30 +70,25 @@ class RequestManager {
         }
     }
     
-    func getDoujinshi(doujinshi: GalleryPage, at page: Int, completeBlock block: ((List<ShowPage>) -> Void)?) {
+    func getGalleryPage(galleryPage: GalleryPage, completeBlock block: (() -> Void)?) {
         print(#function)
-        var url = doujinshi.url + "?p=\(page)"
+        let page = galleryPage.currentPage
+        var url = galleryPage.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
-        let queue = DispatchQueue(label: doujinshi.url, qos: .background, attributes: .concurrent)
+        let queue = DispatchQueue(label: galleryPage.url, qos: .background, attributes: .concurrent)
         Alamofire.request(url, method: .get).responseString(queue: queue) { response in
-            guard let html = response.result.value else {
-                block?(List<ShowPage>())
-                return
-            }
-            if let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
-                doujinshi.setPage(doc)
-                
+            if let html = response.result.value,
+               let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
+                galleryPage.setPage(doc)
                 if page == 0 {
-                    doujinshi.setComments(doc)
+                    galleryPage.setComments(doc)
                 }
-                block?(doujinshi.pages)
-            } else {
-                block?(List<ShowPage>())
             }
+            block?()
         }
     }
 
-    func getPageImageUrl(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
+    func getShowPage(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
         print(#function)
         Alamofire.request(url, method: .get).responseString { response in
             guard let html = response.result.value else {
@@ -97,29 +106,36 @@ class RequestManager {
             block?(nil)
         }
     }
-    
-    private func getNewList(with keywords: [String], completeBlock block: (([GalleryPage]) -> Void)?) {
-        print(#function)
-        guard keywords.count > 0 else {
-            block?([])
-            return
-        }
-        var results: [GalleryPage] = []
-        let totalCount = keywords.count
-        var completedCount = 0
-        for (index, keyword) in keywords.enumerated() {
-            DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + .milliseconds(333 * index) ) {
-                RequestManager.shared.getIndexPage(page: 0, search: keyword, completeBlock: { (books) in
-                    results.append(contentsOf: books)
-                    completedCount += 1
-                    if completedCount == totalCount {
-                        block?(results.sorted(by: { $0.gid > $1.gid }))
-                    }
-                })
-            }
+
+    func addGalleryToFavorite(gallery: GalleryPage, category: Int = 0) {
+        guard gallery.isIdTokenValide else {return}
+        gallery.favorite = .favorite0
+        let url = Defaults.URL.host + "/gallerypopups.php?gid=\(gallery.gid)&t=\(gallery.token)&act=addfav"
+        let parameters: [String: String] = ["favcat": "\(category)", "favnote": "", "apply": "Add to Favorites", "update": "1"]
+        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
         }
     }
 
+    func deleteFavorite(gallery: GalleryPage) {
+        guard gallery.isIdTokenValide else {return}
+        let url = Defaults.URL.host + "/favorites.php"
+        let parameters: [String: Any] = ["ddact": "delete", "modifygids[]": gallery.gid, "apply": "Apply"]
+        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        }
+    }
+    
+    func moveFavorite(gallery: GalleryPage, to catogory: Int) {
+        guard 0...9 ~= catogory else {return}
+        guard gallery.isIdTokenValide else {return}
+        let url = Defaults.URL.host + "/favorites.php"
+        let parameters: [String: Any] = ["ddact": "fav\(catogory)", "modifygids[]": gallery.gid, "apply": "Apply"]
+        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        }
+    }
+}
+
+extension RequestManager {
+    
     func getGData( doujinshi: GalleryPage, completeBlock block: ((GalleryPage?) -> Void)? ) {
         print(#function)
         //Api http://ehwiki.org/wiki/API
@@ -160,44 +176,5 @@ class RequestManager {
             block?(nil)
         }
     }
-
-    func login(username name: String, password pw: String, completeBlock block: (() -> Void)? ) {
-        let url = Defaults.URL.login.absoluteString + "&CODE=01"
-        let parameters: [String: String] = [
-            "CookieDate": "1",
-            "b": "d",
-            "bt": "1-1",
-            "UserName": name,
-            "PassWord": pw,
-            "ipb_login_submit": "Login!"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
-            block?()
-        }
-    }
-
-    func addDoujinshiToFavorite(doujinshi: GalleryPage, category: Int = 0) {
-        guard doujinshi.isIdTokenValide else {return}
-        doujinshi.favorite = .favorite0
-        let url = Defaults.URL.host + "/gallerypopups.php?gid=\(doujinshi.gid)&t=\(doujinshi.token)&act=addfav"
-        let parameters: [String: String] = ["favcat": "\(category)", "favnote": "", "apply": "Add to Favorites", "update": "1"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
-        }
-    }
-
-    func deleteFavorite(doujinshi: GalleryPage) {
-        guard doujinshi.isIdTokenValide else {return}
-        let url = Defaults.URL.host + "/favorites.php"
-        let parameters: [String: Any] = ["ddact": "delete", "modifygids[]": doujinshi.gid, "apply": "Apply"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
-        }
-    }
     
-    func moveFavorite(doujinshi: GalleryPage, to catogory: Int) {
-        guard 0...9 ~= catogory else {return}
-        guard doujinshi.isIdTokenValide else {return}
-        let url = Defaults.URL.host + "/favorites.php"
-        let parameters: [String: Any] = ["ddact": "fav\(catogory)", "modifygids[]": doujinshi.gid, "apply": "Apply"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
-        }
-    }
 }

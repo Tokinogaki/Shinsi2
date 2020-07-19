@@ -223,7 +223,7 @@ class ListVC: BaseViewController {
                     self.collectionView.deleteItems(at: [indexPath])
                 }, completion: nil)
             } else if self.mode == .favorite {
-                RequestManager.shared.deleteFavorite(doujinshi: doujinshi)
+                RequestManager.shared.deleteFavorite(gallery: doujinshi)
                 self.items.remove(at: indexPath.item)
                 self.collectionView.performBatchUpdates({
                     self.collectionView.deleteItems(at: [indexPath])
@@ -259,7 +259,7 @@ class ListVC: BaseViewController {
         Defaults.List.favoriteTitles.enumerated().forEach { f in
             if displayingFavCategory != f.offset {
                 let a = UIAlertAction(title: f.element, style: .default, handler: { (_) in
-                    RequestManager.shared.moveFavorite(doujinshi: doujinshi, to: f.offset)
+                    RequestManager.shared.moveFavorite(gallery: doujinshi, to: f.offset)
                     if displayingFavCategory != -1 {
                         self.items.remove(at: indexPath.item)
                         self.collectionView.performBatchUpdates({
@@ -349,7 +349,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
-        vc.doujinshi = items[indexPath.item]
+        vc.galleryPage = items[indexPath.item]
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -366,7 +366,7 @@ extension ListVC: UIViewControllerPreviewingDelegate {
         guard let indexPath = collectionView.indexPathForItem(at: location) else {return nil}
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
         let item = items[indexPath.item]
-        vc.doujinshi = item
+        vc.galleryPage = item
         vc.delegate = self
         return vc
     }

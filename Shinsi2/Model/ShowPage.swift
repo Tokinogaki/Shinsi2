@@ -77,7 +77,7 @@ class ShowPage: Object {
         guard isLoading == false, underlyingImage == nil else { return }
         isLoading = true
         
-        RequestManager.shared.getPageImageUrl(url: urlString) { [weak self] url in
+        RequestManager.shared.getShowPage(url: urlString) { [weak self] url in
             guard let self = self else { return }
             guard let url = url else {
                 self.imageLoadComplete()

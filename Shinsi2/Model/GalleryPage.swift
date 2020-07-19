@@ -21,12 +21,16 @@ class GalleryPage: Object {
     @objc dynamic var favorite = FavoriteEnum.none
     
     @objc dynamic var readPage: Int = 0
-    @objc dynamic var isDownloaded = false
     @objc dynamic var createdAt: Date = Date()
-    @objc dynamic var updatedAt: Date = Date()
     @objc dynamic var status = StatusEnum.none
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
+    
+    
+    var isLoadGalleryPage: Bool = false
+    
+    var updatedAt: Date = Date()
+    var isDownloaded: Bool = false
     
     let tags = List<Tag>()
     let pages = List<ShowPage>()
@@ -38,6 +42,7 @@ class GalleryPage: Object {
             return self._url
         }
         set {
+            self._url = newValue
             if let url = URL(string: newValue) {
                 self.gid = url.pathComponents.indices.contains(2) ? Int(url.pathComponents[2]) ?? 0 : 0
                 self.token = url.pathComponents.indices.contains(3) ? url.pathComponents[3] : ""
@@ -57,6 +62,10 @@ class GalleryPage: Object {
     var isIdTokenValide: Bool {
         return self.gid == 0 && token != ""
     }
+    
+    var currentPage: Int {
+        return self.pages.count != 0 ? self.`length` / self.pages.count : 0
+    }
 
     var canDownload: Bool {
         if isDownloaded {
@@ -70,9 +79,17 @@ class GalleryPage: Object {
         }
         return false
     }
+    
+    var canLoadGalleryPage: Bool {
+        return self.pages.count != self.`length` && !self.isLoadGalleryPage
+    }
 
     override static func primaryKey() -> String? {
         return "gid"
+    }
+    
+    override class func ignoredProperties() -> [String] {
+        return ["isLoadGalleryPage"]
     }
     
     static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {

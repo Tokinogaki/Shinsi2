@@ -54,7 +54,7 @@ class PageDownloadOperation: SSOperation {
     }
     
     override func main() {
-        RequestManager.shared.getPageImageUrl(url: url) { imageUrl in
+        RequestManager.shared.getShowPage(url: url) { imageUrl in
             if let imageUrl = imageUrl {
                 let documentsURL = URL(fileURLWithPath: self.folderPath)
                 let fileURL = documentsURL.appendingPathComponent(String(format: "%04d.jpg", self.pageNumber))
