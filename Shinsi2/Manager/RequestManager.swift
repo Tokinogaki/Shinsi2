@@ -48,7 +48,7 @@ class RequestManager {
         Alamofire.request(url, method: .get).responseString { response in
             guard let html = response.result.value else { block?(List()); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
-                let items = GalleryPage.gPageList(iPage: doc)
+                let items = GalleryPage.galleryPageList(indexPage: doc)
                 block?(items)
             } else {
                 block?(List())
@@ -56,45 +56,25 @@ class RequestManager {
         }
     }
     
-    func getDoujinshi(doujinshi: GalleryPage, at page: Int, completeBlock block: (([ShowPage]) -> Void)?) {
+    func getDoujinshi(doujinshi: GalleryPage, at page: Int, completeBlock block: ((List<ShowPage>) -> Void)?) {
         print(#function)
         var url = doujinshi.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
         let queue = DispatchQueue(label: doujinshi.url, qos: .background, attributes: .concurrent)
         Alamofire.request(url, method: .get).responseString(queue: queue) { response in
             guard let html = response.result.value else {
-                block?([])
+                block?(List<ShowPage>())
                 return
             }
             if let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
-                var pages: [ShowPage] = []
-                for link in doc.xpath("//div [@class='gdtl'] //a") {
-                    if let url = link["href"] {
-                        if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
-                            let page = ShowPage(value: ["thumbUrl": thumbUrl, "url": url])
-                            pages.append(page)
-                        }
-                    }
-                }
+                doujinshi.setPage(doc)
                 
                 if page == 0 {
-                    //Parse comments
-                    let commentDateFormatter = DateFormatter()
-                    commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"
-                    for c in doc.xpath("//div [@id='cdiv'] //div [@class='c1']") {
-                        if let dateAndAuthor = c.at_xpath("div [@class='c2'] /div [@class='c3']")?.text,
-                            let author = c.at_xpath("div [@class='c2'] /div [@class='c3'] /a")?.text,
-                            let text = c.at_xpath("div [@class='c6']")?.innerHTML {
-                            let dateString = dateAndAuthor.replacingOccurrences(of: author, with: "").replacingOccurrences(of: "Posted on ", with: "").replacingOccurrences(of: " by:   ", with: "")
-                            let r = Comment(author: author, date: commentDateFormatter.date(from: dateString) ?? Date(), text: text)
-                            doujinshi.comments.append(r)
-                        }
-                    }
-                    doujinshi.perPageCount = pages.count
+                    doujinshi.setComments(doc)
                 }
-                block?(pages)
+                block?(doujinshi.pages)
             } else {
-                block?([])
+                block?(List<ShowPage>())
             }
         }
     }

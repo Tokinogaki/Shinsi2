@@ -142,16 +142,16 @@ class GalleryVC: BaseViewController {
             guard let self = self, pages.count > 0 else { return }
             self.favoriteButton.isEnabled = self.doujinshi.favorite == .none
             self.commentButton.isEnabled = self.doujinshi.comments.count > 0
-            let isTempCover = self.doujinshi.pages.count == 0 && self.collectionView.numberOfItems(inSection: 0) == 1
-            self.doujinshi.pages.append(objectsIn: pages)
-            var new = pages.map({IndexPath(item: self.doujinshi.pages.index(of: $0)!, section: 0)})
-            if isTempCover {
-                new.remove(at: 0)
-                ImageManager.shared.prefetch(urls: [URL(string: pages.first!.thumbUrl)!])
-            }
-            self.collectionView.performBatchUpdates({
-                self.collectionView.insertItems(at: new)
-            }, completion: nil)
+//            let isTempCover = self.doujinshi.pages.count == 0 && self.collectionView.numberOfItems(inSection: 0) == 1
+//            self.doujinshi.pages.append(objectsIn: pages)
+//            var new = pages.map({IndexPath(item: self.doujinshi.pages.index(of: $0)!, section: 0)})
+//            if isTempCover {
+//                new.remove(at: 0)
+//                ImageManager.shared.prefetch(urls: [URL(string: pages.first!.thumbUrl)!])
+//            }
+//            self.collectionView.performBatchUpdates({
+//                self.collectionView.insertItems(at: new)
+//            }, completion: nil)
             
             if self.doujinshi.pages.count < self.doujinshi.filecount {
                 self.currentPage += 1
@@ -342,7 +342,7 @@ extension GalleryVC: CommentVCDelegate {
                 }
             } else if url.absoluteString.contains(Defaults.URL.host+"/s/") {
                 //Page
-                if let page = doujinshi.pages.filter({ $0.url == url.absoluteString }).first,
+                if let page = doujinshi.pages.filter({ $0.webUrl == url.absoluteString }).first,
                     let index = doujinshi.pages.index(of: page) {
                     vc.dismiss(animated: true) {
                         self.collectionView.scrollToItem(at: IndexPath(item: index, section: 0),
@@ -387,7 +387,7 @@ UICollectionViewDataSourcePrefetching {
             cell.imageView.image = page.localImage
             cell.loadingView?.hide(animated: false)
         } else {
-            if let image = ImageManager.shared.getCache(forKey: page.url) {
+            if let image = ImageManager.shared.getCache(forKey: page.webUrl) {
                 cell.imageView.image = image
                 cell.loadingView?.hide(animated: false)
             } else {

@@ -95,7 +95,7 @@ class DownloadManager: NSObject {
         books[folderName] = doujinshi
         
         for (i, p) in doujinshi.pages.enumerated() {
-            let o = PageDownloadOperation(url: p.url, folderPath: path, pageNumber: i)
+            let o = PageDownloadOperation(url: p.webUrl, folderPath: path, pageNumber: i)
             queue.addOperation(o)
         }
         queue.addObserver(self, forKeyPath: "operationCount", options: [.new], context: nil)

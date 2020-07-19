@@ -10,13 +10,37 @@ public extension Notification.Name {
 
 class ShowPage: Object {
     @objc dynamic var thumbUrl = ""
-    @objc dynamic var url = ""
-    @objc dynamic var size = CGSize.zero
-    @objc dynamic var thumbSize = CGSize.zero
+    @objc dynamic var imageUrl = ""
+    @objc dynamic var originUrl = ""
+    @objc dynamic var webUrl = ""
+    @objc dynamic private var _sizeWidth: Float = 0
+    @objc dynamic private var _sizeHeight: Float = 0
+    @objc dynamic private var _thumbSizeWidth: Float = 0
+    @objc dynamic private var _thumbSizeHeight: Float = 0
     
     var underlyingImage: UIImage?
     var isLoading = false
     let imageCache = SDWebImageManager.shared().imageCache!
+    
+    var size: CGSize {
+        get {
+            return CGSize(width: CGFloat(self._sizeWidth), height: CGFloat(self._sizeHeight));
+        }
+        set {
+            self._sizeWidth = Float(newValue.width)
+            self._sizeHeight = Float(newValue.height)
+        }
+    }
+    
+    var thumbSize: CGSize {
+        get {
+            return CGSize(width: CGFloat(self._thumbSizeWidth), height: CGFloat(self._thumbSizeHeight));
+        }
+        set {
+            self._thumbSizeWidth = Float(newValue.width)
+            self._thumbSizeHeight = Float(newValue.height)
+        }
+    }
     
     var imageRatio: CGFloat {
         if self.thumbSize != CGSize.zero {
@@ -35,7 +59,7 @@ class ShowPage: Object {
     }
     
     required init() {
-        fatalError("init() has not been implemented")
+        super.init()
     }
     
     func loadUnderlyingImageAndNotify() {

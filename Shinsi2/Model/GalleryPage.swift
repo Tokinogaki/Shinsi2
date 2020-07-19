@@ -14,13 +14,13 @@ class GalleryPage: Object {
     @objc dynamic var rating: Float = 0.0
     @objc dynamic var lastUpdateTime = ""
     @objc dynamic var isDownloaded = false
-    @objc dynamic var readPage: UInt = 0
+    @objc dynamic var readPage: Int = 0
     @objc dynamic var createdAt: Date = Date()
     @objc dynamic var updatedAt: Date = Date()
+    @objc dynamic var favorite = FavoriteEnum.none
+    @objc dynamic var status = StatusEnum.none
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
-    @objc private dynamic var _favorite = FavoriteEnum.none.rawValue
-    @objc private dynamic var _status = StatusEnum.none.rawValue
     
     let tags = List<Tag>()
     let pages = List<ShowPage>()
@@ -48,24 +48,6 @@ class GalleryPage: Object {
         }
     }
     
-    var favorite: FavoriteEnum {
-        get {
-            return FavoriteEnum(rawValue: self._favorite) ?? .none
-        }
-        set {
-            self._favorite = newValue.rawValue
-        }
-    }
-    
-    var status: StatusEnum {
-        get {
-            return StatusEnum(rawValue: self._status) ?? .none
-        }
-        set {
-            self._status = newValue.rawValue
-        }
-    }
-    
     var isIdTokenValide: Bool {
         return self.gid == 0 && token != ""
     }
@@ -87,15 +69,15 @@ class GalleryPage: Object {
         return "gid"
     }
     
-    static func gPage(iPageItem element: XMLElement?) -> GalleryPage {
-        let gPage = GalleryPage(iPageItem: element)
+    static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {
+        let gPage = GalleryPage(indexPageItem: element)
         return gPage
     }
     
-    static func gPageList(iPage doc: HTMLDocument?) -> List<GalleryPage> {
+    static func galleryPageList(indexPage doc: HTMLDocument?) -> List<GalleryPage> {
         let gPageList = List<GalleryPage>()
         for element in doc!.xpath("//div [@class='gl1t']") {
-            gPageList.append(gPage(iPageItem: element))
+            gPageList.append(galleryPage(indexPageItem: element))
         }
         return gPageList
     }
@@ -133,8 +115,16 @@ class GalleryPage: Object {
         super.init()
     }
     
-    init(iPageItem element: XMLElement?) {
+    init(indexPageItem element: XMLElement?) {
         super.init()
+        self.setInfo(indexPageItem: element)
+    }
+    
+    func getTitle() -> String {
+        return title_jpn.isEmpty ? title : title_jpn
+    }
+    
+    func setInfo(indexPageItem element: XMLElement?) {
         var node = element?.at_css("div.gl3t a")
         let imgNode = node?.at_css("img")
         self.url = node?["href"] ?? ""
@@ -157,23 +147,46 @@ class GalleryPage: Object {
         self.filecount = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
     }
     
-    func getTitle() -> String {
-        return title_jpn.isEmpty ? title : title_jpn
-    }
-    
-    func setTags(with element: XMLElement?) {
-        self.tags.removeAll()
-        
-    }
-    
-    func setComments(with element: XMLElement?) {
-        self.comments.removeAll()
-    }
-    
-    func setPage(sPage element: XMLElement?) {
-        if self.pages.count == self.filecount {
-            return;
+    func setRating(_ element: HTMLDocument) {
+        if var rating = element.at_xpath("//td [@id='rating_label']")?.text {
+            rating = rating.replacingOccurrences(of: "Average: ", with: "")
+            self.rating = Float(rating) ?? 0.0
         }
+    }
+    
+    func setTags(_ element: HTMLDocument) {
+        self.tags.removeAll()
+        for t in element.xpath("//div [@id='taglist'] //tr") {
+            self.tags.append(Tag(t))
+        }
+    }
+    
+    func setComments(_ element: HTMLDocument) {
+        self.comments.removeAll()
+        //Parse comments
+        let commentDateFormatter = DateFormatter()
+        commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"
+        for c in element.xpath("//div [@id='cdiv'] //div [@class='c1']") {
+            if let dateAndAuthor = c.at_xpath("div [@class='c2'] /div [@class='c3']")?.text,
+                let author = c.at_xpath("div [@class='c2'] /div [@class='c3'] /a")?.text,
+                let text = c.at_xpath("div [@class='c6']")?.innerHTML {
+                let dateString = dateAndAuthor.replacingOccurrences(of: author, with: "").replacingOccurrences(of: "Posted on ", with: "").replacingOccurrences(of: " by:   ", with: "")
+                let r = Comment(author: author, date: commentDateFormatter.date(from: dateString) ?? Date(), text: text)
+                self.comments.append(r)
+            }
+        }
+    }
+    
+    func setPage(_ element: HTMLDocument) {
+        for link in element.xpath("//div [@class='gdtl'] //a") {
+            if let webUrl = link["href"] {
+                if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
+                    let page = ShowPage(value: ["thumbUrl": thumbUrl, "webUrl": webUrl])
+                    self.pages.append(page)
+                }
+            }
+        }
+        self.perPageCount = self.pages.count
     }
     
 }
@@ -182,8 +195,27 @@ class Tag : Object {
     @objc dynamic var name = ""
     let values = List<String>()
     
-    init(_ element: XMLElement?) {
+    init(_ element: XMLElement) {
         super.init()
+        
+        var index = 0
+        for td in element.xpath("td") {
+            print(td.toHTML)
+            if index == 0 {
+                if var name = td.text {
+                    name.removeLast()
+                    self.name = name
+                }
+            }
+            else {
+                for i in td.xpath("div //a") {
+                    if let text = i.text {
+                        self.values.append(text)
+                    }
+                }
+            }
+            index += 1
+        }
     }
     
     required init() {
@@ -192,11 +224,12 @@ class Tag : Object {
 }
 
 class Comment: Object {
-    var author: String
-    var date: Date
-    var text: String
+    var author: String = ""
+    var date: Date = Date()
+    var text: String = ""
     var htmlAttributedText: NSAttributedString?
     init(author: String, date: Date, text: String) {
+        super.init()
         self.author = author
         self.date = date
         self.text = text
@@ -204,7 +237,7 @@ class Comment: Object {
     }
     
     required init() {
-        fatalError("init() has not been implemented")
+        super.init()
     }
 }
 
@@ -310,7 +343,7 @@ struct CategoryOptions : OptionSet {
     }
 }
 
-enum FavoriteEnum : Int {
+@objc enum FavoriteEnum : Int, RealmEnum {
     case none, favorite0, favorite1, favorite2, favorite3, favorite4, favorite5, favorite6, favorite7, favorite8, favorite9
     
     init(text stringValue: String) {
@@ -400,6 +433,6 @@ enum FavoriteEnum : Int {
     }
 }
 
-enum StatusEnum : Int {
+@objc enum StatusEnum : Int, RealmEnum {
     case none, indexStart, indexEnd, galleryStart, galleryEnd, showStart, showEnd, downloadStart, downloadEnd
 }
