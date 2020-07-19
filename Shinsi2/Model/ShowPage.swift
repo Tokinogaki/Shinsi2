@@ -9,14 +9,14 @@ public extension Notification.Name {
 }
 
 class ShowPage: Object {
+    @objc dynamic var index = 0
     @objc dynamic var thumbUrl = ""
     @objc dynamic var imageUrl = ""
     @objc dynamic var originUrl = ""
     @objc dynamic var webUrl = ""
+    @objc dynamic var fileSize = ""
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
-    @objc dynamic private var _thumbSizeWidth: Float = 0
-    @objc dynamic private var _thumbSizeHeight: Float = 0
     
     var underlyingImage: UIImage?
     var isLoading = false
@@ -32,20 +32,7 @@ class ShowPage: Object {
         }
     }
     
-    var thumbSize: CGSize {
-        get {
-            return CGSize(width: CGFloat(self._thumbSizeWidth), height: CGFloat(self._thumbSizeHeight));
-        }
-        set {
-            self._thumbSizeWidth = Float(newValue.width)
-            self._thumbSizeHeight = Float(newValue.height)
-        }
-    }
-    
     var imageRatio: CGFloat {
-        if self.thumbSize != CGSize.zero {
-            return self.thumbSize.width / self.thumbSize.height
-        }
         if self.size != CGSize.zero {
             return self.size.width / self.size.height
         }
@@ -60,6 +47,30 @@ class ShowPage: Object {
     
     required init() {
         super.init()
+    }
+    
+    func setInfo(showPage doc: HTMLDocument) {
+        if let img = doc.at_xpath("//img [@id='img']"),
+           let imageUrl = img["src"] {
+            self.imageUrl = imageUrl
+        }
+        
+        if let text = doc.at_xpath("//div [@id='i2'] //div //span")?.text,
+           let index = Int(text) {
+            self.index = index
+        }
+        
+        if let origin = doc.at_xpath("//div [@id='i7'] //a"),
+           let originUrl = origin["href"],
+           let imgInfo = origin.text {
+            self.originUrl = originUrl
+            let imgInfoArray = imgInfo.components(separatedBy: " ")
+            if imgInfoArray.count == 8 {
+                self._sizeWidth = Float(imgInfoArray[2]) ?? 0
+                self._sizeHeight = Float(imgInfoArray[4]) ?? 0
+                self.fileSize = imgInfoArray[5] + imgInfoArray[6]
+            }
+        }
     }
     
     func loadUnderlyingImageAndNotify() {
@@ -106,9 +117,6 @@ class ShowPage: Object {
     var aspectRatio: Float {
         if self.size != CGSize.zero {
             return Float(self.size.width / self.size.height)
-        }
-        if self.thumbSize != CGSize.zero {
-            return Float(self.thumbSize.width / self.thumbSize.height)
         }
         return 1.0
     }
