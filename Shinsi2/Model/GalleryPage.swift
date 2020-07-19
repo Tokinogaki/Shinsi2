@@ -7,17 +7,23 @@ import SDWebImage
 class GalleryPage: Object {
     @objc dynamic var gid: Int = 0
     @objc dynamic var token = ""
+    
     @objc dynamic var title = ""
     @objc dynamic var title_jpn = ""
     @objc dynamic var coverUrl = ""
-    @objc dynamic var filecount = 0
+    @objc dynamic var posted: Date = Date()
+    @objc dynamic var parent = 0
+    @objc dynamic var language = ""
+    @objc dynamic var fileSize = ""
+    @objc dynamic var `length` = 0
+    @objc dynamic var favorited: Int = 0
     @objc dynamic var rating: Float = 0.0
-    @objc dynamic var lastUpdateTime = ""
-    @objc dynamic var isDownloaded = false
+    @objc dynamic var favorite = FavoriteEnum.none
+    
     @objc dynamic var readPage: Int = 0
+    @objc dynamic var isDownloaded = false
     @objc dynamic var createdAt: Date = Date()
     @objc dynamic var updatedAt: Date = Date()
-    @objc dynamic var favorite = FavoriteEnum.none
     @objc dynamic var status = StatusEnum.none
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
@@ -56,7 +62,7 @@ class GalleryPage: Object {
         if isDownloaded {
             return false
         }
-        else if self.filecount == self.pages.count {
+        else if self.`length` == self.pages.count {
             return true
         }
         else if self.status.rawValue >= StatusEnum.galleryEnd.rawValue {
@@ -136,7 +142,9 @@ class GalleryPage: Object {
         
         node = element?.at_css("div[id*='posted_']")
         let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
-        self.lastUpdateTime = node?.text ?? ""
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        self.posted = dateFormatter.date(from: node?.text ?? "") ?? Date()
         self.favorite = FavoriteEnum(hexColor: hexColor)
         
         node = element?.at_css("div.ir")
@@ -144,13 +152,31 @@ class GalleryPage: Object {
         self.rating = GalleryPage.getRating(with: style)
         
         node = element?.css("div.gl5t>div>div")[3]
-        self.filecount = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
+        self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
     }
     
-    func setRating(_ element: HTMLDocument) {
+    func setInfo(galleryPage element: HTMLDocument) {
         if var rating = element.at_xpath("//td [@id='rating_label']")?.text {
             rating = rating.replacingOccurrences(of: "Average: ", with: "")
             self.rating = Float(rating) ?? 0.0
+        }
+        
+        for tr in element.xpath("//div [@id='gdd'] //tr") {
+            if let key = tr.at_css("td.gdt1")?.text,
+               let value = tr.at_css("td.gdt2")?.text {
+                switch key {
+                case "Parent:":
+                    self.parent = Int(value) ?? 0
+                case "Language:":
+                    self.language = value
+                case "File Size:":
+                    self.fileSize = value
+                case "Favorited:":
+                    self.favorited = Int(value.replacingOccurrences(of: " times", with: "")) ?? 0
+                default:
+                    break
+                }
+            }
         }
     }
     

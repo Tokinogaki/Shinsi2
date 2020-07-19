@@ -101,7 +101,7 @@ class GalleryVC: BaseViewController {
         if doujinshi.isDownloaded, doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue {
             loadingView.hide()
             scrollToLastReadingPage()
-        } else if doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue && doujinshi.pages.count == doujinshi.filecount {
+        } else if doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue && doujinshi.pages.count == doujinshi.`length` {
             loadingView.hide()
             scrollToLastReadingPage()
         } else if doujinshi.status.rawValue >= StatusEnum.galleryEnd.rawValue, doujinshi.pages.count > 0, let perPageCount = doujinshi.perPageCount {
@@ -153,7 +153,7 @@ class GalleryVC: BaseViewController {
 //                self.collectionView.insertItems(at: new)
 //            }, completion: nil)
             
-            if self.doujinshi.pages.count < self.doujinshi.filecount {
+            if self.doujinshi.pages.count < self.doujinshi.`length` {
                 self.currentPage += 1
                 self.loadPages()
             } else {

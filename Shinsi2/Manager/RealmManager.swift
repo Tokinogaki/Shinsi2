@@ -78,7 +78,7 @@ class RealmManager {
     
     func saveDownloadedDoujinshi(book: GalleryPage) {
         book.pages.removeAll()
-        for i in 0..<book.filecount {
+        for i in 0..<book.`length` {
             let p = ShowPage()
             p.thumbUrl = String(format: String(book.gid) + "/%04d.jpg", i)
             book.pages.append(p)
