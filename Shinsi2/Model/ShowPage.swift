@@ -10,11 +10,12 @@ public extension Notification.Name {
 
 class ShowPage: Object {
     @objc dynamic var index = 0
+    @objc dynamic var imageKey = ""
     @objc dynamic var thumbUrl = ""
     @objc dynamic var imageUrl = ""
     @objc dynamic var originUrl = ""
-    @objc dynamic var webUrl = ""
     @objc dynamic var fileSize = ""
+    @objc dynamic private var _url: String = ""
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
     
@@ -22,6 +23,17 @@ class ShowPage: Object {
     var isLoading = false
     let imageCache = SDWebImageManager.shared().imageCache!
     
+    var url: String {
+        get {
+            return self._url
+        }
+        set {
+            self._url = newValue
+            if let url = URL(string: newValue) {
+                self.imageKey = url.pathComponents.indices.contains(2) ? url.pathComponents[2] : ""
+            }
+        }
+    }
     var size: CGSize {
         get {
             return CGSize(width: CGFloat(self._sizeWidth), height: CGFloat(self._sizeHeight));
@@ -45,6 +57,26 @@ class ShowPage: Object {
         }
     }
     
+    var aspectRatio: Float {
+        if self.size != CGSize.zero {
+            return Float(self.size.width / self.size.height)
+        }
+        return 1.0
+    }
+    
+    var localUrl: URL {
+        return documentURL.appendingPathComponent(thumbUrl)
+    }
+
+    var localImage: UIImage? {
+        return UIImage(contentsOfFile: localUrl.path)
+    }
+
+    static func blankPage() -> ShowPage {
+        let p = ShowPage()
+        return p
+    }
+
     required init() {
         super.init()
     }
@@ -114,21 +146,8 @@ class ShowPage: Object {
         NotificationCenter.default.post(name: .photoLoaded, object: self)
     }
     
-    var aspectRatio: Float {
-        if self.size != CGSize.zero {
-            return Float(self.size.width / self.size.height)
-        }
-        return 1.0
+    override class func primaryKey() -> String? {
+        return "imageKey"
     }
-    
-    var localUrl: URL {
-        return documentURL.appendingPathComponent(thumbUrl)
-    }
-    var localImage: UIImage? {
-        return UIImage(contentsOfFile: localUrl.path)
-    }
-    static func blankPage() -> ShowPage {
-        let p = ShowPage()
-        return p
-    }
+
 }

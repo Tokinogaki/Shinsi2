@@ -87,7 +87,6 @@ class RealmManager {
             book.coverUrl = first.thumbUrl
         }
         book.isDownloaded = true
-        book.updatedAt = Date()
         
         DispatchQueue.main.async {
             try! self.realm.write {
@@ -102,7 +101,7 @@ class RealmManager {
         }
     }
     
-    func isDounjinshiDownloaded(doujinshi: GalleryPage) -> Bool {
-        return downloaded.filter("gdata.gid = '\(doujinshi.gid)'").count != 0
+    func isDounjinshiDownloaded(galleryPage: GalleryPage) -> Bool {
+        return downloaded.filter("gdata.gid = '\(galleryPage.gid)'").count != 0
     }
 }

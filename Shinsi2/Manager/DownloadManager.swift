@@ -82,9 +82,9 @@ class DownloadManager: NSObject {
     var queues: [OperationQueue] = []
     var books: [String: GalleryPage] = [:]
     
-    func download(doujinshi: GalleryPage) {
-        guard doujinshi.pages.count != 0 else {return}
-        let folderName = String(doujinshi.gid)
+    func download(galleryPage: GalleryPage) {
+        guard galleryPage.pages.count != 0 else {return}
+        let folderName = String(galleryPage.gid)
         let path = documentURL.appendingPathComponent(folderName).path
         
         let queue = OperationQueue()
@@ -92,10 +92,10 @@ class DownloadManager: NSObject {
         queue.isSuspended = queues.count != 0
         queue.name = folderName
         queues.append(queue)
-        books[folderName] = doujinshi
+        books[folderName] = galleryPage
         
-        for (i, p) in doujinshi.pages.enumerated() {
-            let o = PageDownloadOperation(url: p.webUrl, folderPath: path, pageNumber: i)
+        for (i, p) in galleryPage.pages.enumerated() {
+            let o = PageDownloadOperation(url: p.url, folderPath: path, pageNumber: i)
             queue.addOperation(o)
         }
         queue.addObserver(self, forKeyPath: "operationCount", options: [.new], context: nil)

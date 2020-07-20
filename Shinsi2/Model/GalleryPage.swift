@@ -26,16 +26,12 @@ class GalleryPage: Object {
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
     
-    
-    var isLoadGalleryPage: Bool = false
-    
-    var updatedAt: Date = Date()
     var isDownloaded: Bool = false
     
     let tags = List<Tag>()
     let pages = List<ShowPage>()
     let comments = List<Comment>()
-    var perPageCount: Int?
+    var perPageCount: Int = 0
     
     var url: String {
         get {
@@ -64,24 +60,27 @@ class GalleryPage: Object {
     }
     
     var currentPage: Int {
-        return self.pages.count != 0 ? self.`length` / self.pages.count : 0
+        return self.pages.count != 0 ? self.`length` / self.perPageCount : 0
     }
 
     var canDownload: Bool {
         if isDownloaded {
             return false
         }
-        else if self.`length` == self.pages.count {
+        
+        if self.`length` == self.pages.count {
             return true
         }
-        else if self.status.rawValue >= StatusEnum.galleryEnd.rawValue {
+        
+        if self.status.rawValue >= StatusEnum.galleryEnd.rawValue {
             return true
         }
+        
         return false
     }
     
     var canLoadGalleryPage: Bool {
-        return self.pages.count != self.`length` && !self.isLoadGalleryPage
+        return self.pages.count != self.`length`
     }
 
     override static func primaryKey() -> String? {
@@ -89,7 +88,7 @@ class GalleryPage: Object {
     }
     
     override class func ignoredProperties() -> [String] {
-        return ["isLoadGalleryPage"]
+        return []
     }
     
     static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {
@@ -222,14 +221,17 @@ class GalleryPage: Object {
     
     func setPage(_ element: HTMLDocument) {
         for link in element.xpath("//div [@class='gdtl'] //a") {
-            if let webUrl = link["href"] {
+            if let url = link["href"] {
                 if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
-                    let page = ShowPage(value: ["thumbUrl": thumbUrl, "webUrl": webUrl])
+                    let page = ShowPage(value: ["thumbUrl": thumbUrl, "url": url])
+                    page.url = url
                     self.pages.append(page)
                 }
             }
         }
-        self.perPageCount = self.pages.count
+        if self.perPageCount == 0 {
+            self.perPageCount = self.pages.count
+        }
     }
     
 }
@@ -243,7 +245,6 @@ class Tag : Object {
         
         var index = 0
         for td in element.xpath("td") {
-            print(td.toHTML)
             if index == 0 {
                 if var name = td.text {
                     name.removeLast()

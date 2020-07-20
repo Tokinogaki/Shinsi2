@@ -8,7 +8,6 @@ class GalleryVC: BaseViewController {
     var galleryPage: GalleryPage!
     private var browsingHistory: BrowsingHistory?
     private var didScrollToHistory = false
-    private var currentPage = 0
     private var backGesture: InteractiveBackGesture!
     private var isPartDownloading = false { didSet { handlePartDownload() } }
     @IBOutlet weak var collectionView: UICollectionView!
@@ -23,21 +22,22 @@ class GalleryVC: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = galleryPage.title
+        title = galleryPage.getTitle()
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
-        
-        browsingHistory = RealmManager.shared.browsingHistory(for: galleryPage)
-        if browsingHistory == nil {
-            RealmManager.shared.createBrowsingHistory(for: galleryPage)
-            browsingHistory = RealmManager.shared.browsingHistory(for: galleryPage)
-        }
-        
+//
+//        browsingHistory = RealmManager.shared.browsingHistory(for: galleryPage)
+//        if browsingHistory == nil {
+//            RealmManager.shared.createBrowsingHistory(for: galleryPage)
+//            browsingHistory = RealmManager.shared.browsingHistory(for: galleryPage)
+//        }
+//
         backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinch(ges:)))
         collectionView.addGestureRecognizer(pinchGesture)
         
-        self.updateNavigationItems()
+        updateNavigationItems()
+        appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
         
         if !isSizeClassRegular {
             navigationItem.rightBarButtonItems =
@@ -60,7 +60,7 @@ class GalleryVC: BaseViewController {
             scrollBar.draggingTextOffset = 40
         }
         
-        self.loadPages()
+        checkGData()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -92,33 +92,57 @@ class GalleryVC: BaseViewController {
         }
     }
     
+    private func checkGData() {
+//        if galleryPage.isDownloaded {
+//            loadingView.hide()
+//            scrollToLastReadingPage()
+//        }
+        
+        if self.galleryPage.pages.count > 0 {
+            loadingView.hide()
+            scrollToLastReadingPage()
+        } else if self.galleryPage.canLoadGalleryPage {
+            self.loadPages()
+        }
+    }
+    
     func updateNavigationItems() {
-        tagButton.isEnabled = galleryPage.tags.count > 0
+        tagButton.isEnabled = true
         downloadButton.isEnabled = galleryPage.canDownload
         commentButton.isEnabled = galleryPage.comments.count > 0
-        favoriteButton.isEnabled = galleryPage.favorite == .none
-        appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
+        favoriteButton.isEnabled = galleryPage.favorite == .none && galleryPage.pages.count > 0
     }
     
     func loadPages() {
-        loadingView.show()
         RequestManager.shared.getGalleryPage(galleryPage: self.galleryPage) {
-            self.commentButton.isEnabled = self.galleryPage.comments.count > 0
-            self.scrollToLastReadingPage()
-            self.collectionView.reloadData()
-            self.updateNavigationItems()
+            guard self.galleryPage.pages.count > 0 else { return }
+            
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+                self.updateNavigationItems()
+            }
+            
+            if self.galleryPage.perPageCount == 0 {
+                self.galleryPage.perPageCount = self.galleryPage.pages.count
+            }
+            
+            if self.galleryPage.canLoadGalleryPage {
+//                self.loadPages()
+            } else {
+                // All pages feteched
+                self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(galleryPage: self.galleryPage)
+            }
         }
     }
     
     private func scrollToLastReadingPage() {
         guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
-        guard let readingPage = self.galleryPage?.readPage,
-            readingPage < galleryPage.pages.count,
+        guard self.galleryPage.readPage < galleryPage.pages.count,
             didScrollToHistory == false else { return }
         didScrollToHistory = true
         // Scroll after collectionView loaded
         DispatchQueue.main.async {
-            self.collectionView.scrollToItem(at: IndexPath(row: readingPage, section: 0), at: .top, animated: true)
+            self.collectionView.scrollToItem(at: IndexPath(row: self.galleryPage.readPage, section: 0), at: .top, animated: true)
         }
     }
     
@@ -139,7 +163,7 @@ class GalleryVC: BaseViewController {
             present(sheet, animated: true, completion: nil)
         } else {
             favoriteButton.isEnabled = false
-            RequestManager.shared.addGalleryToFavorite(gallery: galleryPage)
+            RequestManager.shared.addGalleryToFavorite(gallery: self.galleryPage)
             SVProgressHUD.show("♥".toIcon(), status: nil)
         }
     }
@@ -177,7 +201,7 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showTag",
             let nv = segue.destination as? UINavigationController,
             let vc = nv.viewControllers.first as? TagVC {
-            vc.doujinshi = galleryPage
+            vc.doujinshi = self.galleryPage
             vc.clickBlock = { [unowned self, unowned vc] tag in
                 vc.dismiss(animated: true, completion: {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
@@ -189,7 +213,7 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showComment",
             let nv = segue.destination as? UINavigationController,
             let vc = nv.viewControllers.first as? CommentVC {
-            vc.doujinshi = galleryPage
+            vc.doujinshi = self.galleryPage
             vc.delegate = self
         }
     }
@@ -226,7 +250,7 @@ class GalleryVC: BaseViewController {
     
     func downloadAll() {
         downloadButton.isEnabled = false
-        DownloadManager.shared.download(doujinshi: galleryPage)
+        DownloadManager.shared.download(galleryPage: self.galleryPage)
         DownloadBubble.shared.show(on: navigationController!)
     }
     
@@ -237,22 +261,21 @@ class GalleryVC: BaseViewController {
                 isPartDownloading = false
                 return
         }
-        let new = GalleryPage(value: galleryPage!)
-        // TODO: new.setGData(gdata: GPage(value: doujinshi.gdata!))
+        let new = GalleryPage(value: self.galleryPage!)
         new.pages.removeAll()
         for i in selectedIndexPaths {
             new.pages.append(ShowPage(value: galleryPage.pages[i.item]))
         }
-        // TODO: new.gdata!.gid = new.gdata!.gid + String(Date().timeIntervalSince1970)
-        // TODO: new.gdata!.filecount = selectedIndexPaths.count
+        new.gid = Int("\(new.gid)\(arc4random() % (99999 - 10000) + 10000)") ?? 0
+        new.`length` = selectedIndexPaths.count
         new.coverUrl = new.pages.first!.thumbUrl
-        DownloadManager.shared.download(doujinshi: new)
+        DownloadManager.shared.download(galleryPage: new)
         DownloadBubble.shared.show(on: navigationController!)
         
         isPartDownloading = false
     }
     
-    override var previewActionItems: [UIPreviewActionItem] { 
+    override var previewActionItems: [UIPreviewActionItem] {
         var actions: [UIPreviewActionItem] = []
         let artist = galleryPage.title.artist
         if let artist = artist {
@@ -266,7 +289,7 @@ class GalleryVC: BaseViewController {
             })
         }
         if !galleryPage.isDownloaded && galleryPage.favorite == .none {
-            actions.append( UIPreviewAction(title: "♥", style: .default) { (_, _) -> Void in 
+            actions.append( UIPreviewAction(title: "♥", style: .default) { (_, _) -> Void in
                 RequestManager.shared.addGalleryToFavorite(gallery: self.galleryPage)
                 SVProgressHUD.show("♥".toIcon(), status: nil)
             })
@@ -288,7 +311,7 @@ extension GalleryVC: CommentVCDelegate {
                 }
             } else if url.absoluteString.contains(Defaults.URL.host+"/s/") {
                 //Page
-                if let page = galleryPage.pages.filter({ $0.webUrl == url.absoluteString }).first,
+                if let page = galleryPage.pages.filter({ $0.url == url.absoluteString }).first,
                     let index = galleryPage.pages.index(of: page) {
                     vc.dismiss(animated: true) {
                         self.collectionView.scrollToItem(at: IndexPath(item: index, section: 0),
@@ -333,7 +356,7 @@ UICollectionViewDataSourcePrefetching {
             cell.imageView.image = page.localImage
             cell.loadingView?.hide(animated: false)
         } else {
-            if let image = ImageManager.shared.getCache(forKey: page.webUrl) {
+            if let image = ImageManager.shared.getCache(forKey: page.url) {
                 cell.imageView.image = image
                 cell.loadingView?.hide(animated: false)
             } else {
@@ -368,7 +391,7 @@ UICollectionViewDataSourcePrefetching {
             guard galleryPage.pages.count > 1 else {return}
             let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
             vc.selectedIndexPath = indexPath
-            vc.doujinshi = galleryPage
+            vc.doujinshi = self.galleryPage
             vc.modalPresentationStyle = .fullScreen
             present(vc, animated: true)
         } else {
