@@ -20,18 +20,17 @@ class GalleryPage: Object {
     @objc dynamic var rating: Float = 0.0
     @objc dynamic var favorite = FavoriteEnum.none
     
+    @objc dynamic var isDownloaded: Bool = false
     @objc dynamic var readPage: Int = 0
+    @objc dynamic var perPageCount: Int = 0
     @objc dynamic var createdAt: Date = Date()
-    @objc dynamic var status = StatusEnum.none
+    @objc dynamic var status = StatusEnum.index
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
-    
-    var isDownloaded: Bool = false
     
     let tags = List<Tag>()
     let pages = List<ShowPage>()
     let comments = List<Comment>()
-    var perPageCount: Int = 0
     
     var url: String {
         get {
@@ -72,10 +71,6 @@ class GalleryPage: Object {
             return true
         }
         
-        if self.status.rawValue >= StatusEnum.galleryEnd.rawValue {
-            return true
-        }
-        
         return false
     }
     
@@ -83,7 +78,7 @@ class GalleryPage: Object {
         return self.pages.count != self.`length`
     }
 
-    override static func primaryKey() -> String? {
+    override class func primaryKey() -> String? {
         return "gid"
     }
     
@@ -92,14 +87,20 @@ class GalleryPage: Object {
     }
     
     static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {
-        let gPage = GalleryPage(indexPageItem: element)
-        return gPage
+        let galleryPage = GalleryPage(indexPageItem: element)
+        if let gp = RealmManager.shared.getGalleryPage(galleryPage.gid) {
+            RealmManager.shared.updateGalleryPage(galleryPage)
+            return gp
+        }
+        RealmManager.shared.addGalleryPage(galleryPage)
+        return galleryPage
     }
     
     static func galleryPageList(indexPage doc: HTMLDocument?) -> List<GalleryPage> {
         let gPageList = List<GalleryPage>()
         for element in doc!.xpath("//div [@class='gl1t']") {
-            gPageList.append(galleryPage(indexPageItem: element))
+            let galleryPage = self.galleryPage(indexPageItem: element)
+            gPageList.append(galleryPage)
         }
         return gPageList
     }
@@ -478,5 +479,5 @@ struct CategoryOptions : OptionSet {
 }
 
 @objc enum StatusEnum : Int, RealmEnum {
-    case none, indexStart, indexEnd, galleryStart, galleryEnd, showStart, showEnd, downloadStart, downloadEnd
+    case none, index, gallery, show, download
 }

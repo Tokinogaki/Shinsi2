@@ -93,15 +93,12 @@ class GalleryVC: BaseViewController {
     }
     
     private func checkGData() {
-//        if galleryPage.isDownloaded {
-//            loadingView.hide()
-//            scrollToLastReadingPage()
-//        }
-        
         if self.galleryPage.pages.count > 0 {
             loadingView.hide()
             scrollToLastReadingPage()
-        } else if self.galleryPage.canLoadGalleryPage {
+        }
+        
+        if self.galleryPage.canLoadGalleryPage {
             self.loadPages()
         }
     }
@@ -352,18 +349,9 @@ UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = galleryPage.pages[indexPath.item]
-        if galleryPage.isDownloaded {
-            cell.imageView.image = page.localImage
-            cell.loadingView?.hide(animated: false)
-        } else {
-            if let image = ImageManager.shared.getCache(forKey: page.url) {
-                cell.imageView.image = image
-                cell.loadingView?.hide(animated: false)
-            } else {
-                cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
-                cell.loadingView?.show(animated: false)
-            }
-        }
+
+        cell.imageView.sd_setImage(with: URL(string: page.urlString), placeholderImage: nil, options: [.handleCookies])
+        cell.loadingView?.show(animated: false)
         cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1

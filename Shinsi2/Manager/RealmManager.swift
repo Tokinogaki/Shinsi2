@@ -105,3 +105,30 @@ class RealmManager {
         return downloaded.filter("gdata.gid = '\(galleryPage.gid)'").count != 0
     }
 }
+
+extension RealmManager {
+    
+    func updateGalleryPage(_ galleryPage: GalleryPage) {
+        if let gp = RealmManager.shared.getGalleryPage(galleryPage.gid) {
+            try! realm.write {
+                gp.title = galleryPage.title
+                gp.coverUrl = galleryPage.coverUrl
+                gp.category = galleryPage.category
+                gp.posted = galleryPage.posted
+                gp.favorite = galleryPage.favorite
+                gp.rating = galleryPage.rating
+            }
+        }
+    }
+    
+    func addGalleryPage(_ galleryPage: GalleryPage) {
+        try! realm.write {
+            realm.add(galleryPage, update: .all)
+        }
+    }
+    
+    func getGalleryPage(_ gid: Int) -> GalleryPage? {
+        let resultList = realm.objects(GalleryPage.self).filter("gid=\(gid)")
+        return resultList.first
+    }
+}
