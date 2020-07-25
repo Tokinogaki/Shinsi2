@@ -308,7 +308,10 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: nil)
 
         var infoText = galleryPage.category.text
-        infoText += "\n\(galleryPage.posted)"
+        let df = DateFormatter()
+        df.dateFormat = "yyyy/MM/dd HH:mm"
+        let posted = df.string(from: galleryPage.posted)
+        infoText += "\n\(posted)"
         infoText += "\n\(galleryPage.rating)"
         infoText += "\n\(galleryPage.`length`)"
         
