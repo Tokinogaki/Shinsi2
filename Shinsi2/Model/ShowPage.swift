@@ -66,13 +66,11 @@ class ShowPage: Object {
         }
         return 1.0
     }
-    
-    var thumbImage: UIImage? {
-        return SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
-    }
 
-    var imageImage: UIImage? {
-       return SDImageCache.shared().imageFromMemoryCache(forKey: self.imageUrl)
+    var image: UIImage? {
+        return self.isDownload
+            ? SDImageCache.shared().imageFromMemoryCache(forKey: self.imageUrl)
+            : SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
    }
     
     required init() {

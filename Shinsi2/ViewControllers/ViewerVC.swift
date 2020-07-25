@@ -55,7 +55,6 @@ class ViewerVC: UICollectionViewController {
         collectionView?.addGestureRecognizer(longPressGesture)
         
         setNeedsUpdateOfHomeIndicatorAutoHidden()
-        NotificationCenter.default.addObserver(self, selector: #selector(handleSKPhotoLoadingDidEndNotification(notification:)), name: .photoLoaded, object: nil)
         
         if #available(iOS 13.0, *) {
             NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIScene.willDeactivateNotification, object: nil)
@@ -107,7 +106,7 @@ class ViewerVC: UICollectionViewController {
         let p = ges.location(in: collectionView)
         if let indexPath = collectionView!.indexPathForItem(at: p) {
             let item = self.galleryPage.showPageList[indexPath.item]
-            if let image = item.imageImage {
+            if let image = item.image {
                 let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
                 let ok = UIAlertAction(title: "OK", style: .default) { _ in
                     PHPhotoLibrary.requestAuthorization({ s in
@@ -171,13 +170,11 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = (collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ScrollingImageCell)!
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ScrollingImageCell
         cell.imageView.hero.id = heroID(for: indexPath)
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
-        
-        let page = self.galleryPage.showPageList[indexPath.item]
-        cell.imageView.sd_setImage(with: URL(string: page.currentUrl), placeholderImage: page.thumbImage, options: [.handleCookies])
+        cell.showPage = self.galleryPage.showPageList[indexPath.item]
         
         return cell
     }
@@ -193,14 +190,6 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         } else {
             return CGSize(width: collectionView.bounds.size.width, height: collectionView.bounds.size.width * paperRatio)
         }
-    }
-    
-    @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
-        guard let photo = notification.object as? ShowPage else { return }
-        guard photo.isDownload else {
-            return
-        }
-        collectionView.reloadData()
     }
     
 }

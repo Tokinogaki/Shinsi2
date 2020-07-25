@@ -300,39 +300,28 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ListCell
         
-        let doujinshi = items[indexPath.item]
-        cell.imageView.hero.id = "image_\(doujinshi.gid)_0"
+        let galleryPage = items[indexPath.item]
+        cell.imageView.hero.id = "image_\(galleryPage.gid)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
-        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(doujinshi.gid)_0")]
-        
-        if doujinshi.isDownloaded {
-            if let image = UIImage(contentsOfFile: documentURL.appendingPathComponent(doujinshi.coverUrl).path) {
-                cell.imageView.image = image
-                cell.imageView.contentMode = image.preferContentMode
-            }
-        } else {
-            cell.imageView.sd_setImage(with: URL(string: doujinshi.coverUrl), placeholderImage: nil, options: [.handleCookies], completed: { (image, _, _, _) in
-                if nil == image {return}
-                cell.imageView.contentMode = .scaleAspectFill
-            })
-        }
+        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
+        cell.imageView.contentMode = .scaleAspectFill
+        cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: nil)
 
-        var infoText = doujinshi.category.text
-        infoText += "\n\(doujinshi.posted)"
-        infoText += "\n\(doujinshi.rating)"
-        infoText += "\n\(doujinshi.`length`)"
+        var infoText = galleryPage.category.text
+        infoText += "\n\(galleryPage.posted)"
+        infoText += "\n\(galleryPage.rating)"
+        infoText += "\n\(galleryPage.`length`)"
         
-        if doujinshi.favorite != .none {
+        if galleryPage.favorite != .none {
             cell.infoLabel.layer.borderWidth = 2
-            cell.infoLabel.layer.borderColor = doujinshi.favorite.color.cgColor
-            cell.infoLabel.backgroundColor = doujinshi.favorite.color.withAlphaComponent(0.3)
-        }
-        else {
+            cell.infoLabel.layer.borderColor = galleryPage.favorite.color.cgColor
+            cell.infoLabel.backgroundColor = galleryPage.favorite.color.withAlphaComponent(0.3)
+        } else {
             cell.infoLabel.layer.borderWidth = 0
         }
     
         cell.infoLabel.text = infoText
-        cell.titleLabel?.text = doujinshi.title
+        cell.titleLabel?.text = galleryPage.title
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
         cell.layer.shouldRasterize = true

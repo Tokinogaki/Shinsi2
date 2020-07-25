@@ -17,7 +17,6 @@ class GalleryVC: BaseViewController {
     @IBOutlet weak var favoriteButton: UIBarButtonItem!
     @IBOutlet weak var commentButton: UIBarButtonItem!
     @IBOutlet weak var appendWhitePageButton: UIBarButtonItem!
-    @IBOutlet weak var loadingView: LoadingView!
     private var scrollBar: QuickScrollBar!
     weak var delegate: GalleryVCPreviewActionDelegate?
 
@@ -63,6 +62,7 @@ class GalleryVC: BaseViewController {
             scrollBar.draggingTextOffset = 40
         }
 
+        self.galleryPage.updateCalleryPage()
         self.galleryPage.loadGalleryPage()
     }
 
@@ -325,12 +325,12 @@ extension GalleryVC: UICollectionViewDataSource,
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = galleryPage.showPageList[indexPath.item]
 
-        cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
+        cell.imageView.sd_setImage(with: URL(string: page.currentUrl), placeholderImage: nil, options: [.handleCookies])
         cell.loadingView?.show(animated: false)
         cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1
-
+        
         cell.layer.shouldRasterize = true
         cell.layer.rasterizationScale = UIScreen.main.scale
         return cell

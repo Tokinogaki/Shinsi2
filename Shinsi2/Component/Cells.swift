@@ -22,7 +22,17 @@ class CommentCell: UITableViewCell {
     @IBOutlet weak var commentTextView: UITextView!
 }
 
-class ScrollingImageCell: UICollectionViewCell { 
+class ScrollingImageCell: UICollectionViewCell {
+    private var _showPage: ShowPage!
+    var showPage: ShowPage? {
+        get {
+            return _showPage
+        }
+        set {
+            _showPage = newValue
+            self.image = newValue?.image
+        }
+    }
     var imageView: UIImageView = UIImageView()
     var scrollView: UIScrollView = UIScrollView()
     var dTapGR: UITapGestureRecognizer!
@@ -55,6 +65,8 @@ class ScrollingImageCell: UICollectionViewCell {
         dTapGR.numberOfTapsRequired = 2 
         dTapGR.delegate = self
         addGestureRecognizer(dTapGR)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSKPhotoLoadingDidEndNotification(notification:)), name: .photoLoaded, object: nil)
     }
     
     func zoomRectForScale(scale: CGFloat, center: CGPoint) -> CGRect {
@@ -114,6 +126,15 @@ class ScrollingImageCell: UICollectionViewCell {
             inset.right = insetH
         }
         scrollView.contentInset = inset
+    }
+    
+    @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
+        guard let showPage = notification.object as? ShowPage else { return }
+        guard let page = self.showPage,
+            showPage == page else {
+            return
+        }
+        self.image = showPage.image
     }
 }
 
