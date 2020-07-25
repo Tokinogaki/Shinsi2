@@ -2,13 +2,13 @@ import UIKit
 import Hero
 import SDWebImage
 import Photos
+import RealmSwift
 
 class ViewerVC: UICollectionViewController {
     
     enum ViewerMode: Int {
         case horizontal = 0
         case vertical = 1
-        case doublePage = 2
     }
     var selectedIndexPath: IndexPath? {
         set { _selectedIndexPath = newValue }
@@ -18,29 +18,16 @@ class ViewerVC: UICollectionViewController {
         }
     }
     private var _selectedIndexPath: IndexPath?
-    weak var doujinshi: GalleryPage!
+    weak var galleryPage: GalleryPage!
     private lazy var browsingHistory: BrowsingHistory? = {
-        return RealmManager.shared.browsingHistory(for: doujinshi)
+        return RealmManager.shared.browsingHistory(for: galleryPage)
     }()
-    var pages: [ShowPage] {
-        var ps = Array(doujinshi.showPageList)
-        if Defaults.Gallery.isAppendBlankPage { ps.insert(ShowPage.blankPage(), at: 0) }
-        if ps.count % 2 != 0 { ps.append(ShowPage.blankPage()) } // Fix 
-        return ps
-    }
     var mode: ViewerMode {
-        if collectionView!.bounds.width > 1000 && collectionView!.bounds.width > collectionView!.bounds.height {
-            return .doublePage
-        } else {
-            return Defaults.Viewer.mode
-        }
+        return Defaults.Viewer.mode
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if !doujinshi.isDownloaded {
-            // TODO: pages.forEach { $0.photo.checkCache() }
-        }
         view.layoutIfNeeded()
         collectionView?.reloadData()
         
@@ -50,8 +37,6 @@ class ViewerVC: UICollectionViewController {
                 collectionView!.scrollToItem(at: selectedIndex, at: .right, animated: false)
             case .vertical:
                 collectionView!.scrollToItem(at: selectedIndex, at: .top, animated: false)
-            case .doublePage:
-                collectionView!.scrollToItem(at: selectedIndex.item % 2 != 0 ? selectedIndex : convertIndexPath(from: selectedIndex), at: .right, animated: false)
             }
         }
         
@@ -77,6 +62,8 @@ class ViewerVC: UICollectionViewController {
         } else {
             NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
         }
+        
+        self.galleryPage.startDownloadImage()
     }
     
     deinit {
@@ -85,7 +72,8 @@ class ViewerVC: UICollectionViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        updateBrowsingHistory()
+        self.updateBrowsingHistory()
+        self.galleryPage.cancelDownloadImage()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -96,9 +84,8 @@ class ViewerVC: UICollectionViewController {
         coordinator.animate(alongsideTransition: { _ in
             if let indexPath = indexPath {
                 self.collectionView.reloadData()
-                let covertedIndexPath = self.mode == .doublePage ? self.convertIndexPath(from: indexPath) : indexPath
-                let position: UICollectionView.ScrollPosition = self.mode == .vertical ? .top : (covertedIndexPath.item % 2 == 0 ? .left : .right)
-                self.collectionView!.scrollToItem(at: covertedIndexPath, at: position, animated: false)
+                let position: UICollectionView.ScrollPosition = self.mode == .vertical ? .top : (indexPath.item % 2 == 0 ? .left : .right)
+                self.collectionView!.scrollToItem(at: indexPath, at: position, animated: false)
             }
         })
     }
@@ -119,25 +106,23 @@ class ViewerVC: UICollectionViewController {
         guard ges.state == .began else {return}
         let p = ges.location(in: collectionView)
         if let indexPath = collectionView!.indexPathForItem(at: p) {
-            let item = getPage(for: indexPath)
-            if !doujinshi.isDownloaded && item.underlyingImage == nil {return}
-            let image = doujinshi.isDownloaded ? item.localImage! : item.underlyingImage!
-            
-            let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
-            let ok = UIAlertAction(title: "OK", style: .default) { _ in
-                PHPhotoLibrary.requestAuthorization({ s in
-                    if s == .authorized {
-                        PHPhotoLibrary.shared().performChanges({
-                            PHAssetChangeRequest.creationRequestForAsset(from: image)
-                        }, completionHandler: nil)
-                    }
-                })
-
+            let item = self.galleryPage.showPageList[indexPath.item]
+            if let image = item.imageImage {
+                let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
+                let ok = UIAlertAction(title: "OK", style: .default) { _ in
+                    PHPhotoLibrary.requestAuthorization({ s in
+                        if s == .authorized {
+                            PHPhotoLibrary.shared().performChanges({
+                                PHAssetChangeRequest.creationRequestForAsset(from: image)
+                            }, completionHandler: nil)
+                        }
+                    })
+                }
+                let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                alert.addAction(ok)
+                alert.addAction(cancel)
+                present(alert, animated: true, completion: nil)
             }
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            alert.addAction(ok)
-            alert.addAction(cancel)
-            present(alert, animated: true, completion: nil)
         }
     }
     
@@ -157,15 +142,7 @@ class ViewerVC: UICollectionViewController {
             for indexPath in collectionView!.indexPathsForVisibleItems {
                 let cell = collectionView!.cellForItem(at: indexPath) as! ScrollingImageCell
                 let currentPos = CGPoint(x: translation.x + view.center.x, y: translation.y + view.center.y)
-                if mode == .doublePage {
-                    let size = collectionView(collectionView!, layout: collectionView!.collectionViewLayout, sizeForItemAt: indexPath)
-                    let pos = indexPath.item % 2 == 0 ?
-                        CGPoint(x: currentPos.x - size.width/2, y: currentPos.y) :
-                        CGPoint(x: currentPos.x + size.width/2, y: currentPos.y)
-                    Hero.shared.apply(modifiers: [.position(pos)], to: cell.imageView)
-                } else {
-                    Hero.shared.apply(modifiers: [.position(currentPos)], to: cell.imageView)
-                }
+                Hero.shared.apply(modifiers: [.position(currentPos)], to: cell.imageView)
             }
         default:
             if progress + ges.velocity(in: nil).y / collectionView!.bounds.height > 0.3 {
@@ -190,7 +167,7 @@ class ViewerVC: UICollectionViewController {
 extension ViewerVC: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return pages.count
+        return self.galleryPage.showPageList.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -199,61 +176,19 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         
-        let page = getPage(for: indexPath)
-        if doujinshi.isDownloaded {
-            cell.image = page.localImage
-        } else {
-            let photo = page
-            if let image = photo.underlyingImage {
-                cell.image = image
-            } else {
-                if let image = ImageManager.shared.getCache(forKey: page.thumbUrl) { 
-                    cell.image = image
-                } else {
-                    cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
-                } 
-                photo.loadUnderlyingImageAndNotify()
-            }
-        }
-        
-        //prefetch
-        let pageIndex = indexPath.item
-        for i in 1...5 {
-            if i + pageIndex > doujinshi.showPageList.count - 1 { break }
-            if doujinshi.showPageList.count > i + pageIndex {
-                let nextPhoto = doujinshi.showPageList[i + pageIndex]
-                if nextPhoto.underlyingImage == nil {
-                    nextPhoto.loadUnderlyingImageAndNotify()
-                    ImageManager.shared.prefetch(urls: [URL(string: doujinshi.showPageList[i + pageIndex].thumbUrl)!])
-                }
-            }
-        }
+        let page = self.galleryPage.showPageList[indexPath.item]
+        cell.imageView.sd_setImage(with: URL(string: page.currentUrl), placeholderImage: page.thumbImage, options: [.handleCookies])
         
         return cell
-    } 
-    
-    func convertIndexPath(from indexPath: IndexPath) -> IndexPath {
-        var i = indexPath.item
-        if mode == .doublePage {
-            i = i % 2 == 0 ? i + 1 : i - 1
-            i = min(i, pages.count - 1)
-        }
-        return IndexPath(item: i, section: indexPath.section)
     }
-
+    
     func heroID(for indexPath: IndexPath) -> String {
-        let index = convertIndexPath(from: indexPath).item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0)
-        return "image_\(doujinshi.gid)_\(index)"
+        let index = indexPath.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0)
+        return "image_\(galleryPage.gid)_\(index)"
     }
 
-    func getPage(for indexPath: IndexPath) -> ShowPage {
-        return pages[convertIndexPath(from: indexPath).item]
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if mode == .doublePage {
-            return CGSize(width: collectionView.bounds.width/2, height: collectionView.bounds.height)
-        } else if mode == .horizontal {
+        if mode == .horizontal {
             return collectionView.bounds.size
         } else {
             return CGSize(width: collectionView.bounds.size.width, height: collectionView.bounds.size.width * paperRatio)
@@ -262,9 +197,10 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     
     @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
         guard let photo = notification.object as? ShowPage else { return }
-        if photo.underlyingImage != nil {
-            collectionView.reloadData()
+        guard photo.isDownload else {
+            return
         }
+        collectionView.reloadData()
     }
     
 }

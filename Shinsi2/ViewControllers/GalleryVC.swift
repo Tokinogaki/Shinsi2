@@ -39,6 +39,8 @@ class GalleryVC: BaseViewController {
         updateNavigationItems()
         appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSKPhotoLoadingDidEndNotification(notification:)), name: .updateCalleryPage, object: nil)
+        
         if !isSizeClassRegular {
             navigationItem.rightBarButtonItems =
                 navigationItem.rightBarButtonItems?.filter({$0 != appendWhitePageButton})
@@ -60,7 +62,6 @@ class GalleryVC: BaseViewController {
             scrollBar.draggingTextOffset = 40
         }
 
-        self.galleryPage.updateCalleryPage()
         self.galleryPage.loadGalleryPage()
     }
 
@@ -100,27 +101,27 @@ class GalleryVC: BaseViewController {
         favoriteButton.isEnabled = galleryPage.favorite == .none && galleryPage.showPageList.count > 0
     }
 
-    func loadPages() {
-        RequestManager.shared.getGalleryPage(galleryPage: self.galleryPage) {
-            guard self.galleryPage.showPageList.count > 0 else { return }
-
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-                self.updateNavigationItems()
-            }
-
-            if self.galleryPage.perPageCount == 0 {
-                self.galleryPage.perPageCount = self.galleryPage.showPageList.count
-            }
-
-            if self.galleryPage.isLoading {
-//                self.loadPages()
-            } else {
-                // All pages feteched
-                self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(galleryPage: self.galleryPage)
-            }
-        }
-    }
+//    func loadPages() {
+//        RequestManager.shared.getGalleryPage(galleryPage: self.galleryPage) {
+//            guard self.galleryPage.showPageList.count > 0 else { return }
+//
+//            DispatchQueue.main.async {
+//                self.collectionView.reloadData()
+//                self.updateNavigationItems()
+//            }
+//
+//            if self.galleryPage.perPageCount == 0 {
+//                self.galleryPage.perPageCount = self.galleryPage.showPageList.count
+//            }
+//
+//            if self.galleryPage.isLoaded {
+////                self.loadPages()
+//            } else {
+//                // All pages feteched
+//                self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(galleryPage: self.galleryPage)
+//            }
+//        }
+//    }
 
     private func scrollToLastReadingPage() {
         guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
@@ -283,6 +284,11 @@ class GalleryVC: BaseViewController {
         }
         return actions
     }
+    
+    @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
+        collectionView.reloadData()
+    }
+    
 }
 
 extension GalleryVC: CommentVCDelegate {
@@ -340,7 +346,7 @@ extension GalleryVC: UICollectionViewDataSource,
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = galleryPage.showPageList[indexPath.item]
 
-        cell.imageView.sd_setImage(with: URL(string: page.urlString), placeholderImage: nil, options: [.handleCookies])
+        cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
         cell.loadingView?.show(animated: false)
         cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
@@ -369,7 +375,7 @@ extension GalleryVC: UICollectionViewDataSource,
             guard galleryPage.showPageList.count > 1 else {return}
             let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
             vc.selectedIndexPath = indexPath
-            vc.doujinshi = self.galleryPage
+            vc.galleryPage = self.galleryPage
             vc.modalPresentationStyle = .fullScreen
             present(vc, animated: true)
         } else {

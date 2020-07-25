@@ -37,15 +37,26 @@ class GalleryPage: Object {
     let showPageList = List<ShowPage>()
     let comments = List<Comment>()
     
-    private var _queue: OperationQueue?
-    var queue: OperationQueue {
-        if _queue == nil {
-            _queue = OperationQueue()
-            _queue!.maxConcurrentOperationCount = 5
-            _queue!.name = self.url
+    private var _loadShowPageQueue: OperationQueue?
+    var loadShowPageQueue: OperationQueue {
+        if _loadShowPageQueue == nil {
+            _loadShowPageQueue = OperationQueue()
+            _loadShowPageQueue!.maxConcurrentOperationCount = 25
+            _loadShowPageQueue!.name = self.url
         }
         
-        return _queue!
+        return _loadShowPageQueue!
+    }
+    
+    private var _downloadImageQueue: OperationQueue?
+    var downloadImageQueue: OperationQueue {
+        if _downloadImageQueue == nil {
+            _downloadImageQueue = OperationQueue()
+            _downloadImageQueue!.maxConcurrentOperationCount = 25
+            _downloadImageQueue!.name = self.url
+        }
+        
+        return _downloadImageQueue!
     }
     
     var url: String {
@@ -268,7 +279,7 @@ class GalleryPage: Object {
     
 }
 
-class Tag : Object {
+class Tag: Object {
     @objc dynamic var name = ""
     let values = List<String>()
     
@@ -314,7 +325,7 @@ class Comment: Object {
     }
 }
 
-struct CategoryOptions : OptionSet {
+struct CategoryOptions: OptionSet {
     let rawValue: Int
     
     static func category(with stringValue: String) -> CategoryOptions {
@@ -416,7 +427,7 @@ struct CategoryOptions : OptionSet {
     }
 }
 
-@objc enum FavoriteEnum : Int, RealmEnum {
+@objc enum FavoriteEnum: Int, RealmEnum {
     case none, favorite0, favorite1, favorite2, favorite3, favorite4, favorite5, favorite6, favorite7, favorite8, favorite9
     
     init(text stringValue: String) {
@@ -529,12 +540,28 @@ extension GalleryPage {
         }
     }
     
-    private func loadShowPage() {
-        let showPageList = self.showPageList
-        self.queue.addOperation {
+    func startDownloadImage() {
+        self.downloadImageQueue.addOperation {
             DispatchQueue.main.async {
-                for showPage in showPageList {
-                    guard showPage.isLoading else {
+                for showPage in self.showPageList {
+                    guard !showPage.isDownload else {
+                        continue
+                    }
+                    showPage.dowloadImage()
+                }
+            }
+        }
+    }
+    
+    func cancelDownloadImage() {
+        self.downloadImageQueue.cancelAllOperations()
+    }
+    
+    private func loadShowPage() {
+        self.loadShowPageQueue.addOperation {
+            DispatchQueue.main.async {
+                for showPage in  self.showPageList {
+                    guard !showPage.isDownload else {
                         continue
                     }
                     RequestManager.shared.getShowPage(showPage: showPage) {

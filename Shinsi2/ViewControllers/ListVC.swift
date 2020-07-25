@@ -238,7 +238,7 @@ class ListVC: BaseViewController {
         }
         if mode == .download {
             let cell = collectionView.cellForItem(at: indexPath)!
-            let vc = UIActivityViewController(activityItems: doujinshi.showPageList.map { $0.localUrl }, applicationActivities: nil)
+            let vc = UIActivityViewController(activityItems: doujinshi.showPageList.map { $0.imageUrl }, applicationActivities: nil)
             vc.popoverPresentationController?.sourceView = collectionView
             vc.popoverPresentationController?.sourceRect = cell.frame
             let shareAction = UIAlertAction(title: "Share", style: .default) { (_) in

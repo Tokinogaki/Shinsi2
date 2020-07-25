@@ -19,11 +19,12 @@ class ShowPage: Object {
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
     
-    var underlyingImage: UIImage?
-    let imageCache = SDWebImageManager.shared().imageCache!
-    
     var isLoading: Bool {
-        return self.imageUrl.isEmpty
+        return !self.imageUrl.isEmpty
+    }
+    
+    var isDownload: Bool {
+        return SDImageCache.shared().diskImageDataExists(withKey: self.imageUrl)
     }
     
     var url: String {
@@ -37,9 +38,10 @@ class ShowPage: Object {
             }
         }
     }
+
     var size: CGSize {
         get {
-            return CGSize(width: CGFloat(self._sizeWidth), height: CGFloat(self._sizeHeight));
+            return CGSize(width: CGFloat(self._sizeWidth), height: CGFloat(self._sizeHeight))
         }
         set {
             self._sizeWidth = Float(newValue.width)
@@ -54,10 +56,8 @@ class ShowPage: Object {
         return 0.0
     }
     
-    var urlString: String {
-        get {
-            self.thumbUrl
-        }
+    var currentUrl: String {
+        return self.imageUrl.isEmpty ? self.thumbUrl : self.imageUrl
     }
     
     var aspectRatio: Float {
@@ -67,19 +67,14 @@ class ShowPage: Object {
         return 1.0
     }
     
-    var localUrl: URL {
-        return documentURL.appendingPathComponent(thumbUrl)
+    var thumbImage: UIImage? {
+        return SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
     }
 
-    var localImage: UIImage? {
-        return UIImage(contentsOfFile: localUrl.path)
-    }
-
-    static func blankPage() -> ShowPage {
-        let p = ShowPage()
-        return p
-    }
-
+    var imageImage: UIImage? {
+       return SDImageCache.shared().imageFromMemoryCache(forKey: self.imageUrl)
+   }
+    
     required init() {
         super.init()
     }
@@ -110,43 +105,16 @@ class ShowPage: Object {
         }
     }
     
-    func loadUnderlyingImageAndNotify() {
-        guard isLoading == false, underlyingImage == nil else { return }
-        
-        RequestManager.shared.getShowPage_bak(url: urlString) { [weak self] url in
-            guard let self = self else { return }
-            guard let url = url else {
-                self.imageLoadComplete()
-                return
-            }
-            SDWebImageDownloader.shared().downloadImage( with: URL(string: url)!, options: [.highPriority, .handleCookies, .useNSURLCache], progress: nil, completed: { [weak self] image, _, _, _ in
-                guard let self = self else { return }
-                self.imageCache.store(image, forKey: self.urlString)
-                self.underlyingImage = image
+    func dowloadImage() {
+        guard !self.isDownload else { return }
+        SDWebImageDownloader.shared().downloadImage(with: URL(string: self.imageUrl), options: [.highPriority, .handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
+            if let image = image {
+                SDImageCache.shared().store(image, forKey: self.imageUrl)
                 DispatchQueue.main.async {
-                    self.imageLoadComplete()
+                    NotificationCenter.default.post(name: .photoLoaded, object: self)
                 }
-            })
-        }
-    }
-
-    func checkCache() {
-        if let memoryCache = imageCache.imageFromMemoryCache(forKey: urlString) {
-            underlyingImage = memoryCache
-            imageLoadComplete()
-            return
-        }
-        
-        imageCache.queryCacheOperation(forKey: urlString) { [weak self] image, _, _ in
-            if let diskCache = image, let self = self {
-                self.underlyingImage = diskCache
-                self.imageLoadComplete()
             }
         }
-    }
-
-    func imageLoadComplete() {
-        NotificationCenter.default.post(name: .photoLoaded, object: self)
     }
     
     override class func primaryKey() -> String? {
