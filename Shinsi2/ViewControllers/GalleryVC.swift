@@ -10,6 +10,7 @@ class GalleryVC: BaseViewController {
     private var didScrollToHistory = false
     private var backGesture: InteractiveBackGesture!
     private var isPartDownloading = false { didSet { handlePartDownload() } }
+    private var rowCount: Int { return min(5, max(2, Int(floor(collectionView.bounds.width / Defaults.Gallery.cellWidth)))) }
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tagButton: UIBarButtonItem!
     @IBOutlet weak var downloadButton: UIBarButtonItem!
@@ -100,28 +101,6 @@ class GalleryVC: BaseViewController {
         commentButton.isEnabled = galleryPage.comments.count > 0
         favoriteButton.isEnabled = galleryPage.favorite == .none && galleryPage.showPageList.count > 0
     }
-
-//    func loadPages() {
-//        RequestManager.shared.getGalleryPage(galleryPage: self.galleryPage) {
-//            guard self.galleryPage.showPageList.count > 0 else { return }
-//
-//            DispatchQueue.main.async {
-//                self.collectionView.reloadData()
-//                self.updateNavigationItems()
-//            }
-//
-//            if self.galleryPage.perPageCount == 0 {
-//                self.galleryPage.perPageCount = self.galleryPage.showPageList.count
-//            }
-//
-//            if self.galleryPage.isLoaded {
-////                self.loadPages()
-//            } else {
-//                // All pages feteched
-//                self.downloadButton.isEnabled = !RealmManager.shared.isDounjinshiDownloaded(galleryPage: self.galleryPage)
-//            }
-//        }
-//    }
 
     private func scrollToLastReadingPage() {
         guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
@@ -393,8 +372,7 @@ extension GalleryVC: UICollectionViewDataSource,
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        let rows = max(2, floor(collectionView.bounds.width / Defaults.Gallery.cellWidth))
-        let width = (collectionView.bounds.width - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (rows - 1)) / rows
+        let width = (collectionView.bounds.width - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * CGFloat((rowCount - 1))) / CGFloat(rowCount)
         return CGSize(width: width, height: width * paperRatio)
     }
 }

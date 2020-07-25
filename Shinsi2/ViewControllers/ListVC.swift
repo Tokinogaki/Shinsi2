@@ -15,7 +15,7 @@ class ListVC: BaseViewController {
     private var currentPage = -1
     private var loadingPage = -1
     private var backGesture: InteractiveBackGesture?
-    private var rowCount: Int { return min(12, max(2, Int(floor(collectionView.bounds.width / Defaults.List.cellWidth)))) }
+    private var rowCount: Int { return min(5, max(2, Int(floor(collectionView.bounds.width / Defaults.List.cellWidth)))) }
     @IBOutlet weak var loadingView: LoadingView!
     
     enum Mode: String {
