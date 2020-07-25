@@ -54,7 +54,7 @@ class PageDownloadOperation: SSOperation {
     }
     
     override func main() {
-        RequestManager.shared.getShowPage(url: url) { imageUrl in
+        RequestManager.shared.getShowPage_bak(url: url) { imageUrl in
             if let imageUrl = imageUrl {
                 let documentsURL = URL(fileURLWithPath: self.folderPath)
                 let fileURL = documentsURL.appendingPathComponent(String(format: "%04d.jpg", self.pageNumber))
@@ -83,7 +83,7 @@ class DownloadManager: NSObject {
     var books: [String: GalleryPage] = [:]
     
     func download(galleryPage: GalleryPage) {
-        guard galleryPage.pages.count != 0 else {return}
+        guard galleryPage.showPageList.count != 0 else {return}
         let folderName = String(galleryPage.gid)
         let path = documentURL.appendingPathComponent(folderName).path
         
@@ -94,7 +94,7 @@ class DownloadManager: NSObject {
         queues.append(queue)
         books[folderName] = galleryPage
         
-        for (i, p) in galleryPage.pages.enumerated() {
+        for (i, p) in galleryPage.showPageList.enumerated() {
             let o = PageDownloadOperation(url: p.url, folderPath: path, pageNumber: i)
             queue.addOperation(o)
         }

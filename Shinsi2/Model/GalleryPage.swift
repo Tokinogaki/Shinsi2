@@ -4,6 +4,12 @@ import Kanna
 import UIColor_Hex_Swift
 import SDWebImage
 
+public extension Notification.Name {
+    static let updateCalleryPage = Notification.Name("updateCalleryPage")
+    static let loadGalleryPage = Notification.Name("loadGalleryPage")
+    static let loadShowPage = Notification.Name("loadShowPage")
+}
+
 class GalleryPage: Object {
     @objc dynamic var gid: Int = 0
     @objc dynamic var token = ""
@@ -24,13 +30,23 @@ class GalleryPage: Object {
     @objc dynamic var readPage: Int = 0
     @objc dynamic var perPageCount: Int = 0
     @objc dynamic var createdAt: Date = Date()
-    @objc dynamic var status = StatusEnum.index
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
     
     let tags = List<Tag>()
-    let pages = List<ShowPage>()
+    let showPageList = List<ShowPage>()
     let comments = List<Comment>()
+    
+    private var _queue: OperationQueue?
+    var queue: OperationQueue {
+        if _queue == nil {
+            _queue = OperationQueue()
+            _queue!.maxConcurrentOperationCount = 5
+            _queue!.name = self.url
+        }
+        
+        return _queue!
+    }
     
     var url: String {
         get {
@@ -58,8 +74,12 @@ class GalleryPage: Object {
         return self.gid == 0 && token != ""
     }
     
-    var currentPage: Int {
-        return self.pages.count != 0 ? self.`length` / self.perPageCount : 0
+    var nextPageIndex: Int {
+        guard self.showPageList.count != 0 else {
+            return 0
+        }
+        
+        return self.showPageList.count / self.perPageCount
     }
 
     var canDownload: Bool {
@@ -67,15 +87,15 @@ class GalleryPage: Object {
             return false
         }
         
-        if self.`length` == self.pages.count {
+        if self.`length` == self.showPageList.count {
             return true
         }
         
         return false
     }
     
-    var canLoadGalleryPage: Bool {
-        return self.pages.count != self.`length`
+    var isLoading: Bool {
+        return self.showPageList.count != self.`length`
     }
 
     override class func primaryKey() -> String? {
@@ -148,90 +168,101 @@ class GalleryPage: Object {
     }
     
     func setInfo(indexPageItem element: XMLElement?) {
-        var node = element?.at_css("div.gl3t a")
-        let imgNode = node?.at_css("img")
-        self.url = node?["href"] ?? ""
-        self.title = imgNode?["title"] ?? ""
-        self.coverUrl = imgNode?["src"] ?? ""
-        
-        node = element?.at_css("div[class*='cs']")
-        self.category = CategoryOptions.category(with: node?.text ?? "")
-        
-        node = element?.at_css("div[id*='posted_']")
-        let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
-        self.posted = dateFormatter.date(from: node?.text ?? "") ?? Date()
-        self.favorite = FavoriteEnum(hexColor: hexColor)
-        
-        node = element?.at_css("div.ir")
-        let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
-        self.rating = GalleryPage.getRating(with: style)
-        
-        node = element?.css("div.gl5t>div>div")[3]
-        self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
+        try! RealmManager.shared.realm.write {
+            var node = element?.at_css("div.gl3t a")
+            let imgNode = node?.at_css("img")
+            self.url = node?["href"] ?? ""
+            self.title = imgNode?["title"] ?? ""
+            self.coverUrl = imgNode?["src"] ?? ""
+            
+            node = element?.at_css("div[class*='cs']")
+            self.category = CategoryOptions.category(with: node?.text ?? "")
+            
+            node = element?.at_css("div[id*='posted_']")
+            let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+            self.posted = dateFormatter.date(from: node?.text ?? "") ?? Date()
+            self.favorite = FavoriteEnum(hexColor: hexColor)
+            
+            node = element?.at_css("div.ir")
+            let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
+            self.rating = GalleryPage.getRating(with: style)
+            
+            node = element?.css("div.gl5t>div>div")[3]
+            self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
+        }
     }
     
     func setInfo(galleryPage element: HTMLDocument) {
-        if var rating = element.at_xpath("//td [@id='rating_label']")?.text {
-            rating = rating.replacingOccurrences(of: "Average: ", with: "")
-            self.rating = Float(rating) ?? 0.0
-        }
-        
-        for tr in element.xpath("//div [@id='gdd'] //tr") {
-            if let key = tr.at_css("td.gdt1")?.text,
-               let value = tr.at_css("td.gdt2")?.text {
-                switch key {
-                case "Parent:":
-                    self.parent = Int(value) ?? 0
-                case "Language:":
-                    self.language = value
-                case "File Size:":
-                    self.fileSize = value
-                case "Favorited:":
-                    self.favorited = Int(value.replacingOccurrences(of: " times", with: "")) ?? 0
-                default:
-                    break
+        try! RealmManager.shared.realm.write {
+            if var rating = element.at_xpath("//td [@id='rating_label']")?.text {
+                rating = rating.replacingOccurrences(of: "Average: ", with: "")
+                self.rating = Float(rating) ?? 0.0
+            }
+            
+            for tr in element.xpath("//div [@id='gdd'] //tr") {
+                if let key = tr.at_css("td.gdt1")?.text,
+                   let value = tr.at_css("td.gdt2")?.text {
+                    switch key {
+                    case "Parent:":
+                        self.parent = Int(value) ?? 0
+                    case "Language:":
+                        self.language = value
+                    case "File Size:":
+                        self.fileSize = value
+                    case "Favorited:":
+                        self.favorited = Int(value.replacingOccurrences(of: " times", with: "")) ?? 0
+                    default:
+                        break
+                    }
                 }
             }
         }
     }
     
     func setTags(_ element: HTMLDocument) {
-        self.tags.removeAll()
-        for t in element.xpath("//div [@id='taglist'] //tr") {
-            self.tags.append(Tag(t))
+        try! RealmManager.shared.realm.write {
+            self.tags.removeAll()
+            for t in element.xpath("//div [@id='taglist'] //tr") {
+                self.tags.append(Tag(t))
+            }
         }
     }
     
     func setComments(_ element: HTMLDocument) {
-        self.comments.removeAll()
-        //Parse comments
-        let commentDateFormatter = DateFormatter()
-        commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"
-        for c in element.xpath("//div [@id='cdiv'] //div [@class='c1']") {
-            if let dateAndAuthor = c.at_xpath("div [@class='c2'] /div [@class='c3']")?.text,
-                let author = c.at_xpath("div [@class='c2'] /div [@class='c3'] /a")?.text,
-                let text = c.at_xpath("div [@class='c6']")?.innerHTML {
-                let dateString = dateAndAuthor.replacingOccurrences(of: author, with: "").replacingOccurrences(of: "Posted on ", with: "").replacingOccurrences(of: " by:   ", with: "")
-                let r = Comment(author: author, date: commentDateFormatter.date(from: dateString) ?? Date(), text: text)
-                self.comments.append(r)
+        try! RealmManager.shared.realm.write {
+            self.comments.removeAll()
+            //Parse comments
+            let commentDateFormatter = DateFormatter()
+            commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"
+            for c in element.xpath("//div [@id='cdiv'] //div [@class='c1']") {
+                if let dateAndAuthor = c.at_xpath("div [@class='c2'] /div [@class='c3']")?.text,
+                    let author = c.at_xpath("div [@class='c2'] /div [@class='c3'] /a")?.text,
+                    let text = c.at_xpath("div [@class='c6']")?.innerHTML {
+                    let dateString = dateAndAuthor.replacingOccurrences(of: author, with: "").replacingOccurrences(of: "Posted on ", with: "").replacingOccurrences(of: " by:   ", with: "")
+                    let r = Comment(author: author, date: commentDateFormatter.date(from: dateString) ?? Date(), text: text)
+                    self.comments.append(r)
+                }
             }
         }
     }
     
-    func setPage(_ element: HTMLDocument) {
-        for link in element.xpath("//div [@class='gdtl'] //a") {
-            if let url = link["href"] {
-                if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
-                    let page = ShowPage(value: ["thumbUrl": thumbUrl, "url": url])
-                    page.url = url
-                    self.pages.append(page)
+    func setPages(_ element: HTMLDocument) {
+        guard self.isLoading else { return }
+        try! RealmManager.shared.realm.write {
+            for link in element.xpath("//div [@class='gdtl'] //a") {
+                if let url = link["href"] {
+                    if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
+                        let page = ShowPage(value: ["thumbUrl": thumbUrl, "url": url])
+                        page.url = url
+                        self.showPageList.append(page)
+                    }
                 }
             }
-        }
-        if self.perPageCount == 0 {
-            self.perPageCount = self.pages.count
+            if self.perPageCount == 0 {
+                self.perPageCount = self.showPageList.count
+            }
         }
     }
     
@@ -251,12 +282,9 @@ class Tag : Object {
                     name.removeLast()
                     self.name = name
                 }
-            }
-            else {
+            } else {
                 for i in td.xpath("div //a") {
-                    if let text = i.text {
-                        self.values.append(text)
-                    }
+                    if let text = i.text { self.values.append(text) }
                 }
             }
             index += 1
@@ -478,6 +506,43 @@ struct CategoryOptions : OptionSet {
     }
 }
 
-@objc enum StatusEnum : Int, RealmEnum {
-    case none, index, gallery, show, download
+extension GalleryPage {
+    
+    func updateCalleryPage() {
+        guard !self.isLoading else { return }
+        RequestManager.shared.getGalleryPage(galleryPage: self) {
+            NotificationCenter.default.post(name: .updateCalleryPage, object: self)
+        }
+        self.loadShowPage()
+    }
+    
+    func loadGalleryPage() {
+        guard self.isLoading else { return }
+        RequestManager.shared.getGalleryPage(galleryPage: self) {
+            NotificationCenter.default.post(name: .updateCalleryPage, object: self)
+            
+            if self.isLoading {
+                self.loadGalleryPage()
+            } else {
+                self.loadShowPage()
+            }
+        }
+    }
+    
+    private func loadShowPage() {
+        let showPageList = self.showPageList
+        self.queue.addOperation {
+            DispatchQueue.main.async {
+                for showPage in showPageList {
+                    guard showPage.isLoading else {
+                        continue
+                    }
+                    RequestManager.shared.getShowPage(showPage: showPage) {
+                        NotificationCenter.default.post(name: .loadShowPage, object: self)
+                    }
+                }
+            }
+        }
+    }
+    
 }

@@ -20,8 +20,11 @@ class ShowPage: Object {
     @objc dynamic private var _sizeHeight: Float = 0
     
     var underlyingImage: UIImage?
-    var isLoading = false
     let imageCache = SDWebImageManager.shared().imageCache!
+    
+    var isLoading: Bool {
+        return self.imageUrl.isEmpty
+    }
     
     var url: String {
         get {
@@ -82,34 +85,35 @@ class ShowPage: Object {
     }
     
     func setInfo(showPage doc: HTMLDocument) {
-        if let img = doc.at_xpath("//img [@id='img']"),
-           let imageUrl = img["src"] {
-            self.imageUrl = imageUrl
-        }
-        
-        if let text = doc.at_xpath("//div [@id='i2'] //div //span")?.text,
-           let index = Int(text) {
-            self.index = index
-        }
-        
-        if let origin = doc.at_xpath("//div [@id='i7'] //a"),
-           let originUrl = origin["href"],
-           let imgInfo = origin.text {
-            self.originUrl = originUrl
-            let imgInfoArray = imgInfo.components(separatedBy: " ")
-            if imgInfoArray.count == 8 {
-                self._sizeWidth = Float(imgInfoArray[2]) ?? 0
-                self._sizeHeight = Float(imgInfoArray[4]) ?? 0
-                self.fileSize = imgInfoArray[5] + imgInfoArray[6]
+        try! RealmManager.shared.realm.write {
+            if let img = doc.at_xpath("//img [@id='img']"),
+                let imageUrl = img["src"] {
+                self.imageUrl = imageUrl
+            }
+            
+            if let text = doc.at_xpath("//div [@id='i2'] //div //span")?.text,
+               let index = Int(text) {
+                self.index = index
+            }
+            
+            if let origin = doc.at_xpath("//div [@id='i7'] //a"),
+               let originUrl = origin["href"],
+               let imgInfo = origin.text {
+                self.originUrl = originUrl
+                let imgInfoArray = imgInfo.components(separatedBy: " ")
+                if imgInfoArray.count == 8 {
+                    self._sizeWidth = Float(imgInfoArray[2]) ?? 0
+                    self._sizeHeight = Float(imgInfoArray[4]) ?? 0
+                    self.fileSize = imgInfoArray[5] + imgInfoArray[6]
+                }
             }
         }
     }
     
     func loadUnderlyingImageAndNotify() {
         guard isLoading == false, underlyingImage == nil else { return }
-        isLoading = true
         
-        RequestManager.shared.getShowPage(url: urlString) { [weak self] url in
+        RequestManager.shared.getShowPage_bak(url: urlString) { [weak self] url in
             guard let self = self else { return }
             guard let url = url else {
                 self.imageLoadComplete()
@@ -142,7 +146,6 @@ class ShowPage: Object {
     }
 
     func imageLoadComplete() {
-        isLoading = false
         NotificationCenter.default.post(name: .photoLoaded, object: self)
     }
     

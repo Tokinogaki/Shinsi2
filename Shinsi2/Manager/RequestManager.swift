@@ -72,23 +72,21 @@ class RequestManager {
     
     func getGalleryPage(galleryPage: GalleryPage, completeBlock block: (() -> Void)?) {
         print(#function)
-        let page = galleryPage.currentPage
+        let page = galleryPage.nextPageIndex
         var url = galleryPage.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
-        let queue = DispatchQueue(label: galleryPage.url, qos: .background, attributes: .concurrent)
-        Alamofire.request(url, method: .get).responseString(queue: queue) { response in
+        Alamofire.request(url, method: .get).responseString { response in
             if let html = response.result.value,
                let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
-                galleryPage.setPage(doc)
-                if page == 0 {
-                    galleryPage.setComments(doc)
-                }
+                galleryPage.setPages(doc)
+                galleryPage.setComments(doc)
+                galleryPage.setTags(doc)
             }
             block?()
         }
     }
 
-    func getShowPage(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
+    func getShowPage_bak(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
         print(#function)
         Alamofire.request(url, method: .get).responseString { response in
             guard let html = response.result.value else {
@@ -104,6 +102,20 @@ class RequestManager {
                 }
             }
             block?(nil)
+        }
+    }
+    
+    func getShowPage(showPage: ShowPage, completeBlock block: (() -> Void)?) {
+        print(#function)
+        Alamofire.request(showPage.url, method: .get).responseString { response in
+            guard let html = response.result.value else {
+                block?()
+                return
+            }
+            if let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
+                showPage.setInfo(showPage: doc)
+            }
+            block?()
         }
     }
 

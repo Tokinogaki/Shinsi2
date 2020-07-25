@@ -23,7 +23,7 @@ class ViewerVC: UICollectionViewController {
         return RealmManager.shared.browsingHistory(for: doujinshi)
     }()
     var pages: [ShowPage] {
-        var ps = Array(doujinshi.pages)
+        var ps = Array(doujinshi.showPageList)
         if Defaults.Gallery.isAppendBlankPage { ps.insert(ShowPage.blankPage(), at: 0) }
         if ps.count % 2 != 0 { ps.append(ShowPage.blankPage()) } // Fix 
         return ps
@@ -219,12 +219,12 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         //prefetch
         let pageIndex = indexPath.item
         for i in 1...5 {
-            if i + pageIndex > doujinshi.pages.count - 1 { break }
-            if doujinshi.pages.count > i + pageIndex {
-                let nextPhoto = doujinshi.pages[i + pageIndex]
+            if i + pageIndex > doujinshi.showPageList.count - 1 { break }
+            if doujinshi.showPageList.count > i + pageIndex {
+                let nextPhoto = doujinshi.showPageList[i + pageIndex]
                 if nextPhoto.underlyingImage == nil {
                     nextPhoto.loadUnderlyingImageAndNotify()
-                    ImageManager.shared.prefetch(urls: [URL(string: doujinshi.pages[i + pageIndex].thumbUrl)!])
+                    ImageManager.shared.prefetch(urls: [URL(string: doujinshi.showPageList[i + pageIndex].thumbUrl)!])
                 }
             }
         }
