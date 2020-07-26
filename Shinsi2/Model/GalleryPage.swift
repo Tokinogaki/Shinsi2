@@ -544,8 +544,11 @@ extension GalleryPage {
         self.loadShowPageQueue.addOperation {
             DispatchQueue.main.async {
                 for i in (index - 3)..<(index + 5) {
-                    guard i >= 0 && i < self.showPageList.count else {
+                    guard i < self.showPageList.count else {
                         break
+                    }
+                    guard i >= 0 else {
+                        continue
                     }
                     let showPage = self.showPageList[i]
                     guard !showPage.isDownload && !showPage.isDownloading else {
