@@ -33,7 +33,7 @@ class GalleryPage: Object {
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
     
-    var loadShowPageCount = 0
+    var stopLoadGalleryPage = false
     
     let tags = List<Tag>()
     let showPageList = List<ShowPage>()
@@ -48,17 +48,6 @@ class GalleryPage: Object {
         }
         
         return _loadShowPageQueue!
-    }
-    
-    private var _downloadImageQueue: OperationQueue?
-    var downloadImageQueue: OperationQueue {
-        if _downloadImageQueue == nil {
-            _downloadImageQueue = OperationQueue()
-            _downloadImageQueue!.maxConcurrentOperationCount = 5
-            _downloadImageQueue!.name = self.url
-        }
-        
-        return _downloadImageQueue!
     }
     
     var url: String {
@@ -108,7 +97,7 @@ class GalleryPage: Object {
     }
     
     var isLoading: Bool {
-        return self.showPageList.count != self.`length`
+        return self.showPageList.count != self.`length` && !self.stopLoadGalleryPage
     }
 
     override class func primaryKey() -> String? {
@@ -116,7 +105,7 @@ class GalleryPage: Object {
     }
     
     override class func ignoredProperties() -> [String] {
-        return ["loadShowPageCount"]
+        return ["stopLoadGalleryPage"]
     }
     
     static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {
@@ -532,7 +521,7 @@ extension GalleryPage {
         }
     }
     
-    func loadGalleryPage() {
+    private func loadGalleryPage() {
         guard self.isLoading else { return }
         RequestManager.shared.getGalleryPage(galleryPage: self) {
             NotificationCenter.default.post(name: .updateCalleryPage, object: self)
@@ -542,11 +531,13 @@ extension GalleryPage {
         }
     }
     
-    func cancelLoadShowPageImage() {
-        for showPage in self.showPageList {
-            showPage.isDownloading = false
-        }
-        self.loadShowPageQueue.cancelAllOperations()
+    func startLoadGalleryPage() {
+        self.stopLoadGalleryPage = false
+        self.loadGalleryPage()
+    }
+    
+    func cancelLocadGalleryPage() {
+        self.stopLoadGalleryPage = true
     }
     
     func startLoadShowPageImage(for index: Int) {
@@ -568,6 +559,13 @@ extension GalleryPage {
                 }
             }
         }
+    }
+    
+    func cancelLoadShowPageImage() {
+        for showPage in self.showPageList {
+            showPage.isDownloading = false
+        }
+        self.loadShowPageQueue.cancelAllOperations()
     }
     
 }

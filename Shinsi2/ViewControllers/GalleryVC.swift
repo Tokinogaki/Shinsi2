@@ -63,7 +63,11 @@ class GalleryVC: BaseViewController {
         }
 
         self.galleryPage.updateCalleryPage()
-        self.galleryPage.loadGalleryPage()
+        self.galleryPage.startLoadGalleryPage()
+    }
+
+    deinit {
+        self.galleryPage.cancelLocadGalleryPage()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
