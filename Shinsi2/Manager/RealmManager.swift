@@ -110,7 +110,7 @@ extension RealmManager {
     
     func updateGalleryPage(_ galleryPage: GalleryPage) {
         if let gp = RealmManager.shared.getGalleryPage(galleryPage.gid) {
-            try! realm.write {
+            try! self.realm.write {
                 gp.title = galleryPage.title
                 gp.coverUrl = galleryPage.coverUrl
                 gp.category = galleryPage.category
@@ -122,13 +122,13 @@ extension RealmManager {
     }
     
     func addGalleryPage(_ galleryPage: GalleryPage) {
-        try! realm.write {
-            realm.add(galleryPage, update: .all)
+        try! self.realm.write {
+            self.realm.add(galleryPage, update: .all)
         }
     }
     
     func getGalleryPage(_ gid: Int) -> GalleryPage? {
-        let resultList = realm.objects(GalleryPage.self).filter("gid=\(gid)")
+        let resultList = self.realm.objects(GalleryPage.self).filter("gid=\(gid)")
         return resultList.first
     }
 }

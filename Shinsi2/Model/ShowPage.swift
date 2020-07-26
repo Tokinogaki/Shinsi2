@@ -5,7 +5,7 @@ import UIColor_Hex_Swift
 import SDWebImage
 
 public extension Notification.Name {
-    static let photoLoaded = Notification.Name("SSPHOTO_LOADING_DID_END_NOTIFICATION")
+    static let imageLoaded = Notification.Name("SSPHOTO_LOADING_DID_END_NOTIFICATION")
 }
 
 class ShowPage: Object {
@@ -18,6 +18,8 @@ class ShowPage: Object {
     @objc dynamic private var _url: String = ""
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
+    
+    var isDownloading: Bool = false
     
     var isLoading: Bool {
         return !self.imageUrl.isEmpty
@@ -101,18 +103,18 @@ class ShowPage: Object {
     
     func dowloadImage() {
         guard !self.isDownload else { return }
-        SDWebImageDownloader.shared().downloadImage(with: URL(string: self.imageUrl), options: [.highPriority, .handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
+        SDWebImageDownloader.shared().downloadImage(with: URL(string: self.imageUrl), options: [.handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
             if let image = image {
                 SDImageCache.shared().store(image, forKey: self.imageUrl)
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .photoLoaded, object: self)
+                    NotificationCenter.default.post(name: .imageLoaded, object: self)
                 }
             }
         }
     }
-    
-    override class func primaryKey() -> String? {
-        return "imageKey"
+
+    override class func ignoredProperties() -> [String] {
+        return ["isDownloading"]
     }
 
 }

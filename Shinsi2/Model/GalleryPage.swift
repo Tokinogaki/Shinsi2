@@ -33,6 +33,8 @@ class GalleryPage: Object {
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
     
+    var loadShowPageCount = 0
+    
     let tags = List<Tag>()
     let showPageList = List<ShowPage>()
     let comments = List<Comment>()
@@ -41,7 +43,7 @@ class GalleryPage: Object {
     var loadShowPageQueue: OperationQueue {
         if _loadShowPageQueue == nil {
             _loadShowPageQueue = OperationQueue()
-            _loadShowPageQueue!.maxConcurrentOperationCount = 25
+            _loadShowPageQueue!.maxConcurrentOperationCount = 10
             _loadShowPageQueue!.name = self.url
         }
         
@@ -52,7 +54,7 @@ class GalleryPage: Object {
     var downloadImageQueue: OperationQueue {
         if _downloadImageQueue == nil {
             _downloadImageQueue = OperationQueue()
-            _downloadImageQueue!.maxConcurrentOperationCount = 25
+            _downloadImageQueue!.maxConcurrentOperationCount = 5
             _downloadImageQueue!.name = self.url
         }
         
@@ -114,7 +116,7 @@ class GalleryPage: Object {
     }
     
     override class func ignoredProperties() -> [String] {
-        return []
+        return ["loadShowPageCount"]
     }
     
     static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {
@@ -179,30 +181,28 @@ class GalleryPage: Object {
     }
     
     func setInfo(indexPageItem element: XMLElement?) {
-        try! RealmManager.shared.realm.write {
-            var node = element?.at_css("div.gl3t a")
-            let imgNode = node?.at_css("img")
-            self.url = node?["href"] ?? ""
-            self.title = imgNode?["title"] ?? ""
-            self.coverUrl = imgNode?["src"] ?? ""
-            
-            node = element?.at_css("div[class*='cs']")
-            self.category = CategoryOptions.category(with: node?.text ?? "")
-            
-            node = element?.at_css("div[id*='posted_']")
-            let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
-            self.posted = dateFormatter.date(from: node?.text ?? "") ?? Date()
-            self.favorite = FavoriteEnum(hexColor: hexColor)
-            
-            node = element?.at_css("div.ir")
-            let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
-            self.rating = GalleryPage.getRating(with: style)
-            
-            node = element?.css("div.gl5t>div>div")[3]
-            self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
-        }
+        var node = element?.at_css("div.gl3t a")
+        let imgNode = node?.at_css("img")
+        self.url = node?["href"] ?? ""
+        self.title = imgNode?["title"] ?? ""
+        self.coverUrl = imgNode?["src"] ?? ""
+        
+        node = element?.at_css("div[class*='cs']")
+        self.category = CategoryOptions.category(with: node?.text ?? "")
+        
+        node = element?.at_css("div[id*='posted_']")
+        let hexColor = node?["style"]?.matches(for: "#[0-9a-z]{3,6}").first ?? ""
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        self.posted = dateFormatter.date(from: node?.text ?? "") ?? Date()
+        self.favorite = FavoriteEnum(hexColor: hexColor)
+        
+        node = element?.at_css("div.ir")
+        let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
+        self.rating = GalleryPage.getRating(with: style)
+        
+        node = element?.css("div.gl5t>div>div")[3]
+        self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
     }
     
     func setInfo(galleryPage element: HTMLDocument) {
@@ -530,47 +530,39 @@ extension GalleryPage {
         RequestManager.shared.getGalleryPage(galleryPage: self) {
             NotificationCenter.default.post(name: .updateCalleryPage, object: self)
         }
-        self.loadShowPage()
     }
     
     func loadGalleryPage() {
         guard self.isLoading else { return }
         RequestManager.shared.getGalleryPage(galleryPage: self) {
             NotificationCenter.default.post(name: .updateCalleryPage, object: self)
-            
             if self.isLoading {
                 self.loadGalleryPage()
-            } else {
-                self.loadShowPage()
             }
         }
     }
     
-    func startDownloadImage() {
-        self.downloadImageQueue.addOperation {
-            DispatchQueue.main.async {
-                for showPage in self.showPageList {
-                    guard !showPage.isDownload else {
-                        continue
-                    }
-                    showPage.dowloadImage()
-                }
-            }
+    func cancelLoadShowPageImage() {
+        for showPage in self.showPageList {
+            showPage.isDownloading = false
         }
+        self.loadShowPageQueue.cancelAllOperations()
     }
     
-    func cancelDownloadImage() {
-        self.downloadImageQueue.cancelAllOperations()
-    }
-    
-    private func loadShowPage() {
+    func startLoadShowPageImage(for index: Int) {
         self.loadShowPageQueue.addOperation {
             DispatchQueue.main.async {
-                for showPage in  self.showPageList {
-                    guard !showPage.isDownload else {
+                for i in (index - 3)..<(index + 5) {
+                    guard i >= 0 && i < self.showPageList.count else {
+                        break
+                    }
+                    let showPage = self.showPageList[i]
+                    guard !showPage.isDownload && !showPage.isDownloading else {
                         continue
                     }
+                    showPage.isDownloading = true
                     RequestManager.shared.getShowPage(showPage: showPage) {
+                        showPage.dowloadImage()
                         NotificationCenter.default.post(name: .loadShowPage, object: self)
                     }
                 }
@@ -579,3 +571,4 @@ extension GalleryPage {
     }
     
 }
+

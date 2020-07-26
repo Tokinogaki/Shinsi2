@@ -39,7 +39,7 @@ class GalleryVC: BaseViewController {
         updateNavigationItems()
         appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
-        NotificationCenter.default.addObserver(self, selector: #selector(handleSKPhotoLoadingDidEndNotification(notification:)), name: .updateCalleryPage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .updateCalleryPage, object: nil)
         
         if !isSizeClassRegular {
             navigationItem.rightBarButtonItems =
@@ -264,8 +264,9 @@ class GalleryVC: BaseViewController {
         return actions
     }
     
-    @objc func handleSKPhotoLoadingDidEndNotification(notification: Notification) {
+    @objc func handleUpdateCalleryPageNotification(notification: Notification) {
         collectionView.reloadData()
+        self.updateNavigationItems()
     }
     
 }

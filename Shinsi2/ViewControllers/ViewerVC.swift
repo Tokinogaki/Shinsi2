@@ -61,8 +61,6 @@ class ViewerVC: UICollectionViewController {
         } else {
             NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
         }
-        
-        self.galleryPage.startDownloadImage()
     }
     
     deinit {
@@ -72,7 +70,7 @@ class ViewerVC: UICollectionViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.updateBrowsingHistory()
-        self.galleryPage.cancelDownloadImage()
+        self.galleryPage.cancelLoadShowPageImage()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -177,7 +175,9 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         cell.showPage = self.galleryPage.showPageList[indexPath.item]
-        cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: nil, options: [.highPriority, .handleCookies])
+        cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: showPage.image, options: [.highPriority, .handleCookies])
+        
+        self.galleryPage.startLoadShowPageImage(for: indexPath.item)
         
         return cell
     }
