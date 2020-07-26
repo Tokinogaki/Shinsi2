@@ -171,10 +171,13 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ScrollingImageCell
+        let showPage = self.galleryPage.showPageList[indexPath.item]
+        
         cell.imageView.hero.id = heroID(for: indexPath)
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         cell.showPage = self.galleryPage.showPageList[indexPath.item]
+        cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: nil, options: [.highPriority, .handleCookies])
         
         return cell
     }

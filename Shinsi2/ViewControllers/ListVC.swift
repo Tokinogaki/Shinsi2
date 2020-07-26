@@ -2,6 +2,7 @@ import UIKit
 import SDWebImage
 import RealmSwift
 import SVProgressHUD
+import UIColor_Hex_Swift
 
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -305,7 +306,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
         cell.imageView.contentMode = .scaleAspectFill
-        cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: nil)
+        cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: nil, options: [.handleCookies])
 
         var infoText = galleryPage.category.text
         let df = DateFormatter()
@@ -320,6 +321,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             cell.infoLabel.layer.borderColor = galleryPage.favorite.color.cgColor
             cell.infoLabel.backgroundColor = galleryPage.favorite.color.withAlphaComponent(0.3)
         } else {
+            cell.infoLabel.backgroundColor = UIColor(hex3: 0, alpha: 0.3)
             cell.infoLabel.layer.borderWidth = 0
         }
     

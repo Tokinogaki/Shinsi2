@@ -325,7 +325,7 @@ extension GalleryVC: UICollectionViewDataSource,
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = galleryPage.showPageList[indexPath.item]
 
-        cell.imageView.sd_setImage(with: URL(string: page.currentUrl), placeholderImage: nil, options: [.handleCookies])
+        cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: nil, options: [.handleCookies])
         cell.loadingView?.show(animated: false)
         cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]

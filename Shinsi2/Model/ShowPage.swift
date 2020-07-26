@@ -56,10 +56,6 @@ class ShowPage: Object {
         return 0.0
     }
     
-    var currentUrl: String {
-        return self.imageUrl.isEmpty ? self.thumbUrl : self.imageUrl
-    }
-    
     var aspectRatio: Float {
         if self.size != CGSize.zero {
             return Float(self.size.width / self.size.height)
