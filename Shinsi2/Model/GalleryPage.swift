@@ -82,7 +82,7 @@ class GalleryPage: Object {
     }
     
     var isIdTokenValide: Bool {
-        return self.gid == 0 && token != ""
+        return self.gid != 0 && token != ""
     }
     
     var nextPageIndex: Int {
@@ -518,6 +518,12 @@ struct CategoryOptions: OptionSet {
 }
 
 extension GalleryPage {
+    
+    func setFavorite(index: Int) {
+        try! RealmManager.shared.realm.write {
+            self.favorite = FavoriteEnum(rawValue: index + 1) ?? .none
+        }
+    }
     
     func updateCalleryPage() {
         guard !self.isLoading else { return }

@@ -121,7 +121,7 @@ class RequestManager {
 
     func addGalleryToFavorite(gallery: GalleryPage, category: Int = 0) {
         guard gallery.isIdTokenValide else {return}
-        gallery.favorite = .favorite0
+        gallery.setFavorite(index: category)
         let url = Defaults.URL.host + "/gallerypopups.php?gid=\(gallery.gid)&t=\(gallery.token)&act=addfav"
         let parameters: [String: String] = ["favcat": "\(category)", "favnote": "", "apply": "Add to Favorites", "update": "1"]
         Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
@@ -130,6 +130,7 @@ class RequestManager {
 
     func deleteFavorite(gallery: GalleryPage) {
         guard gallery.isIdTokenValide else {return}
+        gallery.setFavorite(index: -1)
         let url = Defaults.URL.host + "/favorites.php"
         let parameters: [String: Any] = ["ddact": "delete", "modifygids[]": gallery.gid, "apply": "Apply"]
         Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
