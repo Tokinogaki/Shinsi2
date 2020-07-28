@@ -186,6 +186,11 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         let index = indexPath.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0)
         return "image_\(galleryPage.gid)_\(index)"
     }
+    
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let showPage = self.galleryPage.showPageList[indexPath.item];
+        self.galleryPage.setReadPage(index: showPage.index)
+    }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if mode == .horizontal {

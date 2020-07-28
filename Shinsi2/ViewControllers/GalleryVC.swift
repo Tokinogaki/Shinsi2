@@ -25,17 +25,12 @@ class GalleryVC: BaseViewController {
         title = galleryPage.getTitle()
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
-//
-//        browsingHistory = RealmManager.shared.browsingHistory(for: galleryPage)
-//        if browsingHistory == nil {
-//            RealmManager.shared.createBrowsingHistory(for: galleryPage)
-//            browsingHistory = RealmManager.shared.browsingHistory(for: galleryPage)
-//        }
-//
+
         backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinch(ges:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
+        scrollToLastReadingPage()
         updateNavigationItems()
         appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
@@ -108,12 +103,9 @@ class GalleryVC: BaseViewController {
 
     private func scrollToLastReadingPage() {
         guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
-        guard self.galleryPage.readPage < galleryPage.showPageList.count,
-              didScrollToHistory == false else { return }
-        didScrollToHistory = true
-        // Scroll after collectionView loaded
+        guard self.galleryPage.readPage > 0 else { return }
         DispatchQueue.main.async {
-            self.collectionView.scrollToItem(at: IndexPath(row: self.galleryPage.readPage, section: 0), at: .top, animated: true)
+            self.collectionView.scrollToItem(at: IndexPath(row: self.galleryPage.readPage - 1, section: 0), at: .top, animated: true)
         }
     }
 

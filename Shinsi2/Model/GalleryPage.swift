@@ -194,6 +194,12 @@ class GalleryPage: Object {
         self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
     }
     
+    func setReadPage(index: Int) {
+        try! RealmManager.shared.realm.write {
+            self.readPage = index
+        }
+    }
+    
     func setInfo(galleryPage element: HTMLDocument) {
         try! RealmManager.shared.realm.write {
             if var rating = element.at_xpath("//td [@id='rating_label']")?.text {

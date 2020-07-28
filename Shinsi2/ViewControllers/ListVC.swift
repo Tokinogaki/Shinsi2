@@ -314,7 +314,10 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let posted = df.string(from: galleryPage.posted)
         infoText += "\n\(posted)"
         infoText += "\n\(galleryPage.rating)"
-        infoText += "\n\(galleryPage.`length`)"
+        infoText += "\n\(galleryPage.readPage)/\(galleryPage.`length`)"
+        
+        cell.infoLabel.text = infoText
+        cell.titleLabel?.text = galleryPage.title
         
         if galleryPage.favorite != .none {
             cell.infoLabel.layer.borderWidth = 2
@@ -324,9 +327,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             cell.infoLabel.backgroundColor = UIColor(hex3: 0, alpha: 0.3)
             cell.infoLabel.layer.borderWidth = 0
         }
-    
-        cell.infoLabel.text = infoText
-        cell.titleLabel?.text = galleryPage.title
+
         cell.infoLabel.isHidden = Defaults.List.isHideInfo;
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
