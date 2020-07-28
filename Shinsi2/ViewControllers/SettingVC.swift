@@ -96,10 +96,10 @@ class SettingVC: BaseViewController {
         titleSwitch.addTarget(self, action: #selector(listTitleSwitchVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(createStackView([titleLabel, titleSwitch]))
         
-        let tagLabel = createSubTitleLabel("Hide Tag")
+        let tagLabel = createSubTitleLabel("Hide Info")
         let tagSwitch = UISwitch()
-        tagSwitch.isOn = Defaults.List.isHideTag
-        tagSwitch.addTarget(self, action: #selector(listTagSwitchVauleChanged(sender:)), for: .valueChanged)
+        tagSwitch.isOn = Defaults.List.isHideInfo
+        tagSwitch.addTarget(self, action: #selector(listInfoSwitchVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(createStackView([tagLabel, tagSwitch]))
         
         let listFavLabel = createSubTitleLabel("Show Favorites List")
@@ -222,8 +222,8 @@ class SettingVC: BaseViewController {
         Defaults.Search.rating = sender.selectedSegmentIndex
     }
     
-    @objc func listTagSwitchVauleChanged(sender: UISwitch) {
-        Defaults.List.isHideTag = sender.isOn
+    @objc func listInfoSwitchVauleChanged(sender: UISwitch) {
+        Defaults.List.isHideInfo = sender.isOn
         NotificationCenter.default.post(name: .settingChanged, object: nil)
     }
     

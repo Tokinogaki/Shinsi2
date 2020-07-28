@@ -17,7 +17,7 @@ let kUDHost = "kUDHost"
 
 let kUDListCellWidth = "kUDListCellWidth"
 let kUDListLastSearchKeyword = "kUDListLastSearchKeyword"
-let kUDListHideTag = "kUDListHideTag"
+let kUDListHideInfo = "kUDListHideInfo"
 let kUDListHideTitle = "kUDListHideTitle"
 let kUDListFavoriteTitles = "kUDListFavoriteTitles"
 let kUDListFavoriteList = "kUDListFavoriteList"
@@ -64,9 +64,9 @@ class Defaults {
             get { return UserDefaults.standard.bool(forKey: kUDListHideTitle) }
             set { UserDefaults.standard.set(newValue, forKey: kUDListHideTitle) }
         }
-        static var isHideTag: Bool {
-            get { return UserDefaults.standard.bool(forKey: kUDListHideTag) }
-            set { UserDefaults.standard.set(newValue, forKey: kUDListHideTag) }
+        static var isHideInfo: Bool {
+            get { return UserDefaults.standard.bool(forKey: kUDListHideInfo) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDListHideInfo) }
         }
         static var isShowFavoriteList: Bool {
             get { return UserDefaults.standard.bool(forKey: kUDListFavoriteList) }

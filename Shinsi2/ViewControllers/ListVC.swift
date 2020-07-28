@@ -327,6 +327,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     
         cell.infoLabel.text = infoText
         cell.titleLabel?.text = galleryPage.title
+        cell.infoLabel.isHidden = Defaults.List.isHideInfo;
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
         cell.layer.shouldRasterize = true
