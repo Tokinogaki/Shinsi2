@@ -118,8 +118,8 @@ class GalleryPage: Object {
         return galleryPage
     }
     
-    static func galleryPageList(indexPage doc: HTMLDocument?) -> List<GalleryPage> {
-        let gPageList = List<GalleryPage>()
+    static func galleryPageList(indexPage doc: HTMLDocument?) -> [GalleryPage] {
+        var gPageList: [GalleryPage] = []
         for element in doc!.xpath("//div [@class='gl1t']") {
             let galleryPage = self.galleryPage(indexPageItem: element)
             gPageList.append(galleryPage)

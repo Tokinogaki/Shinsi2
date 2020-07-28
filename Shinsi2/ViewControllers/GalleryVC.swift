@@ -6,7 +6,6 @@ import SafariServices
 
 class GalleryVC: BaseViewController {
     var galleryPage: GalleryPage!
-    private var browsingHistory: BrowsingHistory?
     private var didScrollToHistory = false
     private var backGesture: InteractiveBackGesture!
     private var isPartDownloading = false { didSet { handlePartDownload() } }

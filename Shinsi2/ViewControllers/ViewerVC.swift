@@ -19,9 +19,6 @@ class ViewerVC: UICollectionViewController {
     }
     private var _selectedIndexPath: IndexPath?
     weak var galleryPage: GalleryPage!
-    private lazy var browsingHistory: BrowsingHistory? = {
-        return RealmManager.shared.browsingHistory(for: galleryPage)
-    }()
     var mode: ViewerMode {
         return Defaults.Viewer.mode
     }
@@ -55,12 +52,6 @@ class ViewerVC: UICollectionViewController {
         collectionView?.addGestureRecognizer(longPressGesture)
         
         setNeedsUpdateOfHomeIndicatorAutoHidden()
-        
-        if #available(iOS 13.0, *) {
-            NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIScene.willDeactivateNotification, object: nil)
-        } else {
-            NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
-        }
     }
     
     deinit {
@@ -69,7 +60,6 @@ class ViewerVC: UICollectionViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        self.updateBrowsingHistory()
         self.galleryPage.cancelLoadShowPageImage()
     }
 
@@ -148,16 +138,6 @@ class ViewerVC: UICollectionViewController {
                 Hero.shared.cancel()
             }
         }
-    }
-    
-    @objc func willResignActive(_ notification: Notification) {
-        updateBrowsingHistory()
-    }
-    
-    private func updateBrowsingHistory() {
-        guard let browsingHistory = browsingHistory, let currentPage = selectedIndexPath?.item else { return }
-        RealmManager.shared.updateBrowsingHistory(browsingHistory, currentPage: currentPage)
-        print("currentPage: \(currentPage)")
     }
 }
 

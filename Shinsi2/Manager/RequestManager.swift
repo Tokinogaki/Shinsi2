@@ -20,7 +20,7 @@ class RequestManager {
         }
     }
 
-    func getIndexPage(page: Int, search keyword: String? = nil, completeBlock block: ((List<GalleryPage>) -> Void)?) {
+    func getIndexPage(page: Int, search keyword: String? = nil, completeBlock block: (([GalleryPage]) -> Void)?) {
         let categoryFilters = Defaults.Search.categories.map {"f_\($0)=\(UserDefaults.standard.bool(forKey: $0) ? 1 : 0)"}.joined(separator: "&")
         var url = Defaults.URL.host + "/?"
         url += "\(categoryFilters)&f_apply=Apply+Filter" //Apply category filters
@@ -41,7 +41,7 @@ class RequestManager {
                 if page == 0 {
                     url = Defaults.URL.host + "/popular"
                 } else {
-                    block?(List())
+                    block?([])
                     return
                 }
             } else if keyword.contains("watched") {
@@ -60,12 +60,12 @@ class RequestManager {
         }
         
         Alamofire.request(url, method: .get).responseString { response in
-            guard let html = response.result.value else { block?(List()); return }
+            guard let html = response.result.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
                 let items = GalleryPage.galleryPageList(indexPage: doc)
                 block?(items)
             } else {
-                block?(List())
+                block?([])
             }
         }
     }

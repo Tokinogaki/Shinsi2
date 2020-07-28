@@ -16,34 +16,15 @@ class RealmManager {
     }()
     
     lazy var downloaded: Results<GalleryPage> = {
-        return self.realm.objects(GalleryPage.self).filter("isDownloaded == true").sorted(byKeyPath: "date", ascending: false)
+        return self.realm.objects(GalleryPage.self).filter("isDownloaded == true").sorted(byKeyPath: "createdAt", ascending: false)
     }()
     
-    func browsingHistory(for doujinshi: GalleryPage) -> BrowsingHistory? {
-        return realm.objects(BrowsingHistory.self).filter("id == %d", doujinshi.gid).first
-    }
-    
-    func createBrowsingHistory(for doujinshi: GalleryPage) {
-        try! realm.write {
-            realm.create(BrowsingHistory.self, value: ["doujinshi": doujinshi, "id": doujinshi.gid], update: .modified)
-        }
-    }
-    
-    func updateBrowsingHistory(_ browsingHistory: BrowsingHistory, currentPage: Int) {
-        try! realm.write {
-            browsingHistory.updatedAt = Date()
-            browsingHistory.currentPage = currentPage
-        }
-    }
-    
-    var browsedDoujinshi: [GalleryPage] {
-        let hs = realm.objects(BrowsingHistory.self).sorted(byKeyPath: "updatedAt", ascending: false)
+    var browsedGalleryPage: [GalleryPage] {
+        let hs = realm.objects(GalleryPage.self).filter("showPageList.@count > 0").sorted(byKeyPath: "createdAt", ascending: false)
         var results: [GalleryPage] = []
         let maxHistory = min(30, hs.count)
         for i in 0..<maxHistory {
-            if let d = hs[i].doujinshi {
-                results.append(GalleryPage(value: d))
-            }
+            results.append(hs[i])
         }
         return results
     }
@@ -117,6 +98,7 @@ extension RealmManager {
                 gp.posted = galleryPage.posted
                 gp.favorite = galleryPage.favorite
                 gp.rating = galleryPage.rating
+                gp.createdAt = Date()
             }
         }
     }
