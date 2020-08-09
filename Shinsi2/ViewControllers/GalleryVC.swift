@@ -61,7 +61,8 @@ class GalleryVC: BaseViewController {
     }
 
     deinit {
-        self.galleryPage.cancelLocadGalleryPage()
+        self.galleryPage.cancelLoadGalleryPage()
+        self.galleryPage.cancelLoadThumbInShowPage()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -262,6 +263,7 @@ class GalleryVC: BaseViewController {
     @objc func handleUpdateCalleryPageNotification(notification: Notification) {
         collectionView.reloadData()
         self.updateNavigationItems()
+        self.galleryPage.startLoadThumbInShowPage()
     }
     
 }
@@ -345,17 +347,12 @@ extension GalleryVC: UICollectionViewDataSource,
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if !isPartDownloading {
-            guard galleryPage.showPageList.count > 1 else {return}
-            let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
-            vc.selectedIndexPath = indexPath
-            vc.galleryPage = self.galleryPage
-            vc.modalPresentationStyle = .fullScreen
-            present(vc, animated: true)
-        } else {
-            let c = collectionView.cellForItem(at: indexPath) as! ImageCell
-            c.imageView.alpha = 1
-        }
+        guard galleryPage.showPageList.count > 1 else {return}
+        let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
+        vc.selectedIndexPath = indexPath
+        vc.galleryPage = self.galleryPage
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true)
     }
 
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {

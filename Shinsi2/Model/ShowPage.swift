@@ -5,7 +5,7 @@ import UIColor_Hex_Swift
 import SDWebImage
 
 public extension Notification.Name {
-    static let imageLoaded = Notification.Name("SSPHOTO_LOADING_DID_END_NOTIFICATION")
+    static let imageLoaded = Notification.Name("imageLoaded")
 }
 
 class ShowPage: Object {
@@ -19,18 +19,15 @@ class ShowPage: Object {
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
     
-    var isDownloading: Bool = false
+    var isImageDownloading: Bool = false
+    var isThumbDownloading: Bool = false
     
-    var isLoading: Bool {
-        return !self.imageUrl.isEmpty
+    var isImageDownload: Bool {
+        return !self.imageUrl.isEmpty && SDImageCache.shared().diskImageDataExists(withKey: self.imageUrl)
     }
     
-    var isDownloadImage: Bool {
-        return SDImageCache.shared().diskImageDataExists(withKey: self.imageUrl)
-    }
-    
-    var isDownloadThumb: Bool {
-        return SDImageCache.shared().diskImageDataExists(withKey: self.thumbUrl)
+    var isThumbDownload: Bool {
+        return !self.thumbUrl.isEmpty && SDImageCache.shared().diskImageDataExists(withKey: self.thumbUrl)
     }
     
     var url: String {
@@ -70,11 +67,11 @@ class ShowPage: Object {
     }
 
     var imageInViewer: UIImage? {
-        if self.isDownloadImage {
+        if self.isImageDownload {
             return SDImageCache.shared().imageFromMemoryCache(forKey: self.imageUrl)
         }
         
-        if self.isDownloadThumb {
+        if self.isThumbDownload {
             return SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
         }
         
@@ -82,7 +79,7 @@ class ShowPage: Object {
     }
     
     var imageInGallery: UIImage? {
-        if self.isDownloadThumb {
+        if self.isThumbDownload {
             return SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
         }
         
@@ -120,7 +117,7 @@ class ShowPage: Object {
     }
     
     func dowloadImage() {
-        guard !self.isDownloadImage else { return }
+        guard !self.isImageDownload else { return }
         SDWebImageDownloader.shared().downloadImage(with: URL(string: self.imageUrl), options: [.handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
             if let image = image {
                 SDImageCache.shared().store(image, forKey: self.imageUrl)
@@ -130,9 +127,21 @@ class ShowPage: Object {
             }
         }
     }
+    
+    func dowloadThumb() {
+        guard !self.isThumbDownload else { return }
+        SDWebImageDownloader.shared().downloadImage(with: URL(string: self.thumbUrl), options: [.handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
+            if let image = image {
+                SDImageCache.shared().store(image, forKey: self.thumbUrl)
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .imageLoaded, object: self)
+                }
+            }
+        }
+    }
 
     override class func ignoredProperties() -> [String] {
-        return ["isDownloading"]
+        return ["isImageDownloading", "isThumbDownloading"]
     }
 
 }

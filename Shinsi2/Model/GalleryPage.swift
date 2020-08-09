@@ -40,15 +40,26 @@ class GalleryPage: Object {
     let showPageList = List<ShowPage>()
     let comments = List<Comment>()
     
-    private var _loadShowPageQueue: OperationQueue?
-    var loadShowPageQueue: OperationQueue {
-        if _loadShowPageQueue == nil {
-            _loadShowPageQueue = OperationQueue()
-            _loadShowPageQueue!.maxConcurrentOperationCount = 10
-            _loadShowPageQueue!.name = self.url
+    private var _loadThumbInShowPage: OperationQueue?
+    var loadThumbInShowPage: OperationQueue {
+        if _loadThumbInShowPage == nil {
+            _loadThumbInShowPage = OperationQueue()
+            _loadThumbInShowPage!.maxConcurrentOperationCount = 20
+            _loadThumbInShowPage!.name = self.url + "thumb"
         }
         
-        return _loadShowPageQueue!
+        return _loadThumbInShowPage!
+    }
+    
+    private var _loadImageInShowPage: OperationQueue?
+    var loadImageInShowPage: OperationQueue {
+        if _loadImageInShowPage == nil {
+            _loadImageInShowPage = OperationQueue()
+            _loadImageInShowPage!.maxConcurrentOperationCount = 10
+            _loadImageInShowPage!.name = self.url
+        }
+        
+        return _loadImageInShowPage!
     }
     
     var url: String {
@@ -526,27 +537,27 @@ extension GalleryPage {
         }
     }
     
-    private func loadGalleryPage() {
+    private func loadShowPageInGalleryPage() {
         guard self.isLoading else { return }
         RequestManager.shared.getGalleryPage(galleryPage: self) {
             NotificationCenter.default.post(name: .updateCalleryPage, object: self)
             if self.isLoading {
-                self.loadGalleryPage()
+                self.loadShowPageInGalleryPage()
             }
         }
     }
     
     func startLoadGalleryPage() {
         self.stopLoadGalleryPage = false
-        self.loadGalleryPage()
+        self.loadShowPageInGalleryPage()
     }
     
-    func cancelLocadGalleryPage() {
+    func cancelLoadGalleryPage() {
         self.stopLoadGalleryPage = true
     }
     
-    func startLoadShowPageImage(for index: Int) {
-        self.loadShowPageQueue.addOperation {
+    func startLoadImageInShowPage(for index: Int) {
+        self.loadImageInShowPage.addOperation {
             DispatchQueue.main.async {
                 for i in (index - 3)..<(index + 5) {
                     guard i < self.showPageList.count else {
@@ -556,10 +567,10 @@ extension GalleryPage {
                         continue
                     }
                     let showPage = self.showPageList[i]
-                    guard !showPage.isDownloadImage && !showPage.isDownloading else {
+                    guard !showPage.isImageDownload && !showPage.isImageDownloading else {
                         continue
                     }
-                    showPage.isDownloading = true
+                    showPage.isImageDownloading = true
                     RequestManager.shared.getShowPage(showPage: showPage) {
                         showPage.dowloadImage()
                         NotificationCenter.default.post(name: .loadShowPage, object: self)
@@ -569,12 +580,31 @@ extension GalleryPage {
         }
     }
     
-    func cancelLoadShowPageImage() {
+    func cancelLoadImageInShowPage() {
         for showPage in self.showPageList {
-            showPage.isDownloading = false
+            showPage.isImageDownloading = false
         }
-        self.loadShowPageQueue.cancelAllOperations()
+        self.loadImageInShowPage.cancelAllOperations()
     }
     
+    func startLoadThumbInShowPage() {
+        self.loadThumbInShowPage.addOperation {
+            DispatchQueue.main.async {
+                for showPage in self.showPageList {
+                    guard !showPage.isThumbDownload && !showPage.isThumbDownloading else {
+                        continue
+                    }
+                    showPage.isThumbDownloading = true
+                    showPage.dowloadThumb()
+                }
+            }
+        }
+    }
+    
+    func cancelLoadThumbInShowPage() {
+        for showPage in self.showPageList {
+            showPage.isThumbDownloading = false
+        }
+        self.loadThumbInShowPage.cancelAllOperations()
+    }
 }
-

@@ -60,7 +60,7 @@ class ViewerVC: UICollectionViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        self.galleryPage.cancelLoadShowPageImage()
+        self.galleryPage.cancelLoadImageInShowPage()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -157,7 +157,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.showPage = self.galleryPage.showPageList[indexPath.item]
         cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: showPage.imageInViewer, options: [.highPriority, .handleCookies])
         
-        self.galleryPage.startLoadShowPageImage(for: indexPath.item)
+        self.galleryPage.startLoadImageInShowPage(for: indexPath.item)
         
         return cell
     }
