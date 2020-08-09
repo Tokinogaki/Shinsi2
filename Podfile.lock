@@ -1,6 +1,7 @@
 PODS:
   - Alamofire (4.9.1)
   - AloeStackView (1.2.0)
+  - FLAnimatedImage (1.0.12)
   - Hero (1.5.0)
   - Kanna (5.2.2)
   - Realm (5.0.3):
@@ -8,9 +9,12 @@ PODS:
   - Realm/Headers (5.0.3)
   - RealmSwift (5.0.3):
     - Realm (= 5.0.3)
-  - SDWebImage (4.4.8):
-    - SDWebImage/Core (= 4.4.8)
-  - SDWebImage/Core (4.4.8)
+  - SDWebImage (5.8.1):
+    - SDWebImage/Core (= 5.8.1)
+  - SDWebImage/Core (5.8.1)
+  - SDWebImageFLPlugin (0.4.0):
+    - FLAnimatedImage (>= 1.0.11)
+    - SDWebImage/Core (~> 5.6)
   - SVProgressHUD (2.2.5)
   - SwiftLint (0.39.2)
   - UIColor_Hex_Swift (5.1.0)
@@ -21,7 +25,8 @@ DEPENDENCIES:
   - Hero
   - Kanna
   - RealmSwift (> 3.16.2)
-  - SDWebImage (~> 4)
+  - SDWebImage (~> 5)
+  - SDWebImageFLPlugin
   - SVProgressHUD
   - SwiftLint
   - UIColor_Hex_Swift
@@ -30,11 +35,13 @@ SPEC REPOS:
   trunk:
     - Alamofire
     - AloeStackView
+    - FLAnimatedImage
     - Hero
     - Kanna
     - Realm
     - RealmSwift
     - SDWebImage
+    - SDWebImageFLPlugin
     - SVProgressHUD
     - SwiftLint
     - UIColor_Hex_Swift
@@ -42,15 +49,17 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   AloeStackView: 8a4ce0efa08128dd78d538372f60c76c224034bb
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   Kanna: 2c4eddaaa4bfb9a1ed19e53c0b3d42ef02838046
   Realm: bfca1699b61b0b17c3a69ae0e648314eae91fbdb
   RealmSwift: 493c9f089cd3893b3959007973c0e4f640906ba0
-  SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
+  SDWebImage: e3eae2eda88578db0685a0c88597fdadd9433f05
+  SDWebImageFLPlugin: 6c2295fb1242d44467c6c87dc5db6b0a13228fd8
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftLint: 22ccbbe3b8008684be5955693bab135e0ed6a447
   UIColor_Hex_Swift: 8be7432edacb7fa91c78aa05ef3c30b66e4f9415
 
-PODFILE CHECKSUM: a661450ad9b1ef2b76dbd827ae444d99f1e7cc6b
+PODFILE CHECKSUM: 9d570bf55d474985cfd631f1ada7ddd266f1d225
 
 COCOAPODS: 1.9.3

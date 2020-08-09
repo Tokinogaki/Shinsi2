@@ -1,5 +1,6 @@
 import UIKit
 import SDWebImage
+import FLAnimatedImage
 
 class ImageCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
@@ -24,7 +25,7 @@ class CommentCell: UITableViewCell {
 class ScrollingImageCell: UICollectionViewCell {
     @IBOutlet weak var readLabel: UILabel!
     var showPage: ShowPage?
-    var imageView: UIImageView = UIImageView()
+    var imageView: FLAnimatedImageView = FLAnimatedImageView()
     var scrollView: UIScrollView = UIScrollView()
     var dTapGR: UITapGestureRecognizer!
     var image: UIImage? {
