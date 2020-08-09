@@ -156,7 +156,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.isOpaque = true
         cell.showPage = self.galleryPage.showPageList[indexPath.item]
         cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: showPage.imageInViewer, options: [.highPriority, .handleCookies])
-        
+        cell.readLabel.text = "\(showPage.index) / \(self.galleryPage.showPageList.count)"
         self.galleryPage.startLoadImageInShowPage(for: indexPath.item)
         
         return cell

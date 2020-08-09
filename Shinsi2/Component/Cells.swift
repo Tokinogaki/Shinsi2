@@ -22,6 +22,7 @@ class CommentCell: UITableViewCell {
 }
 
 class ScrollingImageCell: UICollectionViewCell {
+    @IBOutlet weak var readLabel: UILabel!
     var showPage: ShowPage?
     var imageView: UIImageView = UIImageView()
     var scrollView: UIScrollView = UIScrollView()
@@ -49,7 +50,7 @@ class ScrollingImageCell: UICollectionViewCell {
         scrollView.contentMode = .center
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        addSubview(scrollView)
+        insertSubview(scrollView, at: 0)
         
         dTapGR = UITapGestureRecognizer(target: self, action: #selector(doubleTap(gr:)))
         dTapGR.numberOfTapsRequired = 2 
