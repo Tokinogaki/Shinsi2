@@ -163,7 +163,7 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showTag",
            let nv = segue.destination as? UINavigationController,
            let vc = nv.viewControllers.first as? TagVC {
-            vc.doujinshi = self.galleryPage
+            vc.galleryPage = self.galleryPage
             vc.clickBlock = { [unowned self, unowned vc] tag in
                 vc.dismiss(animated: true, completion: {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {

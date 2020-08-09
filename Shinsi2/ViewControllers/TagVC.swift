@@ -3,44 +3,29 @@ import Hero
 import AloeStackView
 
 class TagVC: BaseViewController {
-    weak var doujinshi: GalleryPage!
+    weak var galleryPage: GalleryPage!
     var clickBlock: ((String) -> Void)?
-    struct TagItem {
-        var title: String
-        var tags: [String]
-        var sortNumber: Int 
-    }
-    var sortedStrings = ["parody", "artist", "group", "character", "female", "male", "misc", "language"]
-    var items: [TagItem] = []
     let stackView = AloeStackView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.barTintColor = UIColor(white: 0, alpha: 0.5)
         
-        // TODO: let gTag = doujinshi.tags
-        // TODO: let keys = gTag.allProperties().keys
-        // TODO: for key in keys where gTag[key].count != 0 {
-         // TODO:    let item = TagItem(title: key, tags: gTag[key], sortNumber: sortedStrings.firstIndex(of: key) ?? 999)
-         // TODO:    items.append(item)
-        // TODO: }
-        items = items.sorted {$0.sortNumber < $1.sortNumber}
-        
         view.addSubview(stackView)
         stackView.frame = view.bounds
         stackView.separatorInset = .zero
         stackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
-        for item in items {
-            stackView.addRow(createTitleLable(text: item.title))
-            for tag in item.tags {
+        for item in self.galleryPage.tags {
+            stackView.addRow(createTitleLable(text: item.name))
+            for tag in item.values {
                 let l = createTextLable(text: tag)
                 l.isUserInteractionEnabled = true
                 stackView.addRow(l)
                 stackView.hideSeparator(forRow: l)
                 stackView.setInset(forRow: l, inset: UIEdgeInsets(top: 8, left: 15, bottom: 8, right: 15))
                 stackView.setTapHandler(forRow: l) { [weak self] _ in
-                    let string = item.title == "misc" ? tag : item.title + ":" + tag
+                    let string = item.name == "misc" ? tag : item.name + ":" + tag
                     self?.clickBlock?(string)
                 }
             }
