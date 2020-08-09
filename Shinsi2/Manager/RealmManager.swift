@@ -15,6 +15,7 @@ class RealmManager {
         return self.realm.objects(SearchHistory.self).sorted(byKeyPath: "date", ascending: false)
     }()
     
+    // MARK: - The Realm is already in a write transaction
     lazy var downloaded: Results<GalleryPage> = {
         return self.realm.objects(GalleryPage.self).filter("isDownloaded == true").sorted(byKeyPath: "createdAt", ascending: false)
     }()
@@ -22,7 +23,7 @@ class RealmManager {
     var browsedGalleryPage: [GalleryPage] {
         let hs = realm.objects(GalleryPage.self).filter("showPageList.@count > 0").sorted(byKeyPath: "createdAt", ascending: false)
         var results: [GalleryPage] = []
-        let maxHistory = min(30, hs.count)
+        let maxHistory = min(120, hs.count)
         for i in 0..<maxHistory {
             results.append(hs[i])
         }

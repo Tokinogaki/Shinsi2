@@ -1,6 +1,6 @@
 import UIKit
 import AloeStackView
-import SDWebImage
+import Kingfisher
 import SVProgressHUD
 import Hero
 import WebKit
@@ -156,8 +156,14 @@ class SettingVC: BaseViewController {
         addTitle("Cache")
         let cacheSizeLable = createSubTitleLabel("size: counting...")
         stackView.addRow(cacheSizeLable)
-        DispatchQueue.global(qos: .userInteractive).async {
-            let cacheSize = SDImageCache.shared.totalDiskSize() / 1024 / 1024
+        ImageCache.default.calculateDiskStorageSize(completion: { (result) in
+            var cacheSize = 0.0;
+            switch result {
+            case .success(let value):
+                cacheSize = Double(value / 1024 / 1024)
+            case .failure(_):
+                cacheSize = 0
+            }
             DispatchQueue.main.async { [weak self, weak cacheSizeLable] in
                 guard let self = self, let cacheSizeLable = cacheSizeLable else {return}
                 cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
@@ -169,13 +175,12 @@ class SettingVC: BaseViewController {
                 clear.isUserInteractionEnabled = true
                 self.stackView.insertRow(clear, after: cacheSizeLable)
                 self.stackView.setTapHandler(forRow: clear) { _ in
-                    SVProgressHUD.show()
-                    SDImageCache.shared.clearDisk(onCompletion: {
-                        SVProgressHUD.showSuccess(withStatus: "Deleted")
-                    })
+                    KingfisherManager.shared.cache.cleanExpiredDiskCache {
+                        cacheSizeLable.text = "size: 0mb"
+                    }
                 }
             }
-        }
+        })
         
         //Info
         addWhiteSpace(height: 60)

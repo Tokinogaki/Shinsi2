@@ -2,7 +2,7 @@ import Foundation
 import RealmSwift
 import Kanna
 import UIColor_Hex_Swift
-import SDWebImage
+import Kingfisher
 
 public extension Notification.Name {
     static let updateCalleryPage = Notification.Name("updateCalleryPage")

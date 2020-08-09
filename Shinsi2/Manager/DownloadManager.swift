@@ -1,6 +1,6 @@
 import Foundation
 import RealmSwift
-import SDWebImage
+import Kingfisher
 import Alamofire
 
 class SSOperation: Operation {
@@ -81,6 +81,13 @@ class DownloadManager: NSObject {
     static let shared = DownloadManager()
     var queues: [OperationQueue] = []
     var books: [String: GalleryPage] = [:]
+    
+    let modifier = AnyModifier { request in
+        var r = request
+        r.httpShouldHandleCookies = true
+        r.setValue(HTTPCookieStorage.shared.cookies(stringFor: Defaults.URL.exHentai), forHTTPHeaderField: "Cookie")
+        return r
+    }
     
     func download(galleryPage: GalleryPage) {
         guard galleryPage.showPageList.count != 0 else {return}

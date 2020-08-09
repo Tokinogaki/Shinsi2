@@ -1,6 +1,5 @@
 import UIKit
 import Hero
-import SDWebImage
 import SVProgressHUD
 import SafariServices
 
@@ -323,7 +322,7 @@ extension GalleryVC: UICollectionViewDataSource,
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
         let page = galleryPage.showPageList[indexPath.item]
 
-        cell.imageView.sd_setImage(with: URL(string: page.thumbUrl), placeholderImage: page.imageInGallery, options: [.highPriority, .handleCookies])
+        cell.imageView.kf.setImage(with: URL(string: page.thumbUrl), placeholder: page.imageInGallery, options: [.requestModifier(DownloadManager.shared.modifier)])
         cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1

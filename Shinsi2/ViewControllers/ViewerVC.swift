@@ -1,8 +1,8 @@
 import UIKit
 import Hero
-import SDWebImage
 import Photos
 import RealmSwift
+import Kingfisher
 
 class ViewerVC: UICollectionViewController {
     
@@ -155,7 +155,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         cell.showPage = self.galleryPage.showPageList[indexPath.item]
-        cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: showPage.imageInViewer, options: [.highPriority, .handleCookies])
+        cell.imageView.kf.setImage(with: URL(string: showPage.imageUrl), placeholder: showPage.imageInViewer, options: [.requestModifier(DownloadManager.shared.modifier)])
         cell.readLabel.text = "\(showPage.index) / \(self.galleryPage.showPageList.count)"
         self.galleryPage.startLoadImageInShowPage(for: indexPath.item)
         

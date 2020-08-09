@@ -2,7 +2,7 @@ import Foundation
 import RealmSwift
 import Kanna
 import UIColor_Hex_Swift
-import SDWebImage
+import Kingfisher
 
 public extension Notification.Name {
     static let imageLoaded = Notification.Name("imageLoaded")
@@ -23,11 +23,11 @@ class ShowPage: Object {
     var isThumbDownloading: Bool = false
     
     var isImageDownload: Bool {
-        return !self.imageUrl.isEmpty && SDImageCache.shared.diskImageDataExists(withKey: self.imageUrl)
+        return !self.imageUrl.isEmpty && KingfisherManager.shared.cache.isCached(forKey: self.imageUrl)
     }
     
     var isThumbDownload: Bool {
-        return !self.thumbUrl.isEmpty && SDImageCache.shared.diskImageDataExists(withKey: self.thumbUrl)
+        return !self.thumbUrl.isEmpty && KingfisherManager.shared.cache.isCached(forKey: self.thumbUrl)
     }
     
     var url: String {
@@ -68,11 +68,11 @@ class ShowPage: Object {
 
     var imageInViewer: UIImage? {
         if self.isImageDownload {
-            return SDImageCache.shared.imageFromMemoryCache(forKey: self.imageUrl)
+            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: self.imageUrl)
         }
         
         if self.isThumbDownload {
-            return SDImageCache.shared.imageFromMemoryCache(forKey: self.thumbUrl)
+            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: self.thumbUrl)
         }
         
         return UIImage(named: "placeholder")
@@ -80,7 +80,7 @@ class ShowPage: Object {
     
     var imageInGallery: UIImage? {
         if self.isThumbDownload {
-            return SDImageCache.shared.imageFromMemoryCache(forKey: self.thumbUrl)
+            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: self.thumbUrl)
         }
         
         return UIImage(named: "placeholder")
@@ -118,24 +118,18 @@ class ShowPage: Object {
     
     func dowloadImage() {
         guard !self.isImageDownload else { return }
-        SDWebImageDownloader.shared.downloadImage(with: URL(string: self.imageUrl), options: [.handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
-            if let image = image {
-                SDImageCache.shared.store(image, forKey: self.imageUrl)
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .imageLoaded, object: self)
-                }
+        KingfisherManager.shared.cache.retrieveImage(forKey: self.imageUrl, options: [.requestModifier(DownloadManager.shared.modifier)]) { (_) in
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .imageLoaded, object: self)
             }
         }
     }
     
     func dowloadThumb() {
         guard !self.isThumbDownload else { return }
-        SDWebImageDownloader.shared.downloadImage(with: URL(string: self.thumbUrl), options: [.handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
-            if let image = image {
-                SDImageCache.shared.store(image, forKey: self.thumbUrl)
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .imageLoaded, object: self)
-                }
+        KingfisherManager.shared.cache.retrieveImage(forKey: self.thumbUrl, options: [.requestModifier(DownloadManager.shared.modifier)]) { (_) in
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .imageLoaded, object: self)
             }
         }
     }

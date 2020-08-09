@@ -137,6 +137,20 @@ extension UIImage {
     }
 }
 
+extension HTTPCookieStorage {
+    func cookies(stringFor URL: URL) -> String? {
+        var cookies = ""
+        self.cookies(for: URL)?.forEach {
+            if let properties = $0.properties {
+                for (key, value) in properties {
+                    cookies += "\(key.rawValue)=\(value); "
+                }
+            }
+        }
+        return cookies.isEmpty ? nil : cookies
+    }
+}
+
 class InteractiveBackGesture: NSObject, UIGestureRecognizerDelegate {
     
     weak var viewController: UIViewController!
@@ -207,3 +221,4 @@ class InteractiveBackGesture: NSObject, UIGestureRecognizerDelegate {
         return true
     }
 }
+

@@ -1,8 +1,8 @@
 import UIKit
-import SDWebImage
 import RealmSwift
 import SVProgressHUD
 import UIColor_Hex_Swift
+import Kingfisher
 
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -292,7 +292,7 @@ class ListVC: BaseViewController {
     }
 }
 
-extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDataSourcePrefetching {
+extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return galleryPageArray.count
@@ -306,7 +306,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
         cell.imageView.contentMode = .scaleAspectFill
-        cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: UIImage(named: "placeholder"), options: [.highPriority, .handleCookies])
+        cell.imageView.kf.setImage(with: URL(string: galleryPage.coverUrl), placeholder: UIImage(named: "placeholder"), options: [.requestModifier(DownloadManager.shared.modifier)])
 
         var infoText = galleryPage.category.text
         let df = DateFormatter()
@@ -335,12 +335,6 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         cell.layer.rasterizationScale = UIScreen.main.scale
         
         return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        guard mode != .download else {return}
-        let urls = indexPaths.map { URL(string: galleryPageArray[$0.item].coverUrl)! }
-        ImageManager.shared.prefetch(urls: urls)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

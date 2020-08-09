@@ -1,12 +1,12 @@
 import UIKit
-import SDWebImage
+import Kingfisher
 
 class ImageManager {
     static let shared: ImageManager = ImageManager()
     private var downloadingUrls: Set<URL> = Set<URL>()
     
     func getCache(forKey name: String) -> UIImage? {
-        return SDImageCache.shared.imageFromMemoryCache(forKey: name) ?? SDImageCache.shared.imageFromDiskCache(forKey: name)
+        return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: name)
     }
     
     func prefetch(urls: [URL]) {
@@ -18,11 +18,11 @@ class ImageManager {
             prefetchUrls.append(url)
         }
         
-        let prefetcher = SDWebImagePrefetcher()
-        prefetcher.options = [.highPriority, .handleCookies]
-        prefetcher.prefetchURLs(urls, progress: nil) { (_, _) in
-            prefetchUrls.forEach { self.downloadingUrls.remove($0) }
-        }
+//        let prefetcher = SDWebImagePrefetcher()
+//        prefetcher.options = [.highPriority, .handleCookies]
+//        prefetcher.prefetchURLs(urls, progress: nil) { (_, _) in
+//            prefetchUrls.forEach { self.downloadingUrls.remove($0) }
+//        }
         
     }
 }
