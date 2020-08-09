@@ -306,7 +306,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
         cell.imageView.contentMode = .scaleAspectFill
-        cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: nil, options: [.handleCookies])
+        cell.imageView.sd_setImage(with: URL(string: galleryPage.coverUrl), placeholderImage: UIImage(named: "placeholder"), options: [.highPriority, .handleCookies])
 
         var infoText = galleryPage.category.text
         let df = DateFormatter()

@@ -285,15 +285,6 @@
                                             <rect key="frame" x="0.0" y="0.0" width="183" height="166"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <view contentMode="scaleToFill" placeholderIntrinsicWidth="44" placeholderIntrinsicHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="YAS-Dy-82K" customClass="LoadingView" customModule="Shinsi2" customModuleProvider="target">
-                                                    <rect key="frame" x="69.666666666666671" y="61" width="44" height="44"/>
-                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="maxAlpha">
-                                                            <real key="value" value="0.20000000000000001"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                    </userDefinedRuntimeAttributes>
-                                                </view>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LAz-pu-4jG">
                                                     <rect key="frame" x="0.0" y="0.0" width="183" height="166"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
@@ -301,13 +292,8 @@
                                                 </imageView>
                                             </subviews>
                                         </view>
-                                        <constraints>
-                                            <constraint firstItem="YAS-Dy-82K" firstAttribute="centerY" secondItem="65o-14-oGl" secondAttribute="centerY" id="oeF-5k-cnk"/>
-                                            <constraint firstItem="YAS-Dy-82K" firstAttribute="centerX" secondItem="65o-14-oGl" secondAttribute="centerX" id="zU8-MW-ayt"/>
-                                        </constraints>
                                         <connections>
                                             <outlet property="imageView" destination="LAz-pu-4jG" id="GcE-wQ-oOa"/>
-                                            <outlet property="loadingView" destination="YAS-Dy-82K" id="07E-VC-dUD"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>

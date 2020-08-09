@@ -94,7 +94,7 @@ class ViewerVC: UICollectionViewController {
         let p = ges.location(in: collectionView)
         if let indexPath = collectionView!.indexPathForItem(at: p) {
             let item = self.galleryPage.showPageList[indexPath.item]
-            if let image = item.image {
+            if let image = item.imageInViewer {
                 let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
                 let ok = UIAlertAction(title: "OK", style: .default) { _ in
                     PHPhotoLibrary.requestAuthorization({ s in
@@ -155,7 +155,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         cell.showPage = self.galleryPage.showPageList[indexPath.item]
-        cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: showPage.image, options: [.highPriority, .handleCookies])
+        cell.imageView.sd_setImage(with: URL(string: showPage.imageUrl), placeholderImage: showPage.imageInViewer, options: [.highPriority, .handleCookies])
         
         self.galleryPage.startLoadShowPageImage(for: indexPath.item)
         

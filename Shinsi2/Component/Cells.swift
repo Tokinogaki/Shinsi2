@@ -3,7 +3,6 @@ import SDWebImage
 
 class ImageCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var  loadingView: LoadingView?
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.sd_cancelCurrentImageLoad()
@@ -125,7 +124,7 @@ class ScrollingImageCell: UICollectionViewCell {
             showPage.imageKey == page.imageKey else {
             return
         }
-        self.image = showPage.image
+        self.image = showPage.imageInViewer
     }
 }
 

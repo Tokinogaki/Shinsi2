@@ -25,8 +25,12 @@ class ShowPage: Object {
         return !self.imageUrl.isEmpty
     }
     
-    var isDownload: Bool {
+    var isDownloadImage: Bool {
         return SDImageCache.shared().diskImageDataExists(withKey: self.imageUrl)
+    }
+    
+    var isDownloadThumb: Bool {
+        return SDImageCache.shared().diskImageDataExists(withKey: self.thumbUrl)
     }
     
     var url: String {
@@ -65,11 +69,25 @@ class ShowPage: Object {
         return 1.0
     }
 
-    var image: UIImage? {
-        return self.isDownload
-            ? SDImageCache.shared().imageFromMemoryCache(forKey: self.imageUrl)
-            : SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
-   }
+    var imageInViewer: UIImage? {
+        if self.isDownloadImage {
+            return SDImageCache.shared().imageFromMemoryCache(forKey: self.imageUrl)
+        }
+        
+        if self.isDownloadThumb {
+            return SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
+        }
+        
+        return UIImage(named: "placeholder")
+    }
+    
+    var imageInGallery: UIImage? {
+        if self.isDownloadThumb {
+            return SDImageCache.shared().imageFromMemoryCache(forKey: self.thumbUrl)
+        }
+        
+        return UIImage(named: "placeholder")
+    }
     
     required init() {
         super.init()
@@ -102,7 +120,7 @@ class ShowPage: Object {
     }
     
     func dowloadImage() {
-        guard !self.isDownload else { return }
+        guard !self.isDownloadImage else { return }
         SDWebImageDownloader.shared().downloadImage(with: URL(string: self.imageUrl), options: [.handleCookies, .useNSURLCache], progress: nil) { (image, _, _, _) in
             if let image = image {
                 SDImageCache.shared().store(image, forKey: self.imageUrl)

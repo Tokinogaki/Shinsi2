@@ -556,7 +556,7 @@ extension GalleryPage {
                         continue
                     }
                     let showPage = self.showPageList[i]
-                    guard !showPage.isDownload && !showPage.isDownloading else {
+                    guard !showPage.isDownloadImage && !showPage.isDownloading else {
                         continue
                     }
                     showPage.isDownloading = true
