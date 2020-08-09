@@ -78,6 +78,7 @@ class RequestManager {
         Alamofire.request(url, method: .get).responseString { response in
             if let html = response.result.value,
                let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
+                galleryPage.setInfo(galleryPage: doc)
                 galleryPage.setPages(doc)
                 galleryPage.setComments(doc)
                 galleryPage.setTags(doc)
