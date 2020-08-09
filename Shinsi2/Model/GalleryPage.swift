@@ -303,16 +303,14 @@ class Tag: Object {
 }
 
 class Comment: Object {
-    var author: String = ""
-    var date: Date = Date()
-    var text: String = ""
-    var htmlAttributedText: NSAttributedString?
+    @objc dynamic var author: String = ""
+    @objc dynamic var date: Date = Date()
+    @objc dynamic var text: String = ""
     init(author: String, date: Date, text: String) {
         super.init()
         self.author = author
         self.date = date
         self.text = text
-        self.htmlAttributedText = text.htmlAttribute
     }
     
     required init() {

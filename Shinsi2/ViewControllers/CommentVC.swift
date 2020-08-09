@@ -26,7 +26,7 @@ class CommentVC: BaseViewController, UITableViewDelegate, UITableViewDataSource,
         df.dateFormat = "yyyy/MM/dd HH:mm"
         cell.dateLabel.text = df.string(from: c.date)
         cell.authorLabel.text = c.author
-        cell.commentTextView.attributedText = c.htmlAttributedText
+        cell.commentTextView.text = c.text
         
         return cell
     }
