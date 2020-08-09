@@ -29,6 +29,7 @@ class GalleryPage: Object {
     @objc dynamic var isDownloaded: Bool = false
     @objc dynamic var readPage: Int = 0
     @objc dynamic var perPageCount: Int = 0
+    @objc dynamic var updatedAt: Date = Date()
     @objc dynamic var createdAt: Date = Date()
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue

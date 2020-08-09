@@ -98,7 +98,7 @@ extension RealmManager {
                 gp.posted = galleryPage.posted
                 gp.favorite = galleryPage.favorite
                 gp.rating = galleryPage.rating
-                gp.createdAt = Date()
+                gp.updatedAt = Date()
             }
         }
     }
