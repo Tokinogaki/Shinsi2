@@ -37,6 +37,13 @@ let kUDSettingUsePasscpde = "kUDSettingUsePasswcode"
 //Color
 let kMainColor = UIApplication.shared.keyWindow?.tintColor ?? #colorLiteral(red: 0.8459790349, green: 0.2873021364, blue: 0.2579272389, alpha: 1)
 
+
+var kEximagesPath: URL {
+    let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+    return URL(fileURLWithPath: documentsPath, isDirectory: true).appendingPathComponent("eximages")
+}
+
+
 class Defaults {
     class App {
         static var version: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String

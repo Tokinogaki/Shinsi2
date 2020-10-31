@@ -2,17 +2,9 @@ PODS:
   - Alamofire (4.9.1)
   - AloeStackView (1.2.0)
   - Hero (1.5.0)
-  - Kanna (5.2.2)
-  - Kingfisher (5.14.0):
-    - Kingfisher/Core (= 5.14.0)
-  - Kingfisher/Core (5.14.0)
-  - Realm (5.0.3):
-    - Realm/Headers (= 5.0.3)
-  - Realm/Headers (5.0.3)
-  - RealmSwift (5.0.3):
-    - Realm (= 5.0.3)
+  - Kanna (5.2.3)
   - SVProgressHUD (2.2.5)
-  - SwiftLint (0.39.2)
+  - SwiftLint (0.40.3)
   - UIColor_Hex_Swift (5.1.0)
 
 DEPENDENCIES:
@@ -20,8 +12,6 @@ DEPENDENCIES:
   - AloeStackView
   - Hero
   - Kanna
-  - Kingfisher
-  - RealmSwift (> 3.16.2)
   - SVProgressHUD
   - SwiftLint
   - UIColor_Hex_Swift
@@ -32,9 +22,6 @@ SPEC REPOS:
     - AloeStackView
     - Hero
     - Kanna
-    - Kingfisher
-    - Realm
-    - RealmSwift
     - SVProgressHUD
     - SwiftLint
     - UIColor_Hex_Swift
@@ -43,14 +30,11 @@ SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   AloeStackView: 8a4ce0efa08128dd78d538372f60c76c224034bb
   Hero: b7385b75e7259da62f4f85462f59a5082d66b058
-  Kanna: 2c4eddaaa4bfb9a1ed19e53c0b3d42ef02838046
-  Kingfisher: 7b64389a43139c903ec434788344c288217c792d
-  Realm: bfca1699b61b0b17c3a69ae0e648314eae91fbdb
-  RealmSwift: 493c9f089cd3893b3959007973c0e4f640906ba0
+  Kanna: 113d111e95d7e903efe0c3eb7221f7635716084c
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
-  SwiftLint: 22ccbbe3b8008684be5955693bab135e0ed6a447
+  SwiftLint: dfd554ff0dff17288ee574814ccdd5cea85d76f7
   UIColor_Hex_Swift: 8be7432edacb7fa91c78aa05ef3c30b66e4f9415
 
-PODFILE CHECKSUM: 41ca43604a02f5a1b00e8c1c282d9f1f6cb91daf
+PODFILE CHECKSUM: af3af7d27f04f96fc92f2cb02b82a1d454895100
 
 COCOAPODS: 1.9.3

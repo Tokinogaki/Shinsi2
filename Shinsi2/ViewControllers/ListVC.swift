@@ -1,8 +1,7 @@
 import UIKit
-import RealmSwift
+
 import SVProgressHUD
 import UIColor_Hex_Swift
-import Kingfisher
 
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -63,12 +62,13 @@ class ListVC: BaseViewController {
             Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
             backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         }
-        searchHistoryVC.searchController = searchController
-        searchHistoryVC.selectBlock = {[unowned self] text in
-            self.searchController.isActive = false
-            self.searchController.searchBar.text = text
-            self.reloadData()
-        }
+        // TODO: xxxx
+//        searchHistoryVC.searchController = searchController
+//        searchHistoryVC.selectBlock = {[unowned self] text in
+//            self.searchController.isActive = false
+//            self.searchController.searchBar.text = text
+//            self.reloadData()
+//        }
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         searchController.obscuresBackgroundDuringPresentation = false
@@ -131,11 +131,11 @@ class ListVC: BaseViewController {
     func loadNextPage() {
         if mode == .download {
             loadingView.hide()
-            galleryPageArray = RealmManager.shared.downloaded.map { $0 }
+//            galleryPageArray = RealmManager.shared.downloaded.map { $0 }
             collectionView.reloadData()
         } else if mode == .history {
             loadingView.hide()
-            galleryPageArray = RealmManager.shared.browsedGalleryPage
+//            galleryPageArray = RealmManager.shared.browsedGalleryPage
             collectionView.reloadData()
         } else {
             guard loadingPage != currentPage + 1 else {return}
@@ -156,7 +156,7 @@ class ListVC: BaseViewController {
             }
         }
     }
-
+    
     func reloadData() {
         currentPage = -1
         loadingPage = -1
@@ -218,8 +218,9 @@ class ListVC: BaseViewController {
         let alert = UIAlertController(title: title, message: doujinshi.title, preferredStyle: .alert)
         let deleteAction = UIAlertAction(title: actionTitle, style: .destructive) { _ in
             if self.mode == .download {
-                DownloadManager.shared.deleteDownloaded(doujinshi: doujinshi)
-                self.galleryPageArray = RealmManager.shared.downloaded.map { $0 }
+                // TODO: xxx
+//                DownloadManager.shared.deleteDownloaded(doujinshi: doujinshi)
+//                self.galleryPageArray = RealmManager.shared.downloaded.map { $0 }
                 self.collectionView.performBatchUpdates({
                     self.collectionView.deleteItems(at: [indexPath])
                 }, completion: nil)
@@ -302,11 +303,12 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ListCell
         
         let galleryPage = galleryPageArray[indexPath.item]
+        galleryPage.downloadCover()
+        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
         cell.imageView.hero.id = "image_\(galleryPage.gid)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
-        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
         cell.imageView.contentMode = .scaleAspectFill
-        cell.imageView.kf.setImage(with: URL(string: galleryPage.coverUrl), placeholder: UIImage(named: "placeholder"), options: [.requestModifier(DownloadManager.shared.modifier)])
+        cell.imageView.image = galleryPage.cover ?? UIImage(named: "placeholder")
 
         var infoText = galleryPage.category.text
         let df = DateFormatter()
@@ -337,6 +339,13 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            let galleryPage = self.galleryPageArray[indexPath.row]
+            galleryPage.downloadCover()
+        }
+    }
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
         vc.galleryPage = galleryPageArray[indexPath.item]
@@ -385,7 +394,8 @@ extension ListVC: UISearchBarDelegate, UISearchControllerDelegate {
         navigationItem.rightBarButtonItems?.forEach { $0.isEnabled = true }
         searchController.dismiss(animated: true, completion: nil)
         reloadData()
-        RealmManager.shared.saveSearchHistory(text: searchBar.text)
+        //TODO:cccc
+//        RealmManager.shared.saveSearchHistory(text: searchBar.text)
         Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
     }
     

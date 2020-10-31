@@ -1,14 +1,19 @@
 import Foundation
-import RealmSwift
+
 import Kanna
 import UIColor_Hex_Swift
-import Kingfisher
 
 public extension Notification.Name {
-    static let imageLoaded = Notification.Name("imageLoaded")
+    static let loadShowPage = Notification.Name("loadShowPage")
+    static let imageDownloaded = Notification.Name("imageDownloaded")
+    static let thumbDownloaded = Notification.Name("thumbDownloaded")
 }
 
-class ShowPage: Object {
+enum StateEnum: Int {
+    case none, downloading, downloaded
+}
+
+class ShowPage: NSObject {
     @objc dynamic var index = 0
     @objc dynamic var imageKey = ""
     @objc dynamic var thumbUrl = ""
@@ -19,15 +24,62 @@ class ShowPage: Object {
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
     
-    var isImageDownloading: Bool = false
-    var isThumbDownloading: Bool = false
-    
-    var isImageDownload: Bool {
-        return !self.imageUrl.isEmpty && KingfisherManager.shared.cache.isCached(forKey: self.imageUrl)
+    var _imageState: StateEnum = .none
+    var imageState: StateEnum {
+        get {
+            if self.hasImage {
+                return .downloaded
+            }
+            return _imageState
+        }
+        set {
+            _imageState = newValue
+        }
     }
     
-    var isThumbDownload: Bool {
-        return !self.thumbUrl.isEmpty && KingfisherManager.shared.cache.isCached(forKey: self.thumbUrl)
+    var _thumbState: StateEnum = .none
+    var thumbState: StateEnum {
+        get {
+            if self.hasThumb {
+                return .downloaded
+            }
+            return _thumbState
+        }
+        set {
+            _thumbState = newValue
+        }
+    }
+    
+    var localImage: URL {
+        return kEximagesPath.appendingPathComponent("\(self.imageKey)_image.jpg")
+    }
+    
+    var localThumb: URL {
+        return kEximagesPath.appendingPathComponent("\(self.imageKey)_thumb.jpg")
+    }
+    
+    var hasImage: Bool {
+        return FileManager.default.fileExists(atPath: self.localImage.path)
+    }
+    
+    var hasThumb: Bool {
+        return FileManager.default.fileExists(atPath: self.localThumb.path)
+    }
+    
+    var image: UIImage? {
+        if self.hasImage {
+            let data = try! Data(contentsOf: self.localImage)
+            return UIImage(data: data)
+        }
+        return nil
+    }
+    
+    var thumb: UIImage? {
+        if self.hasThumb {
+            let data = try! Data(contentsOf: self.localThumb)
+            return UIImage(data: data)
+        }
+        return nil
     }
     
     var url: String {
@@ -65,77 +117,29 @@ class ShowPage: Object {
         }
         return 1.0
     }
-
-    var imageInViewer: UIImage? {
-        if self.isImageDownload {
-            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: self.imageUrl)
-        }
-        
-        if self.isThumbDownload {
-            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: self.thumbUrl)
-        }
-        
-        return UIImage(named: "placeholder")
-    }
-    
-    var imageInGallery: UIImage? {
-        if self.isThumbDownload {
-            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: self.thumbUrl)
-        }
-        
-        return UIImage(named: "placeholder")
-    }
-    
-    required init() {
-        super.init()
-    }
     
     func setInfo(showPage doc: HTMLDocument) {
-        try! RealmManager.shared.realm.write {
-            if let img = doc.at_xpath("//img [@id='img']"),
-                let imageUrl = img["src"] {
-                self.imageUrl = imageUrl
-            }
-            
-            if let text = doc.at_xpath("//div [@id='i2'] //div //span")?.text,
-               let index = Int(text) {
-                self.index = index
-            }
-            
-            if let origin = doc.at_xpath("//div [@id='i7'] //a"),
-               let originUrl = origin["href"],
-               let imgInfo = origin.text {
-                self.originUrl = originUrl
-                let imgInfoArray = imgInfo.components(separatedBy: " ")
-                if imgInfoArray.count == 8 {
-                    self._sizeWidth = Float(imgInfoArray[2]) ?? 0
-                    self._sizeHeight = Float(imgInfoArray[4]) ?? 0
-                    self.fileSize = imgInfoArray[5] + imgInfoArray[6]
-                }
+        if let img = doc.at_xpath("//img [@id='img']"),
+            let imageUrl = img["src"] {
+            self.imageUrl = imageUrl
+        }
+        
+        if let text = doc.at_xpath("//div [@id='i2'] //div //span")?.text,
+           let index = Int(text) {
+            self.index = index
+        }
+        
+        if let origin = doc.at_xpath("//div [@id='i7'] //a"),
+           let originUrl = origin["href"],
+           let imgInfo = origin.text {
+            self.originUrl = originUrl
+            let imgInfoArray = imgInfo.components(separatedBy: " ")
+            if imgInfoArray.count == 8 {
+                self._sizeWidth = Float(imgInfoArray[2]) ?? 0
+                self._sizeHeight = Float(imgInfoArray[4]) ?? 0
+                self.fileSize = imgInfoArray[5] + imgInfoArray[6]
             }
         }
-    }
-    
-    func dowloadImage() {
-        guard !self.isImageDownload else { return }
-        KingfisherManager.shared.cache.retrieveImage(forKey: self.imageUrl, options: [.requestModifier(DownloadManager.shared.modifier)]) { (_) in
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .imageLoaded, object: self)
-            }
-        }
-    }
-    
-    func dowloadThumb() {
-        guard !self.isThumbDownload else { return }
-        KingfisherManager.shared.cache.retrieveImage(forKey: self.thumbUrl, options: [.requestModifier(DownloadManager.shared.modifier)]) { (_) in
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .imageLoaded, object: self)
-            }
-        }
-    }
-
-    override class func ignoredProperties() -> [String] {
-        return ["isImageDownloading", "isThumbDownloading"]
     }
 
 }

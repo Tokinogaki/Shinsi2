@@ -1,8 +1,7 @@
 import UIKit
 import Hero
 import Photos
-import RealmSwift
-import Kingfisher
+
 
 class ViewerVC: UICollectionViewController {
     
@@ -57,11 +56,6 @@ class ViewerVC: UICollectionViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        self.galleryPage.cancelLoadImageInShowPage()
-    }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         guard UIApplication.shared.applicationState == .active else {return} 
@@ -94,13 +88,13 @@ class ViewerVC: UICollectionViewController {
         let p = ges.location(in: collectionView)
         if let indexPath = collectionView!.indexPathForItem(at: p) {
             let item = self.galleryPage.showPageList[indexPath.item]
-            if let image = item.imageInViewer {
+            if item.hasImage {
                 let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
                 let ok = UIAlertAction(title: "OK", style: .default) { _ in
                     PHPhotoLibrary.requestAuthorization({ s in
                         if s == .authorized {
                             PHPhotoLibrary.shared().performChanges({
-                                PHAssetChangeRequest.creationRequestForAsset(from: image)
+                                PHAssetChangeRequest.creationRequestForAsset(from: item.image!)
                             }, completionHandler: nil)
                         }
                     })
@@ -151,13 +145,13 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ScrollingImageCell
         let showPage = self.galleryPage.showPageList[indexPath.item]
         
+        cell.showPage = showPage
+        cell.image = showPage.image ?? showPage.thumb ?? UIImage(named: "placeholder")
         cell.imageView.hero.id = heroID(for: indexPath)
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
-        cell.showPage = self.galleryPage.showPageList[indexPath.item]
-        cell.imageView.kf.setImage(with: URL(string: showPage.imageUrl), placeholder: showPage.imageInViewer, options: [.requestModifier(DownloadManager.shared.modifier)])
         cell.readLabel.text = "\(showPage.index) / \(self.galleryPage.showPageList.count)"
-        self.galleryPage.startLoadImageInShowPage(for: indexPath.item)
+        self.galleryPage.downloadImages(for: indexPath.item)
         
         return cell
     }

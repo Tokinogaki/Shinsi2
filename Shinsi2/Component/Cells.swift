@@ -1,18 +1,49 @@
 import UIKit
-import Kingfisher
 
 class ImageCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        imageView.kf.cancelDownloadTask()
+    var showPage: ShowPage?
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleImageLoadedNotification(notification:)), name: .thumbDownloaded, object: nil)
+    }
+    
+    @objc func handleImageLoadedNotification(notification: Notification) {
+        guard let showPage = notification.object as? ShowPage else { return }
+        guard let page = self.showPage,
+            showPage.imageKey == page.imageKey else {
+            return
+        }
+        
+        self.imageView.image = self.showPage?.thumb
     }
 }
 
-class ListCell: ImageCell {
+class ListCell: UICollectionViewCell {
+    @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var containerView: UIView!
+    
+    var galleryPage: GalleryPage?
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleImageLoadedNotification(notification:)), name: .coverDownloaded, object: nil)
+    }
+    
+    @objc func handleImageLoadedNotification(notification: Notification) {
+        guard let galleryPage = notification.object as? GalleryPage else { return }
+        guard let page = self.galleryPage,
+              galleryPage.gid == page.gid else {
+            return
+        }
+        
+        self.imageView.image = self.galleryPage?.cover
+    }
 }
 
 class CommentCell: UITableViewCell {
@@ -57,7 +88,8 @@ class ScrollingImageCell: UICollectionViewCell {
         dTapGR.delegate = self
         addGestureRecognizer(dTapGR)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleImageLoadedNotification(notification:)), name: .imageLoaded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleImageLoadedNotification(notification:)), name: .imageDownloaded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleImageLoadedNotification(notification:)), name: .thumbDownloaded, object: nil)
     }
     
     func zoomRectForScale(scale: CGFloat, center: CGPoint) -> CGRect {
@@ -101,7 +133,6 @@ class ScrollingImageCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         scrollView.setZoomScale(1, animated: false)
-        imageView.kf.cancelDownloadTask()
     }
     
     func centerIfNeeded() {
@@ -125,7 +156,7 @@ class ScrollingImageCell: UICollectionViewCell {
             showPage.imageKey == page.imageKey else {
             return
         }
-        self.image = showPage.imageInViewer
+        self.image = self.showPage?.image ?? self.showPage?.thumb
     }
 }
 

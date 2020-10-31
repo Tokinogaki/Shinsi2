@@ -1,10 +1,21 @@
 import Alamofire
-import RealmSwift
+
 import Kanna
 
-class RequestManager {
+class RequestManager : NSObject {
     
     static let shared = RequestManager()
+    
+    var _manager: SessionManager?
+    var manager: SessionManager {
+        if _manager == nil {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 10
+
+            _manager = Alamofire.SessionManager(configuration: configuration)
+        }
+        return _manager!
+    }
     
     func login(username name: String, password pw: String, completeBlock block: (() -> Void)? ) {
         let url = Defaults.URL.login.absoluteString + "&CODE=01"
@@ -59,7 +70,7 @@ class RequestManager {
             url += "&page=\(page)"
         }
         
-        Alamofire.request(url, method: .get).responseString { response in
+        self.manager.request(url, method: .get).responseString { response in
             guard let html = response.result.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
                 let items = GalleryPage.galleryPageList(indexPage: doc)
@@ -75,7 +86,7 @@ class RequestManager {
         let page = galleryPage.nextPageIndex
         var url = galleryPage.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
-        Alamofire.request(url, method: .get).responseString { response in
+        self.manager.request(url, method: .get).responseString { response in
             if let html = response.result.value,
                let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
                 galleryPage.setInfo(galleryPage: doc)
@@ -89,7 +100,7 @@ class RequestManager {
 
     func getShowPage_bak(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
         print(#function)
-        Alamofire.request(url, method: .get).responseString { response in
+        self.manager.request(url, method: .get).responseString { response in
             guard let html = response.result.value else {
                 block?(nil)
                 return
@@ -108,7 +119,7 @@ class RequestManager {
     
     func getShowPage(showPage: ShowPage, completeBlock block: (() -> Void)?) {
         print(#function)
-        Alamofire.request(showPage.url, method: .get).responseString { response in
+        self.manager.request(showPage.url, method: .get).responseString { response in
             guard let html = response.result.value else {
                 block?()
                 return
@@ -125,7 +136,7 @@ class RequestManager {
         gallery.setFavorite(index: category)
         let url = Defaults.URL.host + "/gallerypopups.php?gid=\(gallery.gid)&t=\(gallery.token)&act=addfav"
         let parameters: [String: String] = ["favcat": "\(category)", "favnote": "", "apply": "Add to Favorites", "update": "1"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        self.manager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
         }
     }
 
@@ -134,7 +145,7 @@ class RequestManager {
         gallery.setFavorite(index: -1)
         let url = Defaults.URL.host + "/favorites.php"
         let parameters: [String: Any] = ["ddact": "delete", "modifygids[]": gallery.gid, "apply": "Apply"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        self.manager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
         }
     }
     
@@ -143,7 +154,34 @@ class RequestManager {
         guard gallery.isIdTokenValide else {return}
         let url = Defaults.URL.host + "/favorites.php"
         let parameters: [String: Any] = ["ddact": "fav\(catogory)", "modifygids[]": gallery.gid, "apply": "Apply"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        self.manager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        }
+    }
+    
+    func downloadCover(galleryPage: GalleryPage, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
+        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+            return (galleryPage.localCover, [.removePreviousFile, .createIntermediateDirectories])
+        }
+        self.manager.download(galleryPage.coverUrl, to: destination).responseData { response in
+            block?(response.result)
+        }
+    }
+    
+    func downloadImage(showPage: ShowPage, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
+        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+            return (showPage.localImage, [.removePreviousFile, .createIntermediateDirectories])
+        }
+        self.manager.download(showPage.imageUrl, to: destination).responseData { response in
+            block?(response.result)
+        }
+    }
+    
+    func downloadThumb(showPage: ShowPage, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
+        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+            return (showPage.localThumb, [.removePreviousFile, .createIntermediateDirectories])
+        }
+        self.manager.download(showPage.thumbUrl, to: destination).responseData { response in
+            block?(response.result)
         }
     }
 }
@@ -161,32 +199,39 @@ extension RequestManager {
             "namespace": 1
         ]
         
-        Alamofire.request(Defaults.URL.host + "/api.php", method: .post, parameters: p, encoding: JSONEncoding(), headers: nil).responseJSON { response in
-            if let dic = response.result.value as? NSDictionary {
-                if let metadatas = dic["gmetadata"] as? NSArray {
-                    if let metadata = metadatas[0] as? NSDictionary {
-                        if let count = metadata["filecount"]  as? String,
-                            let rating = metadata["rating"] as? String,
-                            let title = metadata["title"] as? String,
-                            let title_jpn = metadata["title_jpn"] as? String,
-                            let tags = metadata["tags"] as? [String],
-                            let thumb = metadata["thumb"] as? String,
-                            let gid = metadata["gid"] as? Int {
-                            let gdata = GalleryPage(value: ["filecount": Int(count)!, "rating": Float(rating)!, "title": title.isEmpty ? doujinshi.title : title, "title_jpn": title_jpn.isEmpty ? doujinshi.title: title_jpn, "coverUrl": thumb, "gid": String(gid)])
-                            for t in tags {
-                                gdata.tags.append(Tag(value: ["name": t]))
-                            }
-                            block?(gdata)
-                            //Cache
-                            let cachedURLResponse = CachedURLResponse(response: response.response!, data: response.data!, userInfo: nil, storagePolicy: .allowed)
-                            URLCache.shared.storeCachedResponse(cachedURLResponse, for: response.request!)
-                            
-                            return
-                        }
-                    }
-                }
-                block?(nil)
-            }
+        self.manager.request(Defaults.URL.host + "/api.php", method: .post, parameters: p, encoding: JSONEncoding(), headers: nil).responseJSON { response in
+//            if let dic = response.result.value as? NSDictionary {
+//                if let metadatas = dic["gmetadata"] as? NSArray {
+//                    if let metadata = metadatas[0] as? NSDictionary {
+//                        if let count = metadata["filecount"]  as? String,
+//                            let rating = metadata["rating"] as? String,
+//                            let title = metadata["title"] as? String,
+//                            let title_jpn = metadata["title_jpn"] as? String,
+//                            let tags = metadata["tags"] as? [String],
+//                            let thumb = metadata["thumb"] as? String,
+//                            let gid = metadata["gid"] as? Int {
+//                            let gdata = GalleryPage()
+//                            gdata.`length` = Int(count)!
+//                            gdata.rating = Float(rating)!
+//                            gdata.title = title.isEmpty ? doujinshi.title : title
+//                            gdata.title_jpn =  title_jpn.isEmpty ? doujinshi.title: title_jpn
+//                            gdata.coverUrl = thumb
+//                            gdata.gid = String(gid)
+//
+//                            for t in tags {
+//                                gdata.tags.append(Tag(value: ["name": t]))
+//                            }
+//                            block?(gdata)
+//                            //Cache
+//                            let cachedURLResponse = CachedURLResponse(response: response.response!, data: response.data!, userInfo: nil, storagePolicy: .allowed)
+//                            URLCache.shared.storeCachedResponse(cachedURLResponse, for: response.request!)
+//
+//                            return
+//                        }
+//                    }
+//                }
+//                block?(nil)
+//            }
             block?(nil)
         }
     }

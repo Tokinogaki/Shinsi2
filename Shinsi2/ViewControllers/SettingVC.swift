@@ -1,6 +1,5 @@
 import UIKit
 import AloeStackView
-import Kingfisher
 import SVProgressHUD
 import Hero
 import WebKit
@@ -156,31 +155,32 @@ class SettingVC: BaseViewController {
         addTitle("Cache")
         let cacheSizeLable = createSubTitleLabel("size: counting...")
         stackView.addRow(cacheSizeLable)
-        ImageCache.default.calculateDiskStorageSize(completion: { (result) in
-            var cacheSize = 0.0;
-            switch result {
-            case .success(let value):
-                cacheSize = Double(value / 1024 / 1024)
-            case .failure(_):
-                cacheSize = 0
-            }
-            DispatchQueue.main.async { [weak self, weak cacheSizeLable] in
-                guard let self = self, let cacheSizeLable = cacheSizeLable else {return}
-                cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
-                
-                let clear = self.createTextLable("Delete All Cache")
-                clear.heightAnchor.constraint(equalToConstant: 50).isActive = true
-                clear.textAlignment = .right
-                clear.textColor = kMainColor
-                clear.isUserInteractionEnabled = true
-                self.stackView.insertRow(clear, after: cacheSizeLable)
-                self.stackView.setTapHandler(forRow: clear) { _ in
-                    KingfisherManager.shared.cache.cleanExpiredDiskCache {
-                        cacheSizeLable.text = "size: 0mb"
-                    }
-                }
-            }
-        })
+        //TODO: xxxx
+//        ImageCache.default.calculateDiskStorageSize(completion: { (result) in
+//            var cacheSize = 0.0;
+//            switch result {
+//            case .success(let value):
+//                cacheSize = Double(value / 1024 / 1024)
+//            case .failure(_):
+//                cacheSize = 0
+//            }
+//            DispatchQueue.main.async { [weak self, weak cacheSizeLable] in
+//                guard let self = self, let cacheSizeLable = cacheSizeLable else {return}
+//                cacheSizeLable.text = String(format: "size: %.1fmb", cacheSize)
+//                
+//                let clear = self.createTextLable("Delete All Cache")
+//                clear.heightAnchor.constraint(equalToConstant: 50).isActive = true
+//                clear.textAlignment = .right
+//                clear.textColor = kMainColor
+//                clear.isUserInteractionEnabled = true
+//                self.stackView.insertRow(clear, after: cacheSizeLable)
+//                self.stackView.setTapHandler(forRow: clear) { _ in
+//                    KingfisherManager.shared.cache.cleanExpiredDiskCache {
+//                        cacheSizeLable.text = "size: 0mb"
+//                    }
+//                }
+//            }
+//        })
         
         //Info
         addWhiteSpace(height: 60)

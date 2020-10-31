@@ -32,7 +32,7 @@ class GalleryVC: BaseViewController {
         updateNavigationItems()
         appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .updateCalleryPage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryPage, object: nil)
         
         if !isSizeClassRegular {
             navigationItem.rightBarButtonItems =
@@ -55,13 +55,11 @@ class GalleryVC: BaseViewController {
             scrollBar.draggingTextOffset = 40
         }
 
-        self.galleryPage.updateCalleryPage()
         self.galleryPage.startLoadGalleryPage()
     }
 
     deinit {
         self.galleryPage.cancelLoadGalleryPage()
-        self.galleryPage.cancelLoadThumbInShowPage()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -212,29 +210,29 @@ class GalleryVC: BaseViewController {
 
     func downloadAll() {
         downloadButton.isEnabled = false
-        DownloadManager.shared.download(galleryPage: self.galleryPage)
-        DownloadBubble.shared.show(on: navigationController!)
+//        DownloadManager.shared.download(galleryPage: self.galleryPage)
+//        DownloadBubble.shared.show(on: navigationController!)
     }
 
     func downloadSelectedPage() {
-        guard let selectedIndexPaths = collectionView.indexPathsForSelectedItems?.sorted(),
-              selectedIndexPaths.count > 0
-            else {
-            isPartDownloading = false
-            return
-        }
-        let new = GalleryPage(value: self.galleryPage!)
-        new.showPageList.removeAll()
-        for i in selectedIndexPaths {
-            new.showPageList.append(ShowPage(value: galleryPage.showPageList[i.item]))
-        }
-        new.gid = Int("\(new.gid)\(arc4random() % (99999 - 10000) + 10000)") ?? 0
-        new.`length` = selectedIndexPaths.count
-        new.coverUrl = new.showPageList.first!.thumbUrl
-        DownloadManager.shared.download(galleryPage: new)
-        DownloadBubble.shared.show(on: navigationController!)
-
-        isPartDownloading = false
+//        guard let selectedIndexPaths = collectionView.indexPathsForSelectedItems?.sorted(),
+//              selectedIndexPaths.count > 0
+//            else {
+//            isPartDownloading = false
+//            return
+//        }
+//        let new = GalleryPage(value: self.galleryPage!)
+//        new.showPageList.removeAll()
+//        for i in selectedIndexPaths {
+//            new.showPageList.append(ShowPage(value: galleryPage.showPageList[i.item]))
+//        }
+//        new.gid = Int("\(new.gid)\(arc4random() % (99999 - 10000) + 10000)") ?? 0
+//        new.`length` = selectedIndexPaths.count
+//        new.coverUrl = new.showPageList.first!.thumbUrl
+//        DownloadManager.shared.download(galleryPage: new)
+//        DownloadBubble.shared.show(on: navigationController!)
+//
+//        isPartDownloading = false
     }
 
     override var previewActionItems: [UIPreviewActionItem] {
@@ -262,7 +260,6 @@ class GalleryVC: BaseViewController {
     @objc func handleUpdateCalleryPageNotification(notification: Notification) {
         collectionView.reloadData()
         self.updateNavigationItems()
-        self.galleryPage.startLoadThumbInShowPage()
     }
     
 }
@@ -273,9 +270,9 @@ extension GalleryVC: CommentVCDelegate {
             if url.absoluteString.contains(Defaults.URL.host+"/g/"), url.absoluteString != galleryPage.url {
                 //Gallery
                 vc.dismiss(animated: true) {
-                    let d = GalleryPage(value: ["url": url.absoluteString])
-                    let vc = self.storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
-                    vc.galleryPage = d
+//                    let d = GalleryPage(value: ["url": url.absoluteString])
+//                    let vc = self.storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
+//                    vc.galleryPage = d
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             } else if url.absoluteString.contains(Defaults.URL.host+"/s/") {
@@ -320,15 +317,19 @@ extension GalleryVC: UICollectionViewDataSource,
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
-        let page = galleryPage.showPageList[indexPath.item]
-
-        cell.imageView.kf.setImage(with: URL(string: page.thumbUrl), placeholder: page.imageInGallery, options: [.requestModifier(DownloadManager.shared.modifier)])
+        let showPage = galleryPage.showPageList[indexPath.item]
+        
+        cell.showPage = showPage
+        cell.imageView.image = showPage.thumb ?? UIImage(named: "placeholder")
         cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1
         
         cell.layer.shouldRasterize = true
         cell.layer.rasterizationScale = UIScreen.main.scale
+        
+        self.galleryPage.downloadThumb(indexPath.row)
+        
         return cell
     }
 
@@ -340,9 +341,9 @@ extension GalleryVC: UICollectionViewDataSource,
     }
 
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        guard !galleryPage.isDownloaded else {return}
-        let urls = indexPaths.map({URL(string: galleryPage.showPageList[$0.item].thumbUrl)!})
-        ImageManager.shared.prefetch(urls: urls)
+        for indexPath in indexPaths {
+            self.galleryPage.downloadThumb(indexPath.row)
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
