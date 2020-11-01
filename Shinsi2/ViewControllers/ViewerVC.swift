@@ -36,6 +36,8 @@ class ViewerVC: UICollectionViewController {
             }
         }
         
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryPage, object: nil)
+        
         //Close gesture
         let panGR = UIPanGestureRecognizer()
         panGR.addTarget(self, action: #selector(pan(ges:)))
@@ -82,6 +84,10 @@ class ViewerVC: UICollectionViewController {
     override var prefersStatusBarHidden: Bool { return true }
     
     override var prefersHomeIndicatorAutoHidden: Bool { return true }
+    
+    @objc func handleUpdateCalleryPageNotification(notification: Notification) {
+        collectionView.reloadData()
+    }
     
     @objc func longPress(ges: UILongPressGestureRecognizer) {
         guard ges.state == .began else {return}
@@ -162,7 +168,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     }
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        let showPage = self.galleryPage.showPageList[indexPath.item];
+        let showPage = self.galleryPage.showPageList[indexPath.item]
         self.galleryPage.setReadPage(index: showPage.index)
     }
 
