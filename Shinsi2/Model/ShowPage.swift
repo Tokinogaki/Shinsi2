@@ -15,6 +15,7 @@ enum StateEnum: Int {
 
 class ShowPage: NSObject {
     @objc dynamic var index = 0
+    @objc dynamic var gid = 0
     @objc dynamic var imageKey = ""
     @objc dynamic var thumbUrl = ""
     @objc dynamic var imageUrl = ""
@@ -51,11 +52,11 @@ class ShowPage: NSObject {
     }
     
     var localImage: URL {
-        return kEximagesPath.appendingPathComponent("\(self.imageKey)_image.jpg")
+        return kEximagesPath.appendingPathComponent("\(self.gid)/image/\(self.index).jpg")
     }
     
     var localThumb: URL {
-        return kEximagesPath.appendingPathComponent("\(self.imageKey)_thumb.jpg")
+        return kEximagesPath.appendingPathComponent("\(self.gid)/thumb/\(self.index).jpg")
     }
     
     var hasImage: Bool {
@@ -90,6 +91,9 @@ class ShowPage: NSObject {
             self._url = newValue
             if let url = URL(string: newValue) {
                 self.imageKey = url.pathComponents.indices.contains(2) ? url.pathComponents[2] : ""
+                let indexs = url.pathComponents.indices.contains(3) ? url.pathComponents[3].split(separator: "-") : []
+                self.gid = indexs.indices.contains(0) ? Int(indexs[0])! : 0
+                self.index = indexs.indices.contains(1) ? Int(indexs[1])! : 0
             }
         }
     }
