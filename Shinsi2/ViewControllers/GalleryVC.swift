@@ -251,7 +251,7 @@ class GalleryVC: BaseViewController {
         if !galleryPage.isDownloaded && galleryPage.favorite == .none {
             actions.append( UIPreviewAction(title: "♥", style: .default) { (_, _) -> Void in
                 RequestManager.shared.addGalleryToFavorite(gallery: self.galleryPage)
-                SVProgressHUD.show("♥".toIcon(), status: nil)
+//                SVProgressHUD.show("♥".toIcon(), status: nil)
             })
         }
         return actions
