@@ -62,13 +62,13 @@ class ListVC: BaseViewController {
             Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
             backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         }
-        // TODO: xxxx
-//        searchHistoryVC.searchController = searchController
-//        searchHistoryVC.selectBlock = {[unowned self] text in
-//            self.searchController.isActive = false
-//            self.searchController.searchBar.text = text
-//            self.reloadData()
-//        }
+
+        searchHistoryVC.searchController = searchController
+        searchHistoryVC.selectBlock = {[unowned self] text in
+            self.searchController.isActive = false
+            self.searchController.searchBar.text = text
+            self.reloadData()
+        }
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         searchController.obscuresBackgroundDuringPresentation = false
