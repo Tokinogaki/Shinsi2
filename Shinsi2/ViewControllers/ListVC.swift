@@ -145,9 +145,14 @@ class ListVC: BaseViewController {
                 guard let self = self else {return}
                 self.loadingView.hide()
                 guard galleryPageArray.count > 0 else {return}
+                var list = galleryPageArray
+                for page in self.galleryPageArray {
+                    list.removeAll(where: { $0.gid == page.gid })
+                }
+                
                 let lastIndext = max(0, self.galleryPageArray.count - 1)
-                let insertIndexPaths = galleryPageArray.enumerated().map { IndexPath(item: $0.offset + lastIndext, section: 0) }
-                self.galleryPageArray += galleryPageArray
+                let insertIndexPaths = list.enumerated().map { IndexPath(item: $0.offset + lastIndext, section: 0) }
+                self.galleryPageArray += list
                 self.collectionView.performBatchUpdates({
                     self.collectionView.insertItems(at: insertIndexPaths)
                 }, completion: nil)

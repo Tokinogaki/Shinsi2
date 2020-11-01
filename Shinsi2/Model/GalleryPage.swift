@@ -335,7 +335,7 @@ extension GalleryPage {
     }
 
     func downloadThumb(_ index: Int, recursive: Bool = false) {
-        if self.showPageList.count == 0 || self.showPageList.count == index + 1 {
+        if self.showPageList.count == 0 || self.showPageList.count == index {
             return
         }
         
