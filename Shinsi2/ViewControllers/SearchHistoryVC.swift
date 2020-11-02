@@ -2,14 +2,13 @@ import UIKit
 
 
 class SearchHistoryVC: UITableViewController {
-    lazy var results: Array<SearchHistory> = []
     weak var searchController: UISearchController!
     var selectBlock: ((String) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateNotification(notification:)), name: .loadGalleryPage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateNotification(notification:)), name: .searchHistoryUpdate, object: nil)
         
         let blurview = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         tableView.backgroundView = blurview
@@ -37,19 +36,19 @@ class SearchHistoryVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return results.count
+        return SearchManager.shared.searchList.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let r = results[indexPath.row]
-        cell.textLabel?.text = r.text
+        let r = SearchManager.shared.searchList[indexPath.row]
+        cell.textLabel?.text = r["text"] as? String
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        selectBlock?(results[indexPath.row].text)
+        selectBlock?(SearchManager.shared.searchList[indexPath.row]["text"] as! String)
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -58,7 +57,7 @@ class SearchHistoryVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == UITableViewCell.EditingStyle.delete {
-//            RealmManager.shared.deleteSearchHistory(history: results[indexPath.row])
+            SearchManager.shared.deleteSearch(index: indexPath.row)
         }
     }
 }

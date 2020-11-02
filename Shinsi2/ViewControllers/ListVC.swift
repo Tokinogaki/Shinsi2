@@ -399,8 +399,7 @@ extension ListVC: UISearchBarDelegate, UISearchControllerDelegate {
         navigationItem.rightBarButtonItems?.forEach { $0.isEnabled = true }
         searchController.dismiss(animated: true, completion: nil)
         reloadData()
-        //TODO:cccc
-//        RealmManager.shared.saveSearchHistory(text: searchBar.text)
+        SearchManager.shared.addSearch(text: searchBar.text)
         Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
     }
     
