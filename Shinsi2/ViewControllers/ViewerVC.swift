@@ -169,7 +169,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let showPage = self.galleryPage.showPageList[indexPath.item]
-        self.galleryPage.setReadPage(index: showPage.index)
+        self.galleryPage.readPage = showPage.index
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

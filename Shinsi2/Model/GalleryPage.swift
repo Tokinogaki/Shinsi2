@@ -25,7 +25,6 @@ class GalleryPage: NSObject {
     @objc dynamic var favorite = FavoriteEnum.none
     
     @objc dynamic var isDownloaded: Bool = false
-    @objc dynamic var readPage: Int = 0
     @objc dynamic var perPageCount: Int = 0
     @objc dynamic var updatedAt: Date = Date()
     @objc dynamic var createdAt: Date = Date()
@@ -34,9 +33,23 @@ class GalleryPage: NSObject {
     
     var stopLoadGalleryPage = false
     
-    var tags = Array<Tag>()
-    var showPageList = Array<ShowPage>()
-    var comments = Array<Comment>()
+    var tags: [Tag] = []
+    var showPageList: [ShowPage] = []
+    var comments: [Comment] = []
+    
+    var _readPage: Int = 0
+    @objc var readPage: Int {
+        get {
+            if let readPage = UserDefaults.standard.value(forKey: "\(gid)_readPage") {
+                _readPage = readPage as! Int
+            }
+            return _readPage
+        }
+        set {
+            _readPage = newValue
+            UserDefaults.standard.setValue(_readPage, forKey: "\(gid)_readPage")
+        }
+    }
     
     var _coverState: StateEnum = .none
     var coverState: StateEnum {
@@ -196,10 +209,6 @@ class GalleryPage: NSObject {
         
         node = element?.css("div.gl5t>div>div")[3]
         self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
-    }
-    
-    func setReadPage(index: Int) {
-        self.readPage = index
     }
     
     func setInfo(galleryPage element: HTMLDocument) {
