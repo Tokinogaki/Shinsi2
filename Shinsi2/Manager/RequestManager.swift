@@ -10,7 +10,7 @@ class RequestManager : NSObject {
     var manager: SessionManager {
         if _manager == nil {
             let configuration = URLSessionConfiguration.default
-            configuration.timeoutIntervalForRequest = 10
+            configuration.timeoutIntervalForRequest = 30
 
             _manager = Alamofire.SessionManager(configuration: configuration)
         }
