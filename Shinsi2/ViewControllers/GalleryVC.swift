@@ -114,7 +114,7 @@ class GalleryVC: BaseViewController {
                 let a = UIAlertAction(title: f.element, style: .default, handler: { (_) in
                     self.favoriteButton.isEnabled = false
                     RequestManager.shared.addGalleryToFavorite(gallery: self.galleryModel, category: f.offset)
-                    SVProgressHUD.show("♥".toIcon(), status: nil)
+//                    SVProgressHUD.show("♥".toIcon(), status: nil)
                 })
                 sheet.addAction(a)
             })
@@ -124,7 +124,7 @@ class GalleryVC: BaseViewController {
         } else {
             favoriteButton.isEnabled = false
             RequestManager.shared.addGalleryToFavorite(gallery: self.galleryModel)
-            SVProgressHUD.show("♥".toIcon(), status: nil)
+//            SVProgressHUD.show("♥".toIcon(), status: nil)
         }
     }
 
