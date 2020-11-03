@@ -309,6 +309,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         
         let galleryPage = galleryPageArray[indexPath.item]
         galleryPage.downloadCover()
+        cell.galleryPage = galleryPage
         cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
         cell.imageView.hero.id = "image_\(galleryPage.gid)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]

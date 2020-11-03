@@ -43,6 +43,7 @@ class ListCell: UICollectionViewCell {
         }
         
         self.imageView.image = self.galleryPage?.cover
+        setNeedsLayout()
     }
 }
 
