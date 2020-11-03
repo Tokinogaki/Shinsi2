@@ -17,7 +17,7 @@ class ViewerVC: UICollectionViewController {
         }
     }
     private var _selectedIndexPath: IndexPath?
-    weak var galleryPage: GalleryPage!
+    weak var galleryModel: GalleryModel!
     var mode: ViewerMode {
         return Defaults.Viewer.mode
     }
@@ -36,7 +36,7 @@ class ViewerVC: UICollectionViewController {
             }
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryPage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
         
         //Close gesture
         let panGR = UIPanGestureRecognizer()
@@ -93,7 +93,7 @@ class ViewerVC: UICollectionViewController {
         guard ges.state == .began else {return}
         let p = ges.location(in: collectionView)
         if let indexPath = collectionView!.indexPathForItem(at: p) {
-            let item = self.galleryPage.showPageList[indexPath.item]
+            let item = self.galleryModel.shows[indexPath.item]
             if item.hasImage {
                 let alert = UIAlertController(title: "Save to camera roll", message: nil, preferredStyle: .alert)
                 let ok = UIAlertAction(title: "OK", style: .default) { _ in
@@ -144,32 +144,32 @@ class ViewerVC: UICollectionViewController {
 extension ViewerVC: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.galleryPage.showPageList.count
+        return self.galleryModel.shows.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ScrollingImageCell
-        let showPage = self.galleryPage.showPageList[indexPath.item]
+        let showModel = self.galleryModel.shows[indexPath.item]
         
-        cell.showPage = showPage
-        cell.image = showPage.image ?? showPage.thumb ?? UIImage(named: "placeholder")
+        cell.showModel = showModel
+        cell.image = showModel.image ?? showModel.thumb ?? UIImage(named: "placeholder")
         cell.imageView.hero.id = heroID(for: indexPath)
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
-        cell.readLabel.text = "\(showPage.index) / \(self.galleryPage.showPageList.count)"
-        self.galleryPage.downloadImages(for: indexPath.item)
+        cell.readLabel.text = "\(showModel.index) / \(self.galleryModel.shows.count)"
+        self.galleryModel.downloadImages(for: indexPath.item)
         
         return cell
     }
     
     func heroID(for indexPath: IndexPath) -> String {
         let index = indexPath.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0)
-        return "image_\(galleryPage.gid)_\(index)"
+        return "image_\(galleryModel.gid)_\(index)"
     }
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        let showPage = self.galleryPage.showPageList[indexPath.item]
-        self.galleryPage.readPage = showPage.index
+        let showModel = self.galleryModel.shows[indexPath.item]
+        self.galleryModel.readPage = showModel.index
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

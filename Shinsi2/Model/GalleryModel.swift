@@ -4,11 +4,11 @@ import Kanna
 import UIColor_Hex_Swift
 
 public extension Notification.Name {
-    static let loadGalleryPage = Notification.Name("loadGalleryPage")
+    static let loadGalleryModel = Notification.Name("loadGalleryModel")
     static let coverDownloaded = Notification.Name("coverDownloaded")
 }
 
-class GalleryPage: NSObject {
+class GalleryModel: NSObject, NSCoding {
     @objc dynamic var gid: Int = 0
     @objc dynamic var token = ""
     
@@ -31,11 +31,11 @@ class GalleryPage: NSObject {
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
     
-    var stopLoadGalleryPage = false
+    var stopLoadGalleryModel = false
     
-    var tags: [Tag] = []
-    var showPageList: [ShowPage] = []
-    var comments: [Comment] = []
+    var tags: [TagModel] = []
+    var shows: [ShowModel] = []
+    var comments: [CommentModel] = []
     
     var _readPage: Int = 0
     @objc var readPage: Int {
@@ -51,8 +51,8 @@ class GalleryPage: NSObject {
         }
     }
     
-    var _coverState: StateEnum = .none
-    var coverState: StateEnum {
+    var _coverState: DownloadStateEnum = .none
+    var coverState: DownloadStateEnum {
         get {
             if self.hasCover {
                 return .downloaded
@@ -80,8 +80,8 @@ class GalleryPage: NSObject {
         return nil
     }
     
-    var isLoadGalleryPageFinished: Bool {
-        return self.showPageList.count == self.`length`
+    var isLoadGalleryModelFinished: Bool {
+        return self.shows.count == self.`length`
     }
     
     var url: String {
@@ -111,11 +111,11 @@ class GalleryPage: NSObject {
     }
     
     var nextPageIndex: Int {
-        guard self.showPageList.count != 0 else {
+        guard self.shows.count != 0 else {
             return 0
         }
         
-        return self.showPageList.count / self.perPageCount
+        return self.shows.count / self.perPageCount
     }
 
     var canDownload: Bool {
@@ -123,23 +123,23 @@ class GalleryPage: NSObject {
             return false
         }
         
-        if self.`length` == self.showPageList.count {
+        if self.`length` == self.shows.count {
             return true
         }
         
         return false
     }
     
-    static func galleryPage(indexPageItem element: XMLElement?) -> GalleryPage {
-        let galleryPage = GalleryPage(indexPageItem: element)
-        return galleryPage
+    static func galleryModel(indexPageItem element: XMLElement?) -> GalleryModel {
+        let galleryModel = GalleryModel(indexPageItem: element)
+        return galleryModel
     }
     
-    static func galleryPageList(indexPage doc: HTMLDocument?) -> [GalleryPage] {
-        var gPageList: [GalleryPage] = []
+    static func galleryModelList(indexPage doc: HTMLDocument?) -> [GalleryModel] {
+        var gPageList: [GalleryModel] = []
         for element in doc!.xpath("//div [@class='gl1t']") {
-            let galleryPage = self.galleryPage(indexPageItem: element)
-            gPageList.append(galleryPage)
+            let galleryModel = self.galleryModel(indexPageItem: element)
+            gPageList.append(galleryModel)
         }
         return gPageList
     }
@@ -182,6 +182,53 @@ class GalleryPage: NSObject {
         self.setInfo(indexPageItem: element)
     }
     
+    func encode(with coder: NSCoder) {
+        coder.encode(self.gid, forKey: "gid")
+        coder.encode(self.token, forKey: "token")
+
+        coder.encode(self.title, forKey: "title")
+        coder.encode(self.title_jpn, forKey: "title_jpn")
+        coder.encode(self.coverUrl, forKey: "coverUrl")
+        coder.encode(self.posted, forKey: "posted")
+        coder.encode(self.parent, forKey: "parent")
+        coder.encode(self.language, forKey: "language")
+        coder.encode(self.fileSize, forKey: "fileSize")
+        coder.encode(self.`length`, forKey: "`length`")
+        coder.encode(self.favorited, forKey: "favorited")
+        coder.encode(self.rating, forKey: "rating")
+        coder.encode(self.favorite.rawValue, forKey: "favorite")
+
+        coder.encode(self.isDownloaded, forKey: "isDownloaded")
+        coder.encode(self.perPageCount, forKey: "perPageCount")
+        coder.encode(self.updatedAt, forKey: "updatedAt")
+        coder.encode(self.createdAt, forKey: "createdAt")
+        coder.encode(self._url, forKey: "_url")
+        coder.encode(self._category, forKey: "_category")
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init()
+        self.gid = coder.decodeInteger(forKey: "gid")
+        self.token = coder.decodeObject(forKey: "token") as! String
+
+        self.title = coder.decodeObject(forKey: "title") as! String
+        self.title_jpn = coder.decodeObject(forKey: "title_jpn") as! String
+        self.coverUrl = coder.decodeObject(forKey: "coverUrl") as! String
+        self.posted = coder.decodeObject(forKey: "posted") as! Date
+        self.parent = coder.decodeInteger(forKey: "parent")
+        self.language = coder.decodeObject(forKey: "language") as! String
+        self.fileSize = coder.decodeObject(forKey: "fileSize") as! String
+        self.`length` = coder.decodeInteger(forKey: "`length`")
+        self.favorited = coder.decodeInteger(forKey: "favorited")
+        self.rating = coder.decodeFloat(forKey: "rating")
+        self.favorite = FavoriteEnum(rawValue: coder.decodeInteger(forKey: "favorite")) ?? .none
+
+        self.updatedAt = coder.decodeObject(forKey: "updatedAt") as! Date
+        self.createdAt = coder.decodeObject(forKey: "createdAt") as! Date
+        self._url = coder.decodeObject(forKey: "_url") as! String
+        self._category = coder.decodeInteger(forKey: "_category")
+    }
+    
     func getTitle() -> String {
         return title_jpn.isEmpty ? title : title_jpn
     }
@@ -205,13 +252,13 @@ class GalleryPage: NSObject {
         
         node = element?.at_css("div.ir")
         let style = node?["style"]?.matches(for: "[0-9- px]{7,10}").first
-        self.rating = GalleryPage.getRating(with: style)
+        self.rating = GalleryModel.getRating(with: style)
         
         node = element?.css("div.gl5t>div>div")[3]
         self.`length` = Int(node?.text?.replacingOccurrences(of: " pages", with: "") ?? "0") ?? 0
     }
     
-    func setInfo(galleryPage element: HTMLDocument) {
+    func setInfo(galleryModel element: HTMLDocument) {
         if var rating = element.at_xpath("//td [@id='rating_label']")?.text {
             rating = rating.replacingOccurrences(of: "Average: ", with: "")
             self.rating = Float(rating) ?? 0.0
@@ -239,7 +286,7 @@ class GalleryPage: NSObject {
     func setTags(_ element: HTMLDocument) {
         self.tags.removeAll()
         for t in element.xpath("//div [@id='taglist'] //tr") {
-            self.tags.append(Tag(t))
+            self.tags.append(TagModel(t))
         }
     }
     
@@ -253,7 +300,7 @@ class GalleryPage: NSObject {
                 let author = c.at_xpath("div [@class='c2'] /div [@class='c3'] /a")?.text,
                 let text = c.at_xpath("div [@class='c6']")?.innerHTML {
                 let dateString = dateAndAuthor.replacingOccurrences(of: author, with: "").replacingOccurrences(of: "Posted on ", with: "").replacingOccurrences(of: " by:   ", with: "")
-                let r = Comment(author: author, date: commentDateFormatter.date(from: dateString) ?? Date(), text: text)
+                let r = CommentModel(author: author, date: commentDateFormatter.date(from: dateString) ?? Date(), text: text)
                 self.comments.append(r)
             }
         }
@@ -263,48 +310,48 @@ class GalleryPage: NSObject {
         for link in element.xpath("//div [@class='gdtl'] //a") {
             if let url = link["href"] {
                 if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
-                    let page = ShowPage()
+                    let page = ShowModel()
                     page.thumbUrl = thumbUrl
                     page.url = url
-                    self.showPageList.append(page)
+                    self.shows.append(page)
                 }
             }
         }
         if self.perPageCount == 0 {
-            self.perPageCount = self.showPageList.count
+            self.perPageCount = self.shows.count
         }
     }
     
 }
 
-extension GalleryPage {
+extension GalleryModel {
     
     func setFavorite(index: Int) {
         self.favorite = FavoriteEnum(rawValue: index + 1) ?? .none
     }
     
-    private func loadShowPageInGalleryPage() {
-        if self.showPageList.count >= self.`length` || self.stopLoadGalleryPage {
+    private func loadShowModelInGalleryModel() {
+        if self.shows.count >= self.`length` || self.stopLoadGalleryModel {
             return
         }
-        RequestManager.shared.getGalleryPage(galleryPage: self) {
-            NotificationCenter.default.post(name: .loadGalleryPage, object: self)
-            self.loadShowPageInGalleryPage()
+        RequestManager.shared.getGalleryModel(galleryModel: self) {
+            NotificationCenter.default.post(name: .loadGalleryModel, object: self)
+            self.loadShowModelInGalleryModel()
         }
     }
     
-    func startLoadGalleryPage() {
-        self.stopLoadGalleryPage = false
-        self.loadShowPageInGalleryPage()
+    func startLoadGalleryModel() {
+        self.stopLoadGalleryModel = false
+        self.loadShowModelInGalleryModel()
     }
     
-    func cancelLoadGalleryPage() {
-        self.stopLoadGalleryPage = true
+    func cancelLoadGalleryModel() {
+        self.stopLoadGalleryModel = true
     }
     
     func downloadCover() {
         self.coverState = .downloading
-        RequestManager.shared.downloadCover(galleryPage: self) { (result) in
+        RequestManager.shared.downloadCover(galleryModel: self) { (result) in
             if let _ = result.value {
                 self.coverState = .downloaded
                 NotificationCenter.default.post(name: .coverDownloaded, object: self)
@@ -316,48 +363,48 @@ extension GalleryPage {
     
     func downloadImages(for index: Int) {
         for i in (index - 3)..<(index + 5) {
-            guard i < self.showPageList.count else {
+            guard i < self.shows.count else {
                 break
             }
             guard i >= 0 else {
                 continue
             }
-            let showPage = self.showPageList[i]
-            if showPage.imageState == .downloaded || showPage.imageState == .downloading {
+            let showModel = self.shows[i]
+            if showModel.imageState == .downloaded || showModel.imageState == .downloading {
                 continue
             }
             
-            RequestManager.shared.getShowPage(showPage: showPage) {
-                showPage.imageState = .downloading
-                RequestManager.shared.downloadImage(showPage: showPage) { (result) in
+            RequestManager.shared.getShowModel(showModel: showModel) {
+                showModel.imageState = .downloading
+                RequestManager.shared.downloadImage(showModel: showModel) { (result) in
                     if let _ = result.value {
-                        showPage.imageState = .downloaded
-                        NotificationCenter.default.post(name: .imageDownloaded, object: showPage)
+                        showModel.imageState = .downloaded
+                        NotificationCenter.default.post(name: .imageDownloaded, object: showModel)
                     } else {
-                        showPage.imageState = .none
+                        showModel.imageState = .none
                     }
                 }
                 
-                NotificationCenter.default.post(name: .loadShowPage, object: self)
+                NotificationCenter.default.post(name: .loadShowModel, object: self)
             }
         }
     }
 
     func downloadThumb(_ index: Int, recursive: Bool = false) {
-        if self.showPageList.count == 0 || self.showPageList.count == index {
+        if self.shows.count == 0 || self.shows.count == index {
             return
         }
         
-        let showPage = self.showPageList[index]
-        if showPage.thumbState == .downloaded || showPage.thumbState == .downloading {
+        let showModel = self.shows[index]
+        if showModel.thumbState == .downloaded || showModel.thumbState == .downloading {
             return
         }
-        RequestManager.shared.downloadThumb(showPage: showPage) { (result) in
+        RequestManager.shared.downloadThumb(showModel: showModel) { (result) in
             if let _ = result.value {
-                showPage.thumbState = .downloaded
-                NotificationCenter.default.post(name: .thumbDownloaded, object: showPage)
+                showModel.thumbState = .downloaded
+                NotificationCenter.default.post(name: .thumbDownloaded, object: showModel)
             } else {
-                showPage.thumbState = .none
+                showModel.thumbState = .none
             }
             if recursive {
                 self.downloadThumb(index + 1)

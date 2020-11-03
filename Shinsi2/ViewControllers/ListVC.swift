@@ -11,7 +11,7 @@ class ListVC: BaseViewController {
     private lazy var searchHistoryVC: SearchHistoryVC = {
         return self.storyboard!.instantiateViewController(withIdentifier: "SearchHistoryVC") as! SearchHistoryVC
     }()
-    private var galleryPageArray: [GalleryPage] = []
+    private var galleryModelArray: [GalleryModel] = []
     private var currentPage = -1
     private var loadingPage = -1
     private var backGesture: InteractiveBackGesture?
@@ -131,28 +131,28 @@ class ListVC: BaseViewController {
     func loadNextPage() {
         if mode == .download {
             loadingView.hide()
-//            galleryPageArray = RealmManager.shared.downloaded.map { $0 }
+//            galleryModelArray = RealmManager.shared.downloaded.map { $0 }
             collectionView.reloadData()
         } else if mode == .history {
             loadingView.hide()
-//            galleryPageArray = RealmManager.shared.browsedGalleryPage
+            galleryModelArray = HistoryManager.shared.historyList
             collectionView.reloadData()
         } else {
             guard loadingPage != currentPage + 1 else {return}
             loadingPage = currentPage + 1
             if loadingPage == 0 { loadingView.show() }
-            RequestManager.shared.getIndexPage(page: loadingPage, search: searchController.searchBar.text) {[weak self] galleryPageArray in
+            RequestManager.shared.getIndexPage(page: loadingPage, search: searchController.searchBar.text) {[weak self] galleryModelArray in
                 guard let self = self else {return}
                 self.loadingView.hide()
-                guard galleryPageArray.count > 0 else {return}
-                var list = galleryPageArray
-                for page in self.galleryPageArray {
+                guard galleryModelArray.count > 0 else {return}
+                var list = galleryModelArray
+                for page in self.galleryModelArray {
                     list.removeAll(where: { $0.gid == page.gid })
                 }
                 
-                let lastIndext = max(0, self.galleryPageArray.count - 1)
+                let lastIndext = max(0, self.galleryModelArray.count - 1)
                 let insertIndexPaths = list.enumerated().map { IndexPath(item: $0.offset + lastIndext, section: 0) }
-                self.galleryPageArray += list
+                self.galleryModelArray += list
                 self.collectionView.performBatchUpdates({
                     self.collectionView.insertItems(at: insertIndexPaths)
                 }, completion: nil)
@@ -165,8 +165,8 @@ class ListVC: BaseViewController {
     func reloadData() {
         currentPage = -1
         loadingPage = -1
-        let deleteIndexPaths = galleryPageArray.enumerated().map { IndexPath(item: $0.offset, section: 0)}
-        galleryPageArray = []
+        let deleteIndexPaths = galleryModelArray.enumerated().map { IndexPath(item: $0.offset, section: 0)}
+        galleryModelArray = []
         collectionView.performBatchUpdates({
             self.collectionView.deleteItems(at: deleteIndexPaths)
         }, completion: { _ in
@@ -217,7 +217,7 @@ class ListVC: BaseViewController {
         guard mode == .download || mode == .favorite else {return}
         guard ges.state == .began, let indexPath = collectionView.indexPathForItem(at: ges.location(in: collectionView)) else {return}
 
-        let doujinshi = galleryPageArray[indexPath.item]
+        let doujinshi = galleryModelArray[indexPath.item]
         let title = mode == .download ? "Delete" : "Action"
         let actionTitle = mode == .download ? "Delete" : "Remove"
         let alert = UIAlertController(title: title, message: doujinshi.title, preferredStyle: .alert)
@@ -225,13 +225,13 @@ class ListVC: BaseViewController {
             if self.mode == .download {
                 // TODO: xxx
 //                DownloadManager.shared.deleteDownloaded(doujinshi: doujinshi)
-//                self.galleryPageArray = RealmManager.shared.downloaded.map { $0 }
+//                self.galleryModelArray = RealmManager.shared.downloaded.map { $0 }
                 self.collectionView.performBatchUpdates({
                     self.collectionView.deleteItems(at: [indexPath])
                 }, completion: nil)
             } else if self.mode == .favorite {
                 RequestManager.shared.deleteFavorite(gallery: doujinshi)
-                self.galleryPageArray.remove(at: indexPath.item)
+                self.galleryModelArray.remove(at: indexPath.item)
                 self.collectionView.performBatchUpdates({
                     self.collectionView.deleteItems(at: [indexPath])
                 }, completion: nil)
@@ -245,7 +245,7 @@ class ListVC: BaseViewController {
         }
         if mode == .download {
             let cell = collectionView.cellForItem(at: indexPath)!
-            let vc = UIActivityViewController(activityItems: doujinshi.showPageList.map { $0.imageUrl }, applicationActivities: nil)
+            let vc = UIActivityViewController(activityItems: doujinshi.shows.map { $0.imageUrl }, applicationActivities: nil)
             vc.popoverPresentationController?.sourceView = collectionView
             vc.popoverPresentationController?.sourceRect = cell.frame
             let shareAction = UIAlertAction(title: "Share", style: .default) { (_) in
@@ -260,7 +260,7 @@ class ListVC: BaseViewController {
     }
     
     @objc func showFavoriteMoveSheet(with indexPath: IndexPath) {
-        let doujinshi = galleryPageArray[indexPath.item]
+        let doujinshi = galleryModelArray[indexPath.item]
         let sheet = UIAlertController(title: "Move to", message: doujinshi.title, preferredStyle: .actionSheet)
         let displayingFavCategory = favoriteCategory ?? -1
         Defaults.List.favoriteTitles.enumerated().forEach { f in
@@ -268,7 +268,7 @@ class ListVC: BaseViewController {
                 let a = UIAlertAction(title: f.element, style: .default, handler: { (_) in
                     RequestManager.shared.moveFavorite(gallery: doujinshi, to: f.offset)
                     if displayingFavCategory != -1 {
-                        self.galleryPageArray.remove(at: indexPath.item)
+                        self.galleryModelArray.remove(at: indexPath.item)
                         self.collectionView.performBatchUpdates({
                             self.collectionView.deleteItems(at: [indexPath])
                         }, completion: nil)
@@ -301,36 +301,36 @@ class ListVC: BaseViewController {
 extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return galleryPageArray.count
+        return galleryModelArray.count
     } 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ListCell
         
-        let galleryPage = galleryPageArray[indexPath.item]
-        galleryPage.downloadCover()
-        cell.galleryPage = galleryPage
-        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryPage.gid)_0")]
-        cell.imageView.hero.id = "image_\(galleryPage.gid)_0"
+        let galleryModel = galleryModelArray[indexPath.item]
+        galleryModel.downloadCover()
+        cell.galleryModel = galleryModel
+        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryModel.gid)_0")]
+        cell.imageView.hero.id = "image_\(galleryModel.gid)_0"
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.contentMode = .scaleAspectFill
-        cell.imageView.image = galleryPage.cover ?? UIImage(named: "placeholder")
+        cell.imageView.image = galleryModel.cover ?? UIImage(named: "placeholder")
 
-        var infoText = galleryPage.category.text
+        var infoText = galleryModel.category.text
         let df = DateFormatter()
         df.dateFormat = "yyyy/MM/dd HH:mm"
-        let posted = df.string(from: galleryPage.posted)
+        let posted = df.string(from: galleryModel.posted)
         infoText += "\n\(posted)"
-        infoText += "\n\(galleryPage.rating)"
-        infoText += "\n\(galleryPage.readPage)/\(galleryPage.`length`)"
+        infoText += "\n\(galleryModel.rating)"
+        infoText += "\n\(galleryModel.readPage)/\(galleryModel.`length`)"
         
         cell.infoLabel.text = infoText
-        cell.titleLabel?.text = galleryPage.title
+        cell.titleLabel?.text = galleryModel.title
         
-        if galleryPage.favorite != .none {
+        if galleryModel.favorite != .none {
             cell.infoLabel.layer.borderWidth = 2
-            cell.infoLabel.layer.borderColor = galleryPage.favorite.color.cgColor
-            cell.infoLabel.backgroundColor = galleryPage.favorite.color.withAlphaComponent(0.3)
+            cell.infoLabel.layer.borderColor = galleryModel.favorite.color.cgColor
+            cell.infoLabel.backgroundColor = galleryModel.favorite.color.withAlphaComponent(0.3)
         } else {
             cell.infoLabel.backgroundColor = UIColor(hex3: 0, alpha: 0.3)
             cell.infoLabel.layer.borderWidth = 0
@@ -347,14 +347,15 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         for indexPath in indexPaths {
-            let galleryPage = self.galleryPageArray[indexPath.row]
-            galleryPage.downloadCover()
+            let galleryModel = self.galleryModelArray[indexPath.row]
+            galleryModel.downloadCover()
         }
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
-        vc.galleryPage = galleryPageArray[indexPath.item]
+        vc.galleryModel = galleryModelArray[indexPath.item]
+        HistoryManager.shared.addHistory(galleryModel: vc.galleryModel)
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -370,8 +371,8 @@ extension ListVC: UIViewControllerPreviewingDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard let indexPath = collectionView.indexPathForItem(at: location) else {return nil}
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
-        let item = galleryPageArray[indexPath.item]
-        vc.galleryPage = item
+        let item = galleryModelArray[indexPath.item]
+        vc.galleryModel = item
         vc.delegate = self
         return vc
     }
@@ -432,7 +433,7 @@ extension ListVC: UIScrollViewDelegate {
         switch mode {
         case .favorite, .normal:
             if let indexPath = collectionView.indexPathsForVisibleItems.sorted().last,
-                indexPath.item > galleryPageArray.count - max(rowCount * 2, 10) {
+                indexPath.item > galleryModelArray.count - max(rowCount * 2, 10) {
                 loadNextPage()
             }
         default:

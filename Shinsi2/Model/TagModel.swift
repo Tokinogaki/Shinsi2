@@ -5,7 +5,7 @@ import UIColor_Hex_Swift
 
 
 
-class Tag: NSObject {
+class TagModel: NSObject {
     @objc dynamic var name = ""
     var values = Array<String>()
     

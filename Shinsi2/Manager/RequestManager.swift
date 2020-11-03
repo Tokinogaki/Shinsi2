@@ -31,7 +31,7 @@ class RequestManager : NSObject {
         }
     }
 
-    func getIndexPage(page: Int, search keyword: String? = nil, completeBlock block: (([GalleryPage]) -> Void)?) {
+    func getIndexPage(page: Int, search keyword: String? = nil, completeBlock block: (([GalleryModel]) -> Void)?) {
         let categoryFilters = Defaults.Search.categories.map {"f_\($0)=\(UserDefaults.standard.bool(forKey: $0) ? 1 : 0)"}.joined(separator: "&")
         var url = Defaults.URL.host + "/?"
         url += "\(categoryFilters)&f_apply=Apply+Filter" //Apply category filters
@@ -73,7 +73,7 @@ class RequestManager : NSObject {
         self.manager.request(url, method: .get).responseString { response in
             guard let html = response.result.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
-                let items = GalleryPage.galleryPageList(indexPage: doc)
+                let items = GalleryModel.galleryModelList(indexPage: doc)
                 block?(items)
             } else {
                 block?([])
@@ -81,24 +81,24 @@ class RequestManager : NSObject {
         }
     }
     
-    func getGalleryPage(galleryPage: GalleryPage, completeBlock block: (() -> Void)?) {
+    func getGalleryModel(galleryModel: GalleryModel, completeBlock block: (() -> Void)?) {
         print(#function)
-        let page = galleryPage.nextPageIndex
-        var url = galleryPage.url + "?p=\(page)"
+        let page = galleryModel.nextPageIndex
+        var url = galleryModel.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
         self.manager.request(url, method: .get).responseString { response in
             if let html = response.result.value,
                let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
-                galleryPage.setInfo(galleryPage: doc)
-                galleryPage.setPages(doc)
-                galleryPage.setComments(doc)
-                galleryPage.setTags(doc)
+                galleryModel.setInfo(galleryModel: doc)
+                galleryModel.setPages(doc)
+                galleryModel.setComments(doc)
+                galleryModel.setTags(doc)
             }
             block?()
         }
     }
 
-    func getShowPage_bak(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
+    func getShowModel_bak(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
         print(#function)
         self.manager.request(url, method: .get).responseString { response in
             guard let html = response.result.value else {
@@ -117,21 +117,21 @@ class RequestManager : NSObject {
         }
     }
     
-    func getShowPage(showPage: ShowPage, completeBlock block: (() -> Void)?) {
+    func getShowModel(showModel: ShowModel, completeBlock block: (() -> Void)?) {
         print(#function)
-        self.manager.request(showPage.url, method: .get).responseString { response in
+        self.manager.request(showModel.url, method: .get).responseString { response in
             guard let html = response.result.value else {
                 block?()
                 return
             }
             if let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
-                showPage.setInfo(showPage: doc)
+                showModel.setInfo(showModel: doc)
             }
             block?()
         }
     }
 
-    func addGalleryToFavorite(gallery: GalleryPage, category: Int = 0) {
+    func addGalleryToFavorite(gallery: GalleryModel, category: Int = 0) {
         guard gallery.isIdTokenValide else {return}
         gallery.setFavorite(index: category)
         let url = Defaults.URL.host + "/gallerypopups.php?gid=\(gallery.gid)&t=\(gallery.token)&act=addfav"
@@ -140,7 +140,7 @@ class RequestManager : NSObject {
         }
     }
 
-    func deleteFavorite(gallery: GalleryPage) {
+    func deleteFavorite(gallery: GalleryModel) {
         guard gallery.isIdTokenValide else {return}
         gallery.setFavorite(index: -1)
         let url = Defaults.URL.host + "/favorites.php"
@@ -149,7 +149,7 @@ class RequestManager : NSObject {
         }
     }
     
-    func moveFavorite(gallery: GalleryPage, to catogory: Int) {
+    func moveFavorite(gallery: GalleryModel, to catogory: Int) {
         guard 0...9 ~= catogory else {return}
         guard gallery.isIdTokenValide else {return}
         let url = Defaults.URL.host + "/favorites.php"
@@ -158,29 +158,29 @@ class RequestManager : NSObject {
         }
     }
     
-    func downloadCover(galleryPage: GalleryPage, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
+    func downloadCover(galleryModel: GalleryModel, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-            return (galleryPage.localCover, [.removePreviousFile, .createIntermediateDirectories])
+            return (galleryModel.localCover, [.removePreviousFile, .createIntermediateDirectories])
         }
-        self.manager.download(galleryPage.coverUrl, to: destination).responseData { response in
+        self.manager.download(galleryModel.coverUrl, to: destination).responseData { response in
             block?(response.result)
         }
     }
     
-    func downloadImage(showPage: ShowPage, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
+    func downloadImage(showModel: ShowModel, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-            return (showPage.localImage, [.removePreviousFile, .createIntermediateDirectories])
+            return (showModel.localImage, [.removePreviousFile, .createIntermediateDirectories])
         }
-        self.manager.download(showPage.imageUrl, to: destination).responseData { response in
+        self.manager.download(showModel.imageUrl, to: destination).responseData { response in
             block?(response.result)
         }
     }
     
-    func downloadThumb(showPage: ShowPage, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
+    func downloadThumb(showModel: ShowModel, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-            return (showPage.localThumb, [.removePreviousFile, .createIntermediateDirectories])
+            return (showModel.localThumb, [.removePreviousFile, .createIntermediateDirectories])
         }
-        self.manager.download(showPage.thumbUrl, to: destination).responseData { response in
+        self.manager.download(showModel.thumbUrl, to: destination).responseData { response in
             block?(response.result)
         }
     }
@@ -188,7 +188,7 @@ class RequestManager : NSObject {
 
 extension RequestManager {
     
-    func getGData( doujinshi: GalleryPage, completeBlock block: ((GalleryPage?) -> Void)? ) {
+    func getGData( doujinshi: GalleryModel, completeBlock block: ((GalleryModel?) -> Void)? ) {
         print(#function)
         //Api http://ehwiki.org/wiki/API
         guard doujinshi.isIdTokenValide else { block?(nil); return}
@@ -210,7 +210,7 @@ extension RequestManager {
 //                            let tags = metadata["tags"] as? [String],
 //                            let thumb = metadata["thumb"] as? String,
 //                            let gid = metadata["gid"] as? Int {
-//                            let gdata = GalleryPage()
+//                            let gdata = GalleryModel()
 //                            gdata.`length` = Int(count)!
 //                            gdata.rating = Float(rating)!
 //                            gdata.title = title.isEmpty ? doujinshi.title : title

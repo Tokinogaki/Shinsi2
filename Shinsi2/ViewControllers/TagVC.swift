@@ -3,7 +3,7 @@ import Hero
 import AloeStackView
 
 class TagVC: BaseViewController {
-    weak var galleryPage: GalleryPage!
+    weak var galleryModel: GalleryModel!
     var clickBlock: ((String) -> Void)?
     let stackView = AloeStackView()
     
@@ -16,7 +16,7 @@ class TagVC: BaseViewController {
         stackView.separatorInset = .zero
         stackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
-        for item in self.galleryPage.tags {
+        for item in self.galleryModel.tags {
             stackView.addRow(createTitleLable(text: item.name))
             for tag in item.values {
                 let l = createTextLable(text: tag)

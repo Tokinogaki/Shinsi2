@@ -4,7 +4,7 @@ import SVProgressHUD
 import SafariServices
 
 class GalleryVC: BaseViewController {
-    var galleryPage: GalleryPage!
+    var galleryModel: GalleryModel!
     private var didScrollToHistory = false
     private var backGesture: InteractiveBackGesture!
     private var isPartDownloading = false { didSet { handlePartDownload() } }
@@ -20,7 +20,7 @@ class GalleryVC: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = galleryPage.getTitle()
+        title = galleryModel.getTitle()
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
 
@@ -32,7 +32,7 @@ class GalleryVC: BaseViewController {
         updateNavigationItems()
         appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryPage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
         
         if !isSizeClassRegular {
             navigationItem.rightBarButtonItems =
@@ -54,12 +54,12 @@ class GalleryVC: BaseViewController {
             scrollBar.textOffset = 10
             scrollBar.draggingTextOffset = 40
         }
-
-        self.galleryPage.startLoadGalleryPage()
+        
+        self.galleryModel.startLoadGalleryModel()
     }
 
     deinit {
-        self.galleryPage.cancelLoadGalleryPage()
+        self.galleryModel.cancelLoadGalleryModel()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -93,16 +93,16 @@ class GalleryVC: BaseViewController {
 
     func updateNavigationItems() {
         tagButton.isEnabled = true
-        downloadButton.isEnabled = galleryPage.canDownload
-        commentButton.isEnabled = galleryPage.comments.count > 0
-        favoriteButton.isEnabled = galleryPage.favorite == .none && galleryPage.showPageList.count > 0
+        downloadButton.isEnabled = galleryModel.canDownload
+        commentButton.isEnabled = galleryModel.comments.count > 0
+        favoriteButton.isEnabled = galleryModel.favorite == .none && galleryModel.shows.count > 0
     }
 
     private func scrollToLastReadingPage() {
         guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
-        guard self.galleryPage.readPage > 0 else { return }
+        guard self.galleryModel.readPage > 0 else { return }
         DispatchQueue.main.async {
-            self.collectionView.scrollToItem(at: IndexPath(row: self.galleryPage.readPage - 1, section: 0), at: .top, animated: true)
+            self.collectionView.scrollToItem(at: IndexPath(row: self.galleryModel.readPage - 1, section: 0), at: .top, animated: true)
         }
     }
 
@@ -113,7 +113,7 @@ class GalleryVC: BaseViewController {
             Defaults.List.favoriteTitles.enumerated().forEach({ f in
                 let a = UIAlertAction(title: f.element, style: .default, handler: { (_) in
                     self.favoriteButton.isEnabled = false
-                    RequestManager.shared.addGalleryToFavorite(gallery: self.galleryPage, category: f.offset)
+                    RequestManager.shared.addGalleryToFavorite(gallery: self.galleryModel, category: f.offset)
                     SVProgressHUD.show("♥".toIcon(), status: nil)
                 })
                 sheet.addAction(a)
@@ -123,7 +123,7 @@ class GalleryVC: BaseViewController {
             present(sheet, animated: true, completion: nil)
         } else {
             favoriteButton.isEnabled = false
-            RequestManager.shared.addGalleryToFavorite(gallery: self.galleryPage)
+            RequestManager.shared.addGalleryToFavorite(gallery: self.galleryModel)
             SVProgressHUD.show("♥".toIcon(), status: nil)
         }
     }
@@ -161,7 +161,7 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showTag",
            let nv = segue.destination as? UINavigationController,
            let vc = nv.viewControllers.first as? TagVC {
-            vc.galleryPage = self.galleryPage
+            vc.galleryModel = self.galleryModel
             vc.clickBlock = { [unowned self, unowned vc] tag in
                 vc.dismiss(animated: true, completion: {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
@@ -173,7 +173,7 @@ class GalleryVC: BaseViewController {
         if segue.identifier == "showComment",
            let nv = segue.destination as? UINavigationController,
            let vc = nv.viewControllers.first as? CommentVC {
-            vc.doujinshi = self.galleryPage
+            vc.doujinshi = self.galleryModel
             vc.delegate = self
         }
     }
@@ -210,7 +210,7 @@ class GalleryVC: BaseViewController {
 
     func downloadAll() {
         downloadButton.isEnabled = false
-//        DownloadManager.shared.download(galleryPage: self.galleryPage)
+//        DownloadManager.shared.download(galleryModel: self.galleryModel)
 //        DownloadBubble.shared.show(on: navigationController!)
     }
 
@@ -221,15 +221,15 @@ class GalleryVC: BaseViewController {
 //            isPartDownloading = false
 //            return
 //        }
-//        let new = GalleryPage(value: self.galleryPage!)
-//        new.showPageList.removeAll()
+//        let new = GalleryModel(value: self.galleryModel!)
+//        new.shows.removeAll()
 //        for i in selectedIndexPaths {
-//            new.showPageList.append(ShowPage(value: galleryPage.showPageList[i.item]))
+//            new.shows.append(ShowModel(value: galleryModel.shows[i.item]))
 //        }
 //        new.gid = Int("\(new.gid)\(arc4random() % (99999 - 10000) + 10000)") ?? 0
 //        new.`length` = selectedIndexPaths.count
-//        new.coverUrl = new.showPageList.first!.thumbUrl
-//        DownloadManager.shared.download(galleryPage: new)
+//        new.coverUrl = new.shows.first!.thumbUrl
+//        DownloadManager.shared.download(galleryModel: new)
 //        DownloadBubble.shared.show(on: navigationController!)
 //
 //        isPartDownloading = false
@@ -237,20 +237,20 @@ class GalleryVC: BaseViewController {
 
     override var previewActionItems: [UIPreviewActionItem] {
         var actions: [UIPreviewActionItem] = []
-        let artist = galleryPage.title.artist
+        let artist = galleryModel.title.artist
         if let artist = artist {
             actions.append( UIPreviewAction(title: "Artist: \(artist)", style: .default) { (_, _) -> Void in
                 self.delegate?.galleryDidSelectTag(text: "\(artist)" )
             })
         }
-        if let circle = galleryPage.title.circleName, circle != artist {
+        if let circle = galleryModel.title.circleName, circle != artist {
             actions.append( UIPreviewAction(title: "Circle: \(circle)", style: .default) { (_, _) -> Void in
                 self.delegate?.galleryDidSelectTag(text: "\(circle)" )
             })
         }
-        if !galleryPage.isDownloaded && galleryPage.favorite == .none {
+        if !galleryModel.isDownloaded && galleryModel.favorite == .none {
             actions.append( UIPreviewAction(title: "♥", style: .default) { (_, _) -> Void in
-                RequestManager.shared.addGalleryToFavorite(gallery: self.galleryPage)
+                RequestManager.shared.addGalleryToFavorite(gallery: self.galleryModel)
 //                SVProgressHUD.show("♥".toIcon(), status: nil)
             })
         }
@@ -267,18 +267,18 @@ class GalleryVC: BaseViewController {
 extension GalleryVC: CommentVCDelegate {
     func commentVC(_ vc: CommentVC, didTap url: URL) {
         if url.absoluteString.contains(Defaults.URL.host) {
-            if url.absoluteString.contains(Defaults.URL.host+"/g/"), url.absoluteString != galleryPage.url {
+            if url.absoluteString.contains(Defaults.URL.host+"/g/"), url.absoluteString != galleryModel.url {
                 //Gallery
                 vc.dismiss(animated: true) {
-//                    let d = GalleryPage(value: ["url": url.absoluteString])
+//                    let d = GalleryModel(value: ["url": url.absoluteString])
 //                    let vc = self.storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
-//                    vc.galleryPage = d
+//                    vc.galleryModel = d
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             } else if url.absoluteString.contains(Defaults.URL.host+"/s/") {
                 //Page
-                if let page = galleryPage.showPageList.filter({ $0.url == url.absoluteString }).first,
-                   let index = galleryPage.showPageList.index(of: page) {
+                if let page = galleryModel.shows.filter({ $0.url == url.absoluteString }).first,
+                   let index = galleryModel.shows.index(of: page) {
                     vc.dismiss(animated: true) {
                         self.collectionView.scrollToItem(at: IndexPath(item: index, section: 0),
                             at: .top,
@@ -312,23 +312,23 @@ extension GalleryVC: UICollectionViewDataSource,
     UICollectionViewDataSourcePrefetching {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return galleryPage.showPageList.count
+        return galleryModel.shows.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCell
-        let showPage = galleryPage.showPageList[indexPath.item]
+        let showModel = galleryModel.shows[indexPath.item]
         
-        cell.showPage = showPage
-        cell.imageView.image = showPage.thumb ?? UIImage(named: "placeholder")
-        cell.imageView.hero.id = "image_\(galleryPage.gid)_\(indexPath.item)"
+        cell.showModel = showModel
+        cell.imageView.image = showModel.thumb ?? UIImage(named: "placeholder")
+        cell.imageView.hero.id = "image_\(galleryModel.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1
         
         cell.layer.shouldRasterize = true
         cell.layer.rasterizationScale = UIScreen.main.scale
         
-        self.galleryPage.downloadThumb(indexPath.row)
+        self.galleryModel.downloadThumb(indexPath.row)
         
         return cell
     }
@@ -342,15 +342,15 @@ extension GalleryVC: UICollectionViewDataSource,
 
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         for indexPath in indexPaths {
-            self.galleryPage.downloadThumb(indexPath.row)
+            self.galleryModel.downloadThumb(indexPath.row)
         }
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard galleryPage.showPageList.count > 1 else {return}
+        guard galleryModel.shows.count > 1 else {return}
         let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
         vc.selectedIndexPath = indexPath
-        vc.galleryPage = self.galleryPage
+        vc.galleryModel = self.galleryModel
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true)
     }
@@ -373,8 +373,8 @@ extension GalleryVC: HeroViewControllerDelegate {
     func heroWillStartAnimatingFrom(viewController: UIViewController) {
         if let vc = viewController as? ViewerVC, var originalCellIndex = vc.selectedIndexPath, var currentCellIndex = vc.collectionView?.indexPathsForVisibleItems.first {
             view.hero.modifiers = nil
-            originalCellIndex = IndexPath(item: min(originalCellIndex.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0), galleryPage.showPageList.count - 1), section: originalCellIndex.section)
-            currentCellIndex = IndexPath(item: min(currentCellIndex.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0), galleryPage.showPageList.count - 1), section: currentCellIndex.section)
+            originalCellIndex = IndexPath(item: min(originalCellIndex.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0), galleryModel.shows.count - 1), section: originalCellIndex.section)
+            currentCellIndex = IndexPath(item: min(currentCellIndex.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0), galleryModel.shows.count - 1), section: currentCellIndex.section)
             if !collectionView.indexPathsForVisibleItems.contains(currentCellIndex) {
                 collectionView.scrollToItem(at: currentCellIndex, at: originalCellIndex < currentCellIndex ? .bottom : .top, animated: false)
             }

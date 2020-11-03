@@ -2,7 +2,7 @@ import UIKit
 
 class ImageCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
-    var showPage: ShowPage?
+    var showModel: ShowModel?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -11,13 +11,13 @@ class ImageCell: UICollectionViewCell {
     }
     
     @objc func handleImageLoadedNotification(notification: Notification) {
-        guard let showPage = notification.object as? ShowPage else { return }
-        guard let page = self.showPage,
-            showPage.imageKey == page.imageKey else {
+        guard let showModel = notification.object as? ShowModel else { return }
+        guard let page = self.showModel,
+            showModel.imageKey == page.imageKey else {
             return
         }
         
-        self.imageView.image = self.showPage?.thumb
+        self.imageView.image = self.showModel?.thumb
     }
 }
 
@@ -27,7 +27,7 @@ class ListCell: UICollectionViewCell {
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var containerView: UIView!
     
-    var galleryPage: GalleryPage?
+    var galleryModel: GalleryModel?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -36,13 +36,13 @@ class ListCell: UICollectionViewCell {
     }
     
     @objc func handleImageLoadedNotification(notification: Notification) {
-        guard let galleryPage = notification.object as? GalleryPage else { return }
-        guard let page = self.galleryPage,
-              galleryPage.gid == page.gid else {
+        guard let galleryModel = notification.object as? GalleryModel else { return }
+        guard let page = self.galleryModel,
+              galleryModel.gid == page.gid else {
             return
         }
         
-        self.imageView.image = self.galleryPage?.cover
+        self.imageView.image = self.galleryModel?.cover
         setNeedsLayout()
     }
 }
@@ -55,7 +55,7 @@ class CommentCell: UITableViewCell {
 
 class ScrollingImageCell: UICollectionViewCell {
     @IBOutlet weak var readLabel: UILabel!
-    var showPage: ShowPage?
+    var showModel: ShowModel?
     var imageView: UIImageView = UIImageView()
     var scrollView: UIScrollView = UIScrollView()
     var dTapGR: UITapGestureRecognizer!
@@ -152,12 +152,12 @@ class ScrollingImageCell: UICollectionViewCell {
     }
     
     @objc func handleImageLoadedNotification(notification: Notification) {
-        guard let showPage = notification.object as? ShowPage else { return }
-        guard let page = self.showPage,
-            showPage.imageKey == page.imageKey else {
+        guard let showModel = notification.object as? ShowModel else { return }
+        guard let page = self.showModel,
+            showModel.imageKey == page.imageKey else {
             return
         }
-        self.image = self.showPage?.image ?? self.showPage?.thumb
+        self.image = self.showModel?.image ?? self.showModel?.thumb
     }
 }
 

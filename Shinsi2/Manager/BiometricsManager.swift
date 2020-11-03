@@ -1,10 +1,3 @@
-//
-//  BiometricsManager.swift
-//  Shinsi2
-//
-//  Created by Tokinogaki on 14/6/20.
-//  Copyright © 2020 PowHu Yang. All rights reserved.
-//
 
 import UIKit
 import LocalAuthentication

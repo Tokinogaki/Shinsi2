@@ -4,16 +4,12 @@ import Kanna
 import UIColor_Hex_Swift
 
 public extension Notification.Name {
-    static let loadShowPage = Notification.Name("loadShowPage")
+    static let loadShowModel = Notification.Name("loadShowModel")
     static let imageDownloaded = Notification.Name("imageDownloaded")
     static let thumbDownloaded = Notification.Name("thumbDownloaded")
 }
 
-enum StateEnum: Int {
-    case none, downloading, downloaded
-}
-
-class ShowPage: NSObject {
+class ShowModel: NSObject {
     @objc dynamic var index = 0
     @objc dynamic var gid = 0
     @objc dynamic var imageKey = ""
@@ -25,8 +21,8 @@ class ShowPage: NSObject {
     @objc dynamic private var _sizeWidth: Float = 0
     @objc dynamic private var _sizeHeight: Float = 0
     
-    var _imageState: StateEnum = .none
-    var imageState: StateEnum {
+    var _imageState: DownloadStateEnum = .none
+    var imageState: DownloadStateEnum {
         get {
             if self.hasImage {
                 return .downloaded
@@ -38,8 +34,8 @@ class ShowPage: NSObject {
         }
     }
     
-    var _thumbState: StateEnum = .none
-    var thumbState: StateEnum {
+    var _thumbState: DownloadStateEnum = .none
+    var thumbState: DownloadStateEnum {
         get {
             if self.hasThumb {
                 return .downloaded
@@ -122,7 +118,7 @@ class ShowPage: NSObject {
         return 1.0
     }
     
-    func setInfo(showPage doc: HTMLDocument) {
+    func setInfo(showModel doc: HTMLDocument) {
         if let img = doc.at_xpath("//img [@id='img']"),
             let imageUrl = img["src"] {
             self.imageUrl = imageUrl
