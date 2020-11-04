@@ -186,7 +186,8 @@ extension ViewerVC: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard mode != .vertical else {return false}
         guard let panGR = gestureRecognizer as? UIPanGestureRecognizer else {return false}
-        guard let cell = collectionView?.visibleCells[0] as? ScrollingImageCell, cell.scrollView.zoomScale == 1 else {return false}
+        guard collectionView.visibleCells.count > 0 else {return false}
+        guard let cell = collectionView.visibleCells[0] as? ScrollingImageCell, cell.scrollView.zoomScale == 1 else {return false}
         let v = panGR.velocity(in: nil)
         return v.y > abs(v.x)
     } 
