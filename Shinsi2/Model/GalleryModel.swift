@@ -37,7 +37,7 @@ class GalleryModel: NSObject, NSCoding {
     var shows: [ShowModel] = []
     var comments: [CommentModel] = []
     
-    var _readPage: Int = 0
+    private var _readPage: Int = 0
     @objc var readPage: Int {
         get {
             if let readPage = UserDefaults.standard.value(forKey: "\(gid)_readPage") {

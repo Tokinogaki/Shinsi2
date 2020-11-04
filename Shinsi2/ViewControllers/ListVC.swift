@@ -355,6 +355,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = storyboard!.instantiateViewController(withIdentifier: "GalleryVC") as! GalleryVC
         vc.galleryModel = galleryModelArray[indexPath.item]
+        vc.galleryModel.readPage = 1
         HistoryManager.shared.addHistory(galleryModel: vc.galleryModel)
         navigationController?.pushViewController(vc, animated: true)
     }
