@@ -68,6 +68,7 @@ class ListVC: BaseViewController {
             self.searchController.isActive = false
             self.searchController.searchBar.text = text
             self.reloadData()
+            SearchManager.shared.addSearch(text: text)
         }
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -79,6 +80,7 @@ class ListVC: BaseViewController {
         definesPresentationContext = true
         
         loadNextPage()
+        SearchManager.shared.addSearch(text: searchController.searchBar.text)
     }
     
     deinit {
