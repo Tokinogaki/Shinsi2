@@ -20,10 +20,15 @@ class HistoryManager: NSObject {
                 historyList.remove(at: index)
             }
             historyList.insert(galleryModel!, at: 0)
+            
+            if historyList.count > 100 {
+                self.historyList = Array(self.historyList[0...100])
+            }
+            
             do {
                 let encodedData = try NSKeyedArchiver.archivedData(withRootObject: historyList, requiringSecureCoding: false)
                 UserDefaults.standard.set(encodedData, forKey: "HistoryList")
-            } catch  {
+            } catch {
                 print(error)
             }
         }
