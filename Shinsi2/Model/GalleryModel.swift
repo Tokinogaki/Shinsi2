@@ -46,7 +46,9 @@ class GalleryModel: NSObject, NSCoding {
             return _readPage
         }
         set {
-            _readPage = newValue
+            if _readPage == 0 || newValue != 1 {
+                _readPage = newValue
+            }
             UserDefaults.standard.setValue(_readPage, forKey: "\(gid)_readPage")
         }
     }
