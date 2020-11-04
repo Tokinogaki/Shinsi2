@@ -286,14 +286,22 @@ class GalleryModel: NSObject, NSCoding {
     }
     
     func setTags(_ element: HTMLDocument) {
-        self.tags.removeAll()
+        if self.tags.count > 0 {
+            return
+        }
         for t in element.xpath("//div [@id='taglist'] //tr") {
-            self.tags.append(TagModel(t))
+            let tagModel = TagModel(t)
+            self.tags.append(tagModel)
+            for value in tagModel.values {
+                SearchManager.shared.addStatistics(text: "\(tagModel.name):\(value)")
+            }
         }
     }
     
     func setComments(_ element: HTMLDocument) {
-        self.comments.removeAll()
+        if self.comments.count > 0 {
+            return
+        }
         //Parse comments
         let commentDateFormatter = DateFormatter()
         commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"

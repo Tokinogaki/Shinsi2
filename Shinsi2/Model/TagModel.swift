@@ -4,10 +4,9 @@ import Kanna
 import UIColor_Hex_Swift
 
 
-
 class TagModel: NSObject {
     @objc dynamic var name = ""
-    var values = Array<String>()
+    var values: [String] = []
     
     init(_ element: XMLElement) {
         super.init()
@@ -29,4 +28,3 @@ class TagModel: NSObject {
     }
     
 }
-
