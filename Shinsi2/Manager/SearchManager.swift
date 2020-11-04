@@ -9,31 +9,34 @@ class SearchManager: NSObject {
 
     static let shared = SearchManager()
     
-    var _searchList: [[String: Any]]?
-    var searchList: [[String: Any]] {
-        get {
-            if _searchList == nil {
-                _searchList = UserDefaults.standard.value(forKey: "SearchList") as? [[String: Any]]
-            }
-            if _searchList == nil {
-                _searchList = []
-            }
-            return _searchList!
+    override init() {
+        super.init()
+        if let searchList = UserDefaults.standard.value(forKey: "SearchList") as? [[String: Any]] {
+            self.searchList = searchList
         }
     }
     
+    var searchList: [[String: Any]] = []
+    
     func addSearch(text: String?) {
-        if nil != text {
-            let _ = self.searchList
-            _searchList?.insert(["text": text!, "date": Date()], at: 0)
-            UserDefaults.standard.setValue(_searchList, forKey: "SearchList")
+        if nil != text && !text!.isEmpty {
+            if let index = searchList.firstIndex(where: { return $0["text"] as! String == text!}) {
+                searchList.remove(at: index)
+            }
+            searchList.insert(["text": text!, "date": Date()], at: 0)
+            
+            if searchList.count > 100 {
+                self.searchList = Array(self.searchList[0...100])
+            }
+            
+            UserDefaults.standard.setValue(searchList, forKey: "SearchList")
             NotificationCenter.default.post(name: .searchHistoryUpdate, object: self)
         }
     }
     
     func deleteSearch(index: Int) {
-        _searchList?.remove(at: index)
-        UserDefaults.standard.setValue(_searchList, forKey: "SearchList")
+        searchList.remove(at: index)
+        UserDefaults.standard.setValue(searchList, forKey: "SearchList")
         NotificationCenter.default.post(name: .searchHistoryUpdate, object: self)
     }
     
