@@ -2,7 +2,6 @@ import UIKit
 import Hero
 import Photos
 
-
 class ViewerVC: UICollectionViewController {
     
     enum ViewerMode: Int {
@@ -36,7 +35,7 @@ class ViewerVC: UICollectionViewController {
             }
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleLoadCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
         
         //Close gesture
         let panGR = UIPanGestureRecognizer()
@@ -55,10 +54,6 @@ class ViewerVC: UICollectionViewController {
         setNeedsUpdateOfHomeIndicatorAutoHidden()
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         guard UIApplication.shared.applicationState == .active else {return} 
         let indexPath = collectionView.indexPathsForVisibleItems.first
@@ -85,8 +80,37 @@ class ViewerVC: UICollectionViewController {
     
     override var prefersHomeIndicatorAutoHidden: Bool { return true }
     
-    @objc func handleUpdateCalleryPageNotification(notification: Notification) {
-        collectionView.reloadData()
+    @objc func handleLoadCalleryPageNotification(notification: Notification) {
+        var insertIndexPaths: [IndexPath] = []
+        var lastIndext = 0
+        if self.galleryModel.loadPageDirection == "down" {
+            lastIndext = self.galleryModel.shows.count - self.galleryModel.perPageCount
+        }
+        
+        for i in 0...(self.galleryModel.perPageCount - 1) {
+            insertIndexPaths.append(IndexPath(item: i + lastIndext, section: 0))
+        }
+        
+        let scrollToItem = (collectionView.indexPathsForVisibleItems.sorted().first?.item ?? 0) + self.galleryModel.perPageCount
+        let bottomOffset = self.collectionView!.contentSize.height - self.collectionView!.contentOffset.y
+
+        if self.galleryModel.loadPageDirection == "up" && self.mode == .vertical {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+        }
+        
+        self.collectionView.performBatchUpdates({
+            self.collectionView.insertItems(at: insertIndexPaths)
+        }) {_ in
+            if self.galleryModel.loadPageDirection == "up" {
+                if self.mode == .vertical {
+                    self.collectionView!.contentOffset = CGPoint.init(x: 0, y: self.collectionView!.contentSize.height - bottomOffset)
+                    CATransaction.commit()
+                } else {
+                    self.collectionView.scrollToItem(at: IndexPath(item: scrollToItem, section: 0), at: .centeredHorizontally, animated: false)
+                }
+            }
+        }
     }
     
     @objc func longPress(ges: UILongPressGestureRecognizer) {
@@ -191,4 +215,44 @@ extension ViewerVC: UIGestureRecognizerDelegate {
         let v = panGR.velocity(in: nil)
         return v.y > abs(v.x)
     } 
+}
+
+extension ViewerVC {
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let visibleItems = collectionView.indexPathsForVisibleItems.sorted()
+        
+        if self.mode == .horizontal {
+            // Up loading
+            if let indexPath = visibleItems.first,
+               indexPath.item < Defaults.Viewer.upPrefetch {
+                self.galleryModel.loadGalleryModel(direction: "up")
+            }
+            // Down loading
+            else if let indexPath = visibleItems.last,
+                    indexPath.item > (self.galleryModel.shows.count - 1 - Defaults.Viewer.downPrefetch) {
+                self.galleryModel.loadGalleryModel(direction: "down")
+            }
+        } else {
+            let contentSizeHeight = scrollView.contentSize.height
+            let frameSizeHeight = scrollView.frame.size.height
+            let contentOffsetY = scrollView.contentOffset.y
+            
+            if contentSizeHeight == 0 || visibleItems.count == 0 {
+                return
+            }
+            
+            // Up loading
+            if let indexPath = visibleItems.first,
+               let itemHeight = collectionView.cellForItem(at: indexPath)?.bounds.height,
+               contentOffsetY < (itemHeight * CGFloat(Defaults.Viewer.upPrefetch) - 70) {
+                self.galleryModel.loadGalleryModel(direction: "up")
+            }
+            // down loading
+            else if let indexPath = visibleItems.last,
+                    let itemHeight = collectionView.cellForItem(at: indexPath)?.bounds.height,
+                    contentOffsetY > (contentSizeHeight - frameSizeHeight - itemHeight * CGFloat(Defaults.Viewer.downPrefetch)) {
+                self.galleryModel.loadGalleryModel(direction: "down")
+            }
+        }
+    }
 }

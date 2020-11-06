@@ -30,6 +30,8 @@ let kUDGalleryFavoriteList = "kUDGalleryFavoriteList"
 let kUDGalleryAutomaticallyScrollToHistory = "kUDGalleryAutomaticallyScrollToHistory"
 
 let kUDViewerMode = "kUDViewerMode"
+let kUDUpPrefetch = "kUDUpPrefetch"
+let kUDDownPrefetch = "kUDDownPrefetch"
 
 let kUDSettingUseBiometrics = "kUDSettingUseBiometrics"
 let kUDSettingUsePasscpde = "kUDSettingUsePasswcode"
@@ -120,6 +122,14 @@ class Defaults {
         static var mode: ViewerVC.ViewerMode {
             get { return ViewerVC.ViewerMode(rawValue: UserDefaults.standard.integer(forKey: kUDViewerMode))! }
             set { UserDefaults.standard.set(newValue.rawValue, forKey: kUDViewerMode) }
+        }
+        static var upPrefetch: Int {
+            get { return UserDefaults.standard.integer(forKey: kUDUpPrefetch) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDUpPrefetch) }
+        }
+        static var downPrefetch: Int {
+            get { return UserDefaults.standard.integer(forKey: kUDDownPrefetch) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDDownPrefetch) }
         }
     }
     class Setting {

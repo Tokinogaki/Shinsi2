@@ -83,7 +83,7 @@ class RequestManager : NSObject {
     
     func getGalleryModel(galleryModel: GalleryModel, completeBlock block: (() -> Void)?) {
         print(#function)
-        let page = galleryModel.nextPageIndex
+        let page = galleryModel.loadPageIndex!
         var url = galleryModel.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
         self.manager.request(url, method: .get).responseString { response in

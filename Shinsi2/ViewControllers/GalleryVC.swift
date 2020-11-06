@@ -32,7 +32,7 @@ class GalleryVC: BaseViewController {
         updateNavigationItems()
         appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
-        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleLoadCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
         
         if !isSizeClassRegular {
             navigationItem.rightBarButtonItems =
@@ -55,11 +55,7 @@ class GalleryVC: BaseViewController {
             scrollBar.draggingTextOffset = 40
         }
         
-        self.galleryModel.startLoadGalleryModel()
-    }
-
-    deinit {
-        self.galleryModel.cancelLoadGalleryModel()
+        self.galleryModel.loadGalleryModel(direction: "down")
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -257,8 +253,33 @@ class GalleryVC: BaseViewController {
         return actions
     }
     
-    @objc func handleUpdateCalleryPageNotification(notification: Notification) {
-        collectionView.reloadData()
+    @objc func handleLoadCalleryPageNotification(notification: Notification) {
+        var insertIndexPaths: [IndexPath] = []
+        var lastIndext = 0
+        if self.galleryModel.loadPageDirection == "down" {
+            lastIndext = self.galleryModel.shows.count - self.galleryModel.perPageCount
+        }
+        
+        for i in 0...(self.galleryModel.perPageCount - 1) {
+            insertIndexPaths.append(IndexPath(item: i + lastIndext, section: 0))
+        }
+        
+        let bottomOffset = self.collectionView!.contentSize.height - self.collectionView!.contentOffset.y
+
+        if self.galleryModel.loadPageDirection == "up" {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+        }
+        
+        self.collectionView.performBatchUpdates({
+            self.collectionView.insertItems(at: insertIndexPaths)
+        }) {_ in
+            if self.galleryModel.loadPageDirection == "up" {
+                self.collectionView!.contentOffset = CGPoint.init(x: 0, y: self.collectionView!.contentSize.height - bottomOffset)
+                CATransaction.commit()
+            }
+        }
+        
         self.updateNavigationItems()
     }
     
@@ -384,6 +405,32 @@ extension GalleryVC: HeroViewControllerDelegate {
     func heroDidEndAnimatingFrom(viewController: UIViewController) {
         if viewController is ViewerVC {
             collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+        }
+    }
+}
+
+extension GalleryVC: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let visibleItems = collectionView.indexPathsForVisibleItems.sorted()
+        let contentSizeHeight = scrollView.contentSize.height
+        let frameSizeHeight = scrollView.frame.size.height
+        let contentOffsetY = scrollView.contentOffset.y
+        
+        if contentSizeHeight == 0 || visibleItems.count == 0 {
+            return
+        }
+        
+        // Up loading
+        if let indexPath = visibleItems.first,
+           let itemHeight = collectionView.cellForItem(at: indexPath)?.bounds.height,
+           contentOffsetY < (itemHeight * 2 - 70) {
+            self.galleryModel.loadGalleryModel(direction: "up")
+        }
+        // down loading
+        else if let indexPath = visibleItems.last,
+                let itemHeight = collectionView.cellForItem(at: indexPath)?.bounds.height,
+                contentOffsetY > (contentSizeHeight - frameSizeHeight - itemHeight * 2) {
+            self.galleryModel.loadGalleryModel(direction: "down")
         }
     }
 }

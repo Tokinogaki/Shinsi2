@@ -5,6 +5,7 @@ import UIColor_Hex_Swift
 
 public extension Notification.Name {
     static let loadGalleryModel = Notification.Name("loadGalleryModel")
+    static let loadGalleryModelNull = Notification.Name("loadGalleryModelNull")
     static let coverDownloaded = Notification.Name("coverDownloaded")
 }
 
@@ -24,14 +25,14 @@ class GalleryModel: NSObject, NSCoding {
     @objc dynamic var rating: Float = 0.0
     @objc dynamic var favorite = FavoriteEnum.none
     
-    @objc dynamic var isDownloaded: Bool = false
-    @objc dynamic var perPageCount: Int = 0
     @objc dynamic var updatedAt: Date = Date()
     @objc dynamic var createdAt: Date = Date()
     @objc private dynamic var _url = ""
     @objc private dynamic var _category = CategoryOptions.none.rawValue
     
-    var stopLoadGalleryModel = false
+    var isDownloaded: Bool = false
+    var isLoadGalleryModel: Bool = false
+    var loadPageDirection = "down"
     
     var tags: [TagModel] = []
     var shows: [ShowModel] = []
@@ -50,6 +51,20 @@ class GalleryModel: NSObject, NSCoding {
                 _readPage = newValue
             }
             UserDefaults.standard.setValue(_readPage, forKey: "\(gid)_readPage")
+        }
+    }
+    
+    private var _perPageCount: Int = 20
+    @objc var perPageCount: Int {
+        get {
+            if let perPageCount = UserDefaults.standard.value(forKey: "PerPageCount") {
+                _perPageCount = perPageCount as! Int
+            }
+            return _perPageCount
+        }
+        set {
+            _perPageCount = newValue
+            UserDefaults.standard.setValue(_perPageCount, forKey: "PerPageCount")
         }
     }
     
@@ -112,12 +127,22 @@ class GalleryModel: NSObject, NSCoding {
         return self.gid != 0 && token != ""
     }
     
-    var nextPageIndex: Int {
-        guard self.shows.count != 0 else {
-            return 0
+    var loadPageIndex: Int? {
+        if self.shows.count == 0 {
+            return (self.readPage - 1) / self.perPageCount
         }
         
-        return self.shows.count / self.perPageCount
+        if self.loadPageDirection == "up" {
+            if self.shows.first!.index == 1 {
+                return nil
+            }
+            return self.shows.first!.index / self.perPageCount - 1
+        }
+        
+        if self.shows.last!.index >= self.`length` {
+            return nil
+        }
+        return self.shows.last!.index / self.perPageCount
     }
 
     var canDownload: Bool {
@@ -200,8 +225,6 @@ class GalleryModel: NSObject, NSCoding {
         coder.encode(self.rating, forKey: "rating")
         coder.encode(self.favorite.rawValue, forKey: "favorite")
 
-        coder.encode(self.isDownloaded, forKey: "isDownloaded")
-        coder.encode(self.perPageCount, forKey: "perPageCount")
         coder.encode(self.updatedAt, forKey: "updatedAt")
         coder.encode(self.createdAt, forKey: "createdAt")
         coder.encode(self._url, forKey: "_url")
@@ -317,18 +340,27 @@ class GalleryModel: NSObject, NSCoding {
     }
     
     func setPages(_ element: HTMLDocument) {
+        var shows: [ShowModel] = []
         for link in element.xpath("//div [@class='gdtl'] //a") {
             if let url = link["href"] {
                 if let imgNode = link.at_css("img"), let thumbUrl = imgNode["src"] {
                     let page = ShowModel()
                     page.thumbUrl = thumbUrl
                     page.url = url
-                    self.shows.append(page)
+                    shows.append(page)
                 }
             }
         }
-        if self.perPageCount == 0 {
-            self.perPageCount = self.shows.count
+        if self.loadPageDirection == "up" {
+            self.shows = shows + self.shows
+        } else {
+            self.shows += shows
+        }
+        
+        if element.at_xpath("//div[@id='gdo4'] //div")?["onclick"] == nil {
+            self.perPageCount = 40
+        } else {
+            self.perPageCount = 20
         }
     }
     
@@ -340,23 +372,17 @@ extension GalleryModel {
         self.favorite = FavoriteEnum(rawValue: index + 1) ?? .none
     }
     
-    private func loadShowModelInGalleryModel() {
-        if self.shows.count >= self.`length` || self.stopLoadGalleryModel {
+    func loadGalleryModel(direction: String) {
+        self.loadPageDirection = direction
+        
+        if self.loadPageIndex == nil || self.isLoadGalleryModel {
             return
         }
+        self.isLoadGalleryModel = true
         RequestManager.shared.getGalleryModel(galleryModel: self) {
             NotificationCenter.default.post(name: .loadGalleryModel, object: self)
-            self.loadShowModelInGalleryModel()
+            self.isLoadGalleryModel = false
         }
-    }
-    
-    func startLoadGalleryModel() {
-        self.stopLoadGalleryModel = false
-        self.loadShowModelInGalleryModel()
-    }
-    
-    func cancelLoadGalleryModel() {
-        self.stopLoadGalleryModel = true
     }
     
     func downloadCover() {

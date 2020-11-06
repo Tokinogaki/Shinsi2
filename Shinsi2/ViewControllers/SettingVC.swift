@@ -14,6 +14,9 @@ class SettingVC: BaseViewController {
     
     let passcodeSwitch = UISwitch()
 
+    let upPrefetchArray = ["1", "2", "3", "5", "10"]
+    let downPrefetchArray = ["1", "2", "3", "5", "10"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -136,6 +139,18 @@ class SettingVC: BaseViewController {
         viewerModeSeg.addTarget(self, action: #selector(viewerModeSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(viewerModeSeg)
         
+        addSubTitle("Up Prefetch")
+        let upPrefetchSeg = UISegmentedControl(items: upPrefetchArray)
+        upPrefetchSeg.selectedSegmentIndex = upPrefetchArray.firstIndex{ $0 == "\(Defaults.Viewer.upPrefetch)"} ?? 1
+        upPrefetchSeg.addTarget(self, action: #selector(upPrefetchSegmentedControlVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(upPrefetchSeg)
+        
+        addSubTitle("Up Prefetch")
+        let downPrefetchSeg = UISegmentedControl(items: downPrefetchArray)
+        downPrefetchSeg.selectedSegmentIndex = downPrefetchArray.firstIndex{ $0 == "\(Defaults.Viewer.downPrefetch)"} ?? 3
+        downPrefetchSeg.addTarget(self, action: #selector(downPrefetchSegmentedControlVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(downPrefetchSeg)
+        
         if BiometricsManager.canSupported() {
             addTitle("Settings")
             let touchLabel = createSubTitleLabel(BiometricsManager.getBiometryType())
@@ -225,6 +240,14 @@ class SettingVC: BaseViewController {
     
     @objc func ratingSegmentedControlVauleChanged(sender: UISegmentedControl) {
         Defaults.Search.rating = sender.selectedSegmentIndex
+    }
+    
+    @objc func upPrefetchSegmentedControlVauleChanged(sender: UISegmentedControl) {
+        Defaults.Viewer.upPrefetch = Int(upPrefetchArray[sender.selectedSegmentIndex]) ?? 1
+    }
+    
+    @objc func downPrefetchSegmentedControlVauleChanged(sender: UISegmentedControl) {
+        Defaults.Viewer.downPrefetch = Int(downPrefetchArray[sender.selectedSegmentIndex]) ?? 3
     }
     
     @objc func listInfoSwitchVauleChanged(sender: UISwitch) {
