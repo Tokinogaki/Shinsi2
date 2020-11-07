@@ -54,7 +54,6 @@ class CommentCell: UITableViewCell {
 }
 
 class ScrollingImageCell: UICollectionViewCell {
-    @IBOutlet weak var readLabel: UILabel!
     var showModel: ShowModel?
     var imageView: UIImageView = UIImageView()
     var scrollView: UIScrollView = UIScrollView()

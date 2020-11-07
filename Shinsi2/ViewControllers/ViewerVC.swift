@@ -1,8 +1,29 @@
 import UIKit
 import Hero
 import Photos
+import UIColor_Hex_Swift
 
 class ViewerVC: UICollectionViewController {
+    
+    private var _readLabel: InsetLabel?
+    var readLabel: InsetLabel {
+        if _readLabel == nil {
+            _readLabel = InsetLabel()
+            _readLabel?.backgroundColor = UIColor.init(hex3: 0x0, alpha: 0.3)
+            _readLabel?.textColor = UIColor.white
+            _readLabel?.numberOfLines = 2
+            _readLabel?.font = UIFont.systemFont(ofSize: 11)
+            _readLabel?.translatesAutoresizingMaskIntoConstraints = false
+
+            self.view.addSubview(_readLabel!)
+
+            NSLayoutConstraint.activate([
+                _readLabel!.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+                _readLabel!.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20)
+            ])
+        }
+        return _readLabel!
+    }
     
     enum ViewerMode: Int {
         case horizontal = 0
@@ -182,7 +203,6 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         cell.imageView.hero.id = heroID(for: indexPath)
         cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
-        cell.readLabel.text = "\(showModel.index) / \(self.galleryModel.shows.count)"
         self.galleryModel.downloadImages(for: indexPath.item)
         
         return cell
@@ -196,6 +216,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let showModel = self.galleryModel.shows[indexPath.item]
         self.galleryModel.readPage = showModel.index
+        self.readLabel.text = "\(showModel.index)/\(self.galleryModel.shows.count)/\(self.galleryModel.`length`)"
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

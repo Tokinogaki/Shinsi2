@@ -391,24 +391,7 @@
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="0.0" y="0.0" width="217" height="196"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="middleTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nPp-zb-U9N" customClass="InsetLabel" customModule="Shinsi2" customModuleProvider="target">
-                                            <rect key="frame" x="162.33333333333334" y="156.66666666666666" width="28.666666666666657" height="13.333333333333343"/>
-                                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <nil key="highlightedColor"/>
-                                            <size key="shadowOffset" width="0.0" height="0.0"/>
-                                        </label>
-                                    </subviews>
                                 </view>
-                                <constraints>
-                                    <constraint firstAttribute="bottomMargin" secondItem="nPp-zb-U9N" secondAttribute="bottom" constant="18" id="jgU-NG-cUz"/>
-                                    <constraint firstAttribute="trailingMargin" secondItem="nPp-zb-U9N" secondAttribute="trailing" constant="18" id="tcL-Md-xhU"/>
-                                </constraints>
-                                <connections>
-                                    <outlet property="readLabel" destination="nPp-zb-U9N" id="zQk-2S-d1r"/>
-                                </connections>
                             </collectionViewCell>
                         </cells>
                         <connections>

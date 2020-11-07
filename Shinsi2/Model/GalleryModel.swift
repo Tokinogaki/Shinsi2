@@ -398,7 +398,9 @@ extension GalleryModel {
     }
     
     func downloadImages(for index: Int) {
-        for i in (index - 3)..<(index + 5) {
+        let upPrefetch = Defaults.Viewer.upPrefetch
+        let downPrefetch = Defaults.Viewer.downPrefetch
+        for i in (index - upPrefetch)..<(index + downPrefetch) {
             guard i < self.shows.count else {
                 break
             }
