@@ -83,11 +83,13 @@ class ViewerVC: UICollectionViewController {
     @objc func handleLoadCalleryPageNotification(notification: Notification) {
         var insertIndexPaths: [IndexPath] = []
         var lastIndext = 0
+        var pageCount = self.galleryModel.shows.count % self.galleryModel.perPageCount
+        pageCount = pageCount == 0 ? self.galleryModel.perPageCount : pageCount
         if self.galleryModel.loadPageDirection == "down" {
-            lastIndext = self.galleryModel.shows.count - self.galleryModel.perPageCount
+            lastIndext = self.galleryModel.shows.count - pageCount
         }
         
-        for i in 0...(self.galleryModel.perPageCount - 1) {
+        for i in 0...(pageCount - 1) {
             insertIndexPaths.append(IndexPath(item: i + lastIndext, section: 0))
         }
         
