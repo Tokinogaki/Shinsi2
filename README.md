@@ -1,14 +1,9 @@
-[![Build Status](https://app.bitrise.io/app/e86f4f4671dc9fef/status.svg?token=QvpljE9s8D1RLn5wjrCdyQ&branch=master)](https://app.bitrise.io/app/e86f4f4671dc9fef)
 
 # Shinsi2
 
 An unofficial iOS app for E-Hentai / EX-Hentai. Fully supporting iOS devices of any size. Written in Swift 5.0
 
-
 ![](Screenshots/top.jpg)
-
-
-
 
 ## Features
 
@@ -36,11 +31,6 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully supporting iOS devices of 
 
 ![](Screenshots/f02.jpg)
 
-### Downlaod
-* Download
-* Download part of a gallery
-* Background downloading not supported
-
 ### Tag
 * Tap to search tag
 
@@ -49,7 +39,6 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully supporting iOS devices of 
 ### Viewer
 
 * View in portrait or landscape
-* Double Page Viewer (iPad only)
 
 ![](Screenshots/f04.jpg)
 
@@ -60,6 +49,8 @@ An unofficial iOS app for E-Hentai / EX-Hentai. Fully supporting iOS devices of 
 * Pinch in/out to change thumbnail size
 * 3D touch support, quick preview galleries
 * Quick scroll 
+* ExKey login format `ipb_pass_hash+ipb_member_id+'x'+igneous`
+* Touch ID or Face ID unlocked app
 
 ## Enviroment
 
@@ -91,6 +82,12 @@ It would be very helpful if you could help me with my grammar and spelling.
 
 ## Change log
 
+* **ver 2.0.0** 2020/12/5
+  * Add the lock screen
+  * Add ExKey login
+  * Remove download
+  * Remove double Page Viewer
+
 * **ver 1.4.1** 2020/4/20
   * Bug fix
 
@@ -116,10 +113,11 @@ Copyright © 2018 PowHu Yang. Released under the MIT license.
 
 Shinsi2 uses the following awesome open sources.
 
-* RealmSwift
 * Alamofire
 * Kanna
-* SDWebImage
 * SVProgressHUD
 * Hero
 * AloeStackView
+* SwiftLint
+* UIColor_Hex_Swift
+* KSCrash
