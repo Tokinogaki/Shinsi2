@@ -338,7 +338,7 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
             cell.infoLabel.layer.borderWidth = 0
         }
 
-        cell.infoLabel.isHidden = Defaults.List.isHideInfo;
+        cell.infoLabel.isHidden = Defaults.List.isHideInfo
         cell.titleLabel?.isHidden = Defaults.List.isHideTitle
         
         cell.layer.shouldRasterize = true

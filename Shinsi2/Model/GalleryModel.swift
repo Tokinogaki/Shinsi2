@@ -91,7 +91,7 @@ class GalleryModel: NSObject, NSCoding {
     
     var cover: UIImage? {
         if self.hasCover {
-            let data = try! Data(contentsOf: self.localCover)
+            guard let data = try? Data(contentsOf: self.localCover) else { return nil }
             return UIImage(data: data)
         }
         return nil
@@ -327,7 +327,7 @@ class GalleryModel: NSObject, NSCoding {
         }
         //Parse comments
         let commentDateFormatter = DateFormatter()
-        commentDateFormatter.dateFormat = "dd MMMM  yyyy, HH:mm zzz"
+        commentDateFormatter.dateFormat = "dd MMMM yyyy, HH:mm"
         for c in element.xpath("//div [@id='cdiv'] //div [@class='c1']") {
             if let dateAndAuthor = c.at_xpath("div [@class='c2'] /div [@class='c3']")?.text,
                 let author = c.at_xpath("div [@class='c2'] /div [@class='c3'] /a")?.text,
@@ -351,7 +351,8 @@ class GalleryModel: NSObject, NSCoding {
                 }
             }
         }
-        if self.loadPageDirection == "up" {
+        
+        if self.shows.last?.index ?? 0 > shows.first!.index {
             self.shows = shows + self.shows
         } else {
             self.shows += shows
