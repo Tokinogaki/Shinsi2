@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (4.9.1)
+  - Alamofire (5.4.0)
   - AloeStackView (1.2.0)
   - Hero (1.5.0)
   - Kanna (5.2.3)
@@ -67,11 +67,11 @@ PODS:
   - KSCrash/Reporting/Tools (1.15.21):
     - KSCrash/Recording
   - SVProgressHUD (2.2.5)
-  - SwiftLint (0.40.3)
+  - SwiftLint (0.41.0)
   - UIColor_Hex_Swift (5.1.0)
 
 DEPENDENCIES:
-  - Alamofire (~> 4)
+  - Alamofire
   - AloeStackView
   - Hero
   - Kanna
@@ -92,15 +92,15 @@ SPEC REPOS:
     - UIColor_Hex_Swift
 
 SPEC CHECKSUMS:
-  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
   AloeStackView: 8a4ce0efa08128dd78d538372f60c76c224034bb
   Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   Kanna: 113d111e95d7e903efe0c3eb7221f7635716084c
   KSCrash: 47bc2f48bb5537f112432cfbea9a359aaf7a6cc5
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
-  SwiftLint: dfd554ff0dff17288ee574814ccdd5cea85d76f7
+  SwiftLint: c585ebd615d9520d7fbdbe151f527977b0534f1e
   UIColor_Hex_Swift: 8be7432edacb7fa91c78aa05ef3c30b66e4f9415
 
-PODFILE CHECKSUM: a9a9d884663c915bd26a541400c9dc93e2545c0d
+PODFILE CHECKSUM: 4230bdcd70c2e4d23fbca69f33d419142fce995c
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

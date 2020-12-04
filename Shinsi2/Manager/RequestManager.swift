@@ -6,13 +6,13 @@ class RequestManager : NSObject {
     
     static let shared = RequestManager()
     
-    var _manager: SessionManager?
-    var manager: SessionManager {
+    var _manager: Alamofire.Session?
+    var manager: Alamofire.Session {
         if _manager == nil {
             let configuration = URLSessionConfiguration.default
             configuration.timeoutIntervalForRequest = 30
 
-            _manager = Alamofire.SessionManager(configuration: configuration)
+            _manager = Alamofire.Session(configuration: configuration)
         }
         return _manager!
     }
@@ -26,7 +26,7 @@ class RequestManager : NSObject {
             "UserName": name,
             "PassWord": pw,
             "ipb_login_submit": "Login!"]
-        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
+        self.manager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseString { _ in
             block?()
         }
     }
@@ -71,7 +71,7 @@ class RequestManager : NSObject {
         }
         
         self.manager.request(url, method: .get).responseString { response in
-            guard let html = response.result.value else { block?([]); return }
+            guard let html = response.value else { block?([]); return }
             if let doc = try? Kanna.HTML(html: html, encoding: .utf8) {
                 let items = GalleryModel.galleryModelList(indexPage: doc)
                 block?(items)
@@ -87,7 +87,7 @@ class RequestManager : NSObject {
         var url = galleryModel.url + "?p=\(page)"
         url += "&inline_set=ts_l" //Set thumbnal size to large
         self.manager.request(url, method: .get).responseString { response in
-            if let html = response.result.value,
+            if let html = response.value,
                let doc = try? Kanna.HTML(html: html, encoding: String.Encoding.utf8) {
                 galleryModel.setInfo(galleryModel: doc)
                 galleryModel.setPages(doc)
@@ -101,7 +101,7 @@ class RequestManager : NSObject {
     func getShowModel_bak(url: String, completeBlock block: ( (_ imageURL: String?) -> Void )?) {
         print(#function)
         self.manager.request(url, method: .get).responseString { response in
-            guard let html = response.result.value else {
+            guard let html = response.value else {
                 block?(nil)
                 return
             }
@@ -120,7 +120,7 @@ class RequestManager : NSObject {
     func getShowModel(showModel: ShowModel, completeBlock block: (() -> Void)?) {
         print(#function)
         self.manager.request(showModel.url, method: .get).responseString { response in
-            guard let html = response.result.value else {
+            guard let html = response.value else {
                 block?()
                 return
             }
@@ -158,30 +158,30 @@ class RequestManager : NSObject {
         }
     }
     
-    func downloadCover(galleryModel: GalleryModel, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+    func downloadCover(galleryModel: GalleryModel, completeBlock block: ((_ result: Error?) -> Void)?) {
+        let destination: DownloadRequest.Destination = { _, _ in
             return (galleryModel.localCover, [.removePreviousFile, .createIntermediateDirectories])
         }
-        self.manager.download(galleryModel.coverUrl, to: destination).responseData { response in
-            block?(response.result)
+        self.manager.download(galleryModel.coverUrl, to: destination).response { response in
+            block?(response.error)
         }
     }
     
-    func downloadImage(showModel: ShowModel, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+    func downloadImage(showModel: ShowModel, completeBlock block: ((_ result: Error?) -> Void)?) {
+        let destination: DownloadRequest.Destination = { _, _ in
             return (showModel.localImage, [.removePreviousFile, .createIntermediateDirectories])
         }
-        self.manager.download(showModel.imageUrl, to: destination).responseData { response in
-            block?(response.result)
+        self.manager.download(showModel.imageUrl, to: destination).response { response in
+            block?(response.error)
         }
     }
     
-    func downloadThumb(showModel: ShowModel, completeBlock block: ((_ result: Result<Data>) -> Void)?) {
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+    func downloadThumb(showModel: ShowModel, completeBlock block: ((_ result: Error?) -> Void)?) {
+        let destination: DownloadRequest.Destination = { _, _ in
             return (showModel.localThumb, [.removePreviousFile, .createIntermediateDirectories])
         }
-        self.manager.download(showModel.thumbUrl, to: destination).responseData { response in
-            block?(response.result)
+        self.manager.download(showModel.thumbUrl, to: destination).response { response in
+            block?(response.error)
         }
     }
 }

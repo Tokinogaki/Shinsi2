@@ -1,10 +1,10 @@
 project 'Shinsi2.xcodeproj'
-platform :ios, '10.0'
+platform :ios, '11.0'
 inhibit_all_warnings!
 use_modular_headers!
 use_frameworks!
 target 'Shinsi2' do
-    pod 'Alamofire', '~> 4' 
+    pod 'Alamofire'
     pod 'Kanna'
     pod 'SVProgressHUD'
     pod 'Hero'

@@ -388,8 +388,8 @@ extension GalleryModel {
     
     func downloadCover() {
         self.coverState = .downloading
-        RequestManager.shared.downloadCover(galleryModel: self) { (result) in
-            if let _ = result.value {
+        RequestManager.shared.downloadCover(galleryModel: self) { (error) in
+            if error == nil {
                 self.coverState = .downloaded
                 NotificationCenter.default.post(name: .coverDownloaded, object: self)
             } else {
@@ -415,8 +415,8 @@ extension GalleryModel {
             
             RequestManager.shared.getShowModel(showModel: showModel) {
                 showModel.imageState = .downloading
-                RequestManager.shared.downloadImage(showModel: showModel) { (result) in
-                    if let _ = result.value {
+                RequestManager.shared.downloadImage(showModel: showModel) { (error) in
+                    if error == nil {
                         showModel.imageState = .downloaded
                         NotificationCenter.default.post(name: .imageDownloaded, object: showModel)
                     } else {
@@ -438,8 +438,8 @@ extension GalleryModel {
         if showModel.thumbState == .downloaded || showModel.thumbState == .downloading {
             return
         }
-        RequestManager.shared.downloadThumb(showModel: showModel) { (result) in
-            if let _ = result.value {
+        RequestManager.shared.downloadThumb(showModel: showModel) { (error) in
+            if error == nil {
                 showModel.thumbState = .downloaded
                 NotificationCenter.default.post(name: .thumbDownloaded, object: showModel)
             } else {
