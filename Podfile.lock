@@ -3,6 +3,69 @@ PODS:
   - AloeStackView (1.2.0)
   - Hero (1.5.0)
   - Kanna (5.2.3)
+  - KSCrash (1.15.21):
+    - KSCrash/Installations (= 1.15.21)
+  - KSCrash/Installations (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting
+  - KSCrash/Recording (1.15.21):
+    - KSCrash/Recording/Tools (= 1.15.21)
+  - KSCrash/Recording/Tools (1.15.21)
+  - KSCrash/Reporting (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters (= 1.15.21)
+    - KSCrash/Reporting/MessageUI (= 1.15.21)
+    - KSCrash/Reporting/Sinks (= 1.15.21)
+    - KSCrash/Reporting/Tools (= 1.15.21)
+  - KSCrash/Reporting/Filters (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Alert (= 1.15.21)
+    - KSCrash/Reporting/Filters/AppleFmt (= 1.15.21)
+    - KSCrash/Reporting/Filters/Base (= 1.15.21)
+    - KSCrash/Reporting/Filters/Basic (= 1.15.21)
+    - KSCrash/Reporting/Filters/GZip (= 1.15.21)
+    - KSCrash/Reporting/Filters/JSON (= 1.15.21)
+    - KSCrash/Reporting/Filters/Sets (= 1.15.21)
+    - KSCrash/Reporting/Filters/Stringify (= 1.15.21)
+    - KSCrash/Reporting/Filters/Tools (= 1.15.21)
+  - KSCrash/Reporting/Filters/Alert (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - KSCrash/Reporting/Filters/AppleFmt (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - KSCrash/Reporting/Filters/Base (1.15.21):
+    - KSCrash/Recording
+  - KSCrash/Reporting/Filters/Basic (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - KSCrash/Reporting/Filters/GZip (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - KSCrash/Reporting/Filters/JSON (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - KSCrash/Reporting/Filters/Sets (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/AppleFmt
+    - KSCrash/Reporting/Filters/Base
+    - KSCrash/Reporting/Filters/Basic
+    - KSCrash/Reporting/Filters/GZip
+    - KSCrash/Reporting/Filters/JSON
+    - KSCrash/Reporting/Filters/Stringify
+  - KSCrash/Reporting/Filters/Stringify (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - KSCrash/Reporting/Filters/Tools (1.15.21):
+    - KSCrash/Recording
+  - KSCrash/Reporting/MessageUI (1.15.21):
+    - KSCrash/Recording
+  - KSCrash/Reporting/Sinks (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters
+    - KSCrash/Reporting/Tools
+  - KSCrash/Reporting/Tools (1.15.21):
+    - KSCrash/Recording
   - SVProgressHUD (2.2.5)
   - SwiftLint (0.40.3)
   - UIColor_Hex_Swift (5.1.0)
@@ -12,6 +75,7 @@ DEPENDENCIES:
   - AloeStackView
   - Hero
   - Kanna
+  - KSCrash
   - SVProgressHUD
   - SwiftLint
   - UIColor_Hex_Swift
@@ -22,6 +86,7 @@ SPEC REPOS:
     - AloeStackView
     - Hero
     - Kanna
+    - KSCrash
     - SVProgressHUD
     - SwiftLint
     - UIColor_Hex_Swift
@@ -31,10 +96,11 @@ SPEC CHECKSUMS:
   AloeStackView: 8a4ce0efa08128dd78d538372f60c76c224034bb
   Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   Kanna: 113d111e95d7e903efe0c3eb7221f7635716084c
+  KSCrash: 47bc2f48bb5537f112432cfbea9a359aaf7a6cc5
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftLint: dfd554ff0dff17288ee574814ccdd5cea85d76f7
   UIColor_Hex_Swift: 8be7432edacb7fa91c78aa05ef3c30b66e4f9415
 
-PODFILE CHECKSUM: af3af7d27f04f96fc92f2cb02b82a1d454895100
+PODFILE CHECKSUM: a9a9d884663c915bd26a541400c9dc93e2545c0d
 
 COCOAPODS: 1.9.3

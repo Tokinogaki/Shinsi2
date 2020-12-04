@@ -1,6 +1,7 @@
 import UIKit
 
 import SVProgressHUD
+import KSCrash
 
 @UIApplicationMain
 
@@ -10,13 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         setDefaultAppearance()
         setDefaultHudAppearance()
-        Defaults.Search.categories.map { [$0: true] }.forEach { UserDefaults.standard.register(defaults: $0) }
+        setCrashReport()
         
-        #if DEBUG
-        //RealmManager.shared.deleteSearchHistory()
-        //SDImageCache.shared().clearMemory()
-        //SDImageCache.shared().clearDisk()
-        #endif
+        Defaults.Search.categories.map { [$0: true] }.forEach { UserDefaults.standard.register(defaults: $0) }
         
         return true
     }
@@ -61,5 +58,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setDefaultMaskType(.black)
         SVProgressHUD.setMinimumDismissTimeInterval(3)
         SVProgressHUD.setImageViewSize(CGSize(width: 44, height: 44))
+    }
+    
+    func setCrashReport() {
+        let installation = KSCrashInstallationEmail.sharedInstance()
+        installation?.recipients = ["tokinogaki@gmail.com"]
+        installation?.setReportStyle(KSCrashEmailReportStyleApple, useDefaultFilenameFormat: true)
+        installation?.addConditionalAlert(withTitle: "Crash Detected", message: "The app crashed last time it was launched. Send a crash report?", yesAnswer: "Sure!", noAnswer: "No thanks")
+        installation?.install()
+        
+        installation?.sendAllReports(completion: { (reports, completed, error) in
+            if error != nil {
+                print("Sent \(String(describing: reports?.count)) reports")
+            }
+            else {
+                print("Failed to send reports: \(error)")
+            }
+        })
     }
 }

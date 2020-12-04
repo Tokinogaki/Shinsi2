@@ -11,4 +11,5 @@ target 'Shinsi2' do
     pod 'AloeStackView'
     pod 'SwiftLint'
     pod 'UIColor_Hex_Swift'
+    pod 'KSCrash'
 end
