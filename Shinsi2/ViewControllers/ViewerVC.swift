@@ -32,7 +32,7 @@ class ViewerVC: UICollectionViewController {
     var selectedIndexPath: IndexPath? {
         set { _selectedIndexPath = newValue }
         get {
-            if let i = _selectedIndexPath { return IndexPath(item: i.item + (Defaults.Gallery.isAppendBlankPage ? 1 : 0), section: i.section) }
+            if let i = _selectedIndexPath { return IndexPath(item: i.item, section: i.section) }
             return _selectedIndexPath
         }
     }
@@ -209,8 +209,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
     }
     
     func heroID(for indexPath: IndexPath) -> String {
-        let index = indexPath.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0)
-        return "image_\(galleryModel.gid)_\(index)"
+        return "image_\(galleryModel.gid)_\(indexPath.item)"
     }
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {

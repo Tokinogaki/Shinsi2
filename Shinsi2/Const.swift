@@ -25,7 +25,6 @@ let kUDSearchRating = "kUDSearchRating"
 
 let kUDGalleryCellWidth = "kUDGalleryCellWidth"
 let kUDGalleryQuickScroll = "kUDGalleryQuickScroll"
-let kUDGalleryBlankPage = "kUDGalleryBlankPage"
 let kUDGalleryFavoriteList = "kUDGalleryFavoriteList"
 let kUDGalleryAutomaticallyScrollToHistory = "kUDGalleryAutomaticallyScrollToHistory"
 
@@ -103,10 +102,6 @@ class Defaults {
         static var isAutomaticallyScrollToHistory: Bool {
             get { return UserDefaults.standard.bool(forKey: kUDGalleryAutomaticallyScrollToHistory) }
             set { UserDefaults.standard.set(newValue, forKey: kUDGalleryAutomaticallyScrollToHistory) }
-        }
-        static var isAppendBlankPage: Bool {
-            get { return UserDefaults.standard.bool(forKey: kUDGalleryBlankPage) }
-            set { UserDefaults.standard.set(newValue, forKey: kUDGalleryBlankPage) }
         }
         static var isShowFavoriteList: Bool {
             get { return UserDefaults.standard.bool(forKey: kUDGalleryFavoriteList) }

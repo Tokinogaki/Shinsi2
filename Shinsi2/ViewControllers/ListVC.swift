@@ -20,15 +20,12 @@ class ListVC: BaseViewController {
     
     enum Mode: String {
         case normal = "normal"
-        case download = "download"
         case favorite = "favorites"
         case history = "history"
     }
     private var mode: Mode {
         let text = searchController.searchBar.text?.lowercased() ?? ""
-        if text == Mode.download.rawValue {
-            return .download
-        } else if text == Mode.history.rawValue {
+        if text == Mode.history.rawValue {
             return .history
         } else if text.contains("favorites") {
             return .favorite
@@ -131,11 +128,7 @@ class ListVC: BaseViewController {
     }
 
     func loadNextPage() {
-        if mode == .download {
-            loadingView.hide()
-//            galleryModelArray = RealmManager.shared.downloaded.map { $0 }
-            collectionView.reloadData()
-        } else if mode == .history {
+        if mode == .history {
             loadingView.hide()
             galleryModelArray = HistoryManager.shared.historyList
             collectionView.reloadData()
@@ -201,12 +194,6 @@ class ListVC: BaseViewController {
         } 
     }
     
-    @IBAction func showDownloads() {
-        guard navigationController?.presentedViewController == nil else {return}
-        showSearch(with: "download")
-        Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
-    }
-    
     func showSearch(with shotcut: String) {
         searchController.searchBar.text = shotcut
         if searchController.isActive {
@@ -216,22 +203,15 @@ class ListVC: BaseViewController {
     }
 
     @objc func longPress(ges: UILongPressGestureRecognizer) {
-        guard mode == .download || mode == .favorite else {return}
+        guard mode == .favorite else {return}
         guard ges.state == .began, let indexPath = collectionView.indexPathForItem(at: ges.location(in: collectionView)) else {return}
 
         let doujinshi = galleryModelArray[indexPath.item]
-        let title = mode == .download ? "Delete" : "Action"
-        let actionTitle = mode == .download ? "Delete" : "Remove"
+        let title = "Action"
+        let actionTitle = "Remove"
         let alert = UIAlertController(title: title, message: doujinshi.title, preferredStyle: .alert)
         let deleteAction = UIAlertAction(title: actionTitle, style: .destructive) { _ in
-            if self.mode == .download {
-                // TODO: xxx
-//                DownloadManager.shared.deleteDownloaded(doujinshi: doujinshi)
-//                self.galleryModelArray = RealmManager.shared.downloaded.map { $0 }
-                self.collectionView.performBatchUpdates({
-                    self.collectionView.deleteItems(at: [indexPath])
-                }, completion: nil)
-            } else if self.mode == .favorite {
+            if self.mode == .favorite {
                 RequestManager.shared.deleteFavorite(gallery: doujinshi)
                 self.galleryModelArray.remove(at: indexPath.item)
                 self.collectionView.performBatchUpdates({
@@ -245,16 +225,7 @@ class ListVC: BaseViewController {
             }
             alert.addAction(moveAction)
         }
-        if mode == .download {
-            let cell = collectionView.cellForItem(at: indexPath)!
-            let vc = UIActivityViewController(activityItems: doujinshi.shows.map { $0.imageUrl }, applicationActivities: nil)
-            vc.popoverPresentationController?.sourceView = collectionView
-            vc.popoverPresentationController?.sourceRect = cell.frame
-            let shareAction = UIAlertAction(title: "Share", style: .default) { (_) in
-                self.present(vc, animated: true, completion: nil)
-            }
-            alert.addAction(shareAction)
-        }
+        
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(deleteAction)
         alert.addAction(cancelAction)

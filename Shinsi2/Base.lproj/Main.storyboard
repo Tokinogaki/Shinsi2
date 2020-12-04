@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fD2-PE-NKt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fD2-PE-NKt">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -218,11 +218,6 @@
                                     <action selector="showFavoritesWithSender:" destination="BYZ-38-t0r" id="PwK-Mn-qfk"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="ic_folder" id="3H6-uZ-Ywz" userLabel="Download">
-                                <connections>
-                                    <action selector="showDownloads" destination="BYZ-38-t0r" id="c9i-7d-ed7"/>
-                                </connections>
-                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
@@ -334,11 +329,6 @@
                                     <action selector="addToFavoriteWithSender:" destination="zOY-ve-4cz" id="23C-B5-Gus"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem enabled="NO" image="ic_file_download" id="gVf-uw-Tzw" userLabel="Download">
-                                <connections>
-                                    <action selector="downloadButtonDidClick:" destination="zOY-ve-4cz" id="PEy-Cx-CIp"/>
-                                </connections>
-                            </barButtonItem>
                             <barButtonItem enabled="NO" image="ic_comment" id="yoz-kl-ykx" userLabel="Comment">
                                 <connections>
                                     <segue destination="9hd-Fr-quj" kind="popoverPresentation" identifier="showComment" popoverAnchorBarButtonItem="yoz-kl-ykx" id="M67-b9-RZ9">
@@ -349,18 +339,11 @@
                                     </segue>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="ic_page_0" id="j1T-7s-SWl" userLabel="White">
-                                <connections>
-                                    <action selector="appendBlankPageButtonDidClick:" destination="zOY-ve-4cz" id="94K-Ie-Bl7"/>
-                                </connections>
-                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
-                        <outlet property="appendWhitePageButton" destination="j1T-7s-SWl" id="zPg-4j-rmI"/>
                         <outlet property="collectionView" destination="f4O-W1-rDC" id="yHZ-D4-Nmx"/>
                         <outlet property="commentButton" destination="yoz-kl-ykx" id="50K-SP-smD"/>
-                        <outlet property="downloadButton" destination="gVf-uw-Tzw" id="Waf-Uw-YkN"/>
                         <outlet property="favoriteButton" destination="wzi-88-69A" id="PyJ-EU-hfD"/>
                         <outlet property="tagButton" destination="jlj-hj-nLv" id="vMr-Yl-nX2"/>
                         <segue destination="Rmq-TP-74f" kind="show" identifier="showViewerVC" id="iYC-bb-t8Z"/>
@@ -747,10 +730,7 @@
         <image name="ic_comment" width="24" height="24"/>
         <image name="ic_favorite" width="24" height="24"/>
         <image name="ic_favorite_border" width="24" height="24"/>
-        <image name="ic_file_download" width="24" height="24"/>
-        <image name="ic_folder" width="24" height="24"/>
         <image name="ic_local_offer" width="24" height="24"/>
         <image name="ic_menu" width="24" height="24"/>
-        <image name="ic_page_0" width="24" height="24"/>
     </resources>
 </document>

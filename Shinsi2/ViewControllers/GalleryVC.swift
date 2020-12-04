@@ -7,14 +7,11 @@ class GalleryVC: BaseViewController {
     var galleryModel: GalleryModel!
     private var didScrollToHistory = false
     private var backGesture: InteractiveBackGesture!
-    private var isPartDownloading = false { didSet { handlePartDownload() } }
     private var rowCount: Int { return min(5, max(2, Int(floor(collectionView.bounds.width / Defaults.Gallery.cellWidth)))) }
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tagButton: UIBarButtonItem!
-    @IBOutlet weak var downloadButton: UIBarButtonItem!
     @IBOutlet weak var favoriteButton: UIBarButtonItem!
     @IBOutlet weak var commentButton: UIBarButtonItem!
-    @IBOutlet weak var appendWhitePageButton: UIBarButtonItem!
     private var scrollBar: QuickScrollBar!
     weak var delegate: GalleryVCPreviewActionDelegate?
 
@@ -30,14 +27,8 @@ class GalleryVC: BaseViewController {
 
         scrollToLastReadingPage()
         updateNavigationItems()
-        appendWhitePageButton.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleLoadCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
-        
-        if !isSizeClassRegular {
-            navigationItem.rightBarButtonItems =
-                navigationItem.rightBarButtonItems?.filter({$0 != appendWhitePageButton})
-        }
 
         if Defaults.Gallery.isShowQuickScroll {
             scrollBar = QuickScrollBar(scrollView: collectionView, target: self)
@@ -89,7 +80,6 @@ class GalleryVC: BaseViewController {
 
     func updateNavigationItems() {
         tagButton.isEnabled = true
-        downloadButton.isEnabled = galleryModel.canDownload
         commentButton.isEnabled = galleryModel.comments.count > 0
         favoriteButton.isEnabled = galleryModel.favorite == .none && galleryModel.shows.count > 0
     }
@@ -124,34 +114,6 @@ class GalleryVC: BaseViewController {
         }
     }
 
-    @IBAction func downloadButtonDidClick(_ sender: UIBarButtonItem) {
-        guard navigationController?.presentedViewController == nil else {return}
-        if isPartDownloading {
-            downloadSelectedPage()
-        } else {
-            let sheet = UIAlertController(title: "Download", message: nil, preferredStyle: .actionSheet)
-            let downloadAll = UIAlertAction(title: "All", style: .default) { (_) in
-                self.downloadAll()
-            }
-            let downloadPart = UIAlertAction(title: "Part", style: .default) { (_) in
-                self.isPartDownloading = true
-            }
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-            sheet.addAction(downloadAll)
-            sheet.addAction(downloadPart)
-            sheet.addAction(cancel)
-            sheet.popoverPresentationController?.sourceView = view
-            sheet.popoverPresentationController?.barButtonItem = sender
-            navigationController?.present(sheet, animated: true, completion: nil)
-        }
-    }
-
-    @IBAction func appendBlankPageButtonDidClick(_ sender: UIBarButtonItem) {
-        guard navigationController?.presentedViewController == nil else {return}
-        Defaults.Gallery.isAppendBlankPage.toggle()
-        sender.image = Defaults.Gallery.isAppendBlankPage ? #imageLiteral(resourceName: "ic_page_1") : #imageLiteral(resourceName: "ic_page_0")
-    }
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         if segue.identifier == "showTag",
@@ -178,57 +140,6 @@ class GalleryVC: BaseViewController {
         let vc = storyboard!.instantiateViewController(withIdentifier: "ListVC") as! ListVC
         vc.searchController.searchBar.text = tag
         navigationController?.pushViewController(vc, animated: true)
-    }
-
-    func handlePartDownload() {
-        setEditing(isPartDownloading, animated: true)
-        navigationItem.rightBarButtonItems?
-            .filter({ $0 != downloadButton })
-            .forEach({ $0.isEnabled = !isPartDownloading })
-        navigationItem.leftBarButtonItem = isPartDownloading ?
-            UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelPartDownload(sender:)))
-            : nil
-    }
-
-    override func setEditing(_ editing: Bool, animated: Bool) {
-        if !isPartDownloading,
-           let selecteds = collectionView.indexPathsForSelectedItems,
-           selecteds.count != 0 {
-            selecteds.forEach({collectionView.deselectItem(at: $0, animated: animated)})
-        }
-        collectionView.allowsMultipleSelection = isPartDownloading
-        collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
-    }
-
-    @objc func cancelPartDownload(sender: UIBarButtonItem) {
-        isPartDownloading = false
-    }
-
-    func downloadAll() {
-        downloadButton.isEnabled = false
-//        DownloadManager.shared.download(galleryModel: self.galleryModel)
-//        DownloadBubble.shared.show(on: navigationController!)
-    }
-
-    func downloadSelectedPage() {
-//        guard let selectedIndexPaths = collectionView.indexPathsForSelectedItems?.sorted(),
-//              selectedIndexPaths.count > 0
-//            else {
-//            isPartDownloading = false
-//            return
-//        }
-//        let new = GalleryModel(value: self.galleryModel!)
-//        new.shows.removeAll()
-//        for i in selectedIndexPaths {
-//            new.shows.append(ShowModel(value: galleryModel.shows[i.item]))
-//        }
-//        new.gid = Int("\(new.gid)\(arc4random() % (99999 - 10000) + 10000)") ?? 0
-//        new.`length` = selectedIndexPaths.count
-//        new.coverUrl = new.shows.first!.thumbUrl
-//        DownloadManager.shared.download(galleryModel: new)
-//        DownloadBubble.shared.show(on: navigationController!)
-//
-//        isPartDownloading = false
     }
 
     override var previewActionItems: [UIPreviewActionItem] {
@@ -346,7 +257,6 @@ extension GalleryVC: UICollectionViewDataSource,
         cell.imageView.image = showModel.thumb ?? UIImage(named: "placeholder")
         cell.imageView.hero.id = "image_\(galleryModel.gid)_\(indexPath.item)"
         cell.imageView.hero.modifiers = [.arc(intensity: 1)]
-        cell.imageView.alpha = isPartDownloading ? (isIndexPathSelected(indexPath: indexPath) ? 1 : 0.5) : 1
         
         cell.layer.shouldRasterize = true
         cell.layer.rasterizationScale = UIScreen.main.scale
@@ -378,13 +288,6 @@ extension GalleryVC: UICollectionViewDataSource,
         present(vc, animated: true)
     }
 
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if isPartDownloading {
-            let c = collectionView.cellForItem(at: indexPath) as! ImageCell
-            c.imageView.alpha = 0.5
-        }
-    }
-
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
         let width = (collectionView.bounds.width - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * CGFloat((rowCount - 1))) / CGFloat(rowCount)
@@ -396,8 +299,8 @@ extension GalleryVC: HeroViewControllerDelegate {
     func heroWillStartAnimatingFrom(viewController: UIViewController) {
         if let vc = viewController as? ViewerVC, var originalCellIndex = vc.selectedIndexPath, var currentCellIndex = vc.collectionView?.indexPathsForVisibleItems.first {
             view.hero.modifiers = nil
-            originalCellIndex = IndexPath(item: min(originalCellIndex.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0), galleryModel.shows.count - 1), section: originalCellIndex.section)
-            currentCellIndex = IndexPath(item: min(currentCellIndex.item - (Defaults.Gallery.isAppendBlankPage ? 1 : 0), galleryModel.shows.count - 1), section: currentCellIndex.section)
+            originalCellIndex = IndexPath(item: min(originalCellIndex.item, galleryModel.shows.count - 1), section: originalCellIndex.section)
+            currentCellIndex = IndexPath(item: min(currentCellIndex.item, galleryModel.shows.count - 1), section: currentCellIndex.section)
             if !collectionView.indexPathsForVisibleItems.contains(currentCellIndex) {
                 collectionView.scrollToItem(at: currentCellIndex, at: originalCellIndex < currentCellIndex ? .bottom : .top, animated: false)
             }
