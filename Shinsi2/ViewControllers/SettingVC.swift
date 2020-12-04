@@ -145,7 +145,7 @@ class SettingVC: BaseViewController {
         upPrefetchSeg.addTarget(self, action: #selector(upPrefetchSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(upPrefetchSeg)
         
-        addSubTitle("Up Prefetch")
+        addSubTitle("Down Prefetch")
         let downPrefetchSeg = UISegmentedControl(items: downPrefetchArray)
         downPrefetchSeg.selectedSegmentIndex = downPrefetchArray.firstIndex{ $0 == "\(Defaults.Viewer.downPrefetch)"} ?? 3
         downPrefetchSeg.addTarget(self, action: #selector(downPrefetchSegmentedControlVauleChanged(sender:)), for: .valueChanged)
