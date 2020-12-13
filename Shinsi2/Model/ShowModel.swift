@@ -65,7 +65,7 @@ class ShowModel: NSObject {
     
     var image: UIImage? {
         if self.hasImage {
-            let data = try! Data(contentsOf: self.localImage)
+            guard let data = try? Data(contentsOf: self.localImage) else { return nil }
             return UIImage(data: data)
         }
         return nil
@@ -73,7 +73,7 @@ class ShowModel: NSObject {
     
     var thumb: UIImage? {
         if self.hasThumb {
-            let data = try! Data(contentsOf: self.localThumb)
+            guard let data = try? Data(contentsOf: self.localThumb) else { return nil }
             return UIImage(data: data)
         }
         return nil
