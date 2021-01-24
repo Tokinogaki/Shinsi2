@@ -119,11 +119,17 @@ class Defaults {
             set { UserDefaults.standard.set(newValue.rawValue, forKey: kUDViewerMode) }
         }
         static var upPrefetch: Int {
-            get { return UserDefaults.standard.integer(forKey: kUDUpPrefetch) }
+            get {
+                let value = UserDefaults.standard.integer(forKey: kUDUpPrefetch)
+                return value == 0 ? 2 : value
+            }
             set { UserDefaults.standard.set(newValue, forKey: kUDUpPrefetch) }
         }
         static var downPrefetch: Int {
-            get { return UserDefaults.standard.integer(forKey: kUDDownPrefetch) }
+            get {
+                let value = UserDefaults.standard.integer(forKey: kUDDownPrefetch)
+                return value == 0 ? 5 : value
+            }
             set { UserDefaults.standard.set(newValue, forKey: kUDDownPrefetch) }
         }
     }
