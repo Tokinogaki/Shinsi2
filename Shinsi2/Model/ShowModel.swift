@@ -48,11 +48,11 @@ class ShowModel: NSObject {
     }
     
     var localImage: URL {
-        return kEximagesPath.appendingPathComponent("\(self.gid)/image/\(self.index).jpg")
+        return kEximagesPath.appendingPathComponent("\(self.imageKey)_image.jpg")
     }
     
     var localThumb: URL {
-        return kEximagesPath.appendingPathComponent("\(self.gid)/thumb/\(self.index).jpg")
+        return kEximagesPath.appendingPathComponent("\(self.imageKey)_thumb.jpg")
     }
     
     var hasImage: Bool {

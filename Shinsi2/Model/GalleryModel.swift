@@ -82,7 +82,7 @@ class GalleryModel: NSObject, NSCoding {
     }
     
     var localCover: URL {
-        return kEximagesPath.appendingPathComponent("\(self.gid)/cover.jpg")
+        return kEximagesPath.appendingPathComponent("\(self.gid)_cover.jpg")
     }
     
     var hasCover: Bool {
