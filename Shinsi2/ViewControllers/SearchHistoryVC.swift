@@ -34,7 +34,9 @@ class SearchHistoryVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        selectBlock?(SearchManager.shared.searchList[indexPath.row]["text"] as! String)
+        let text = SearchManager.shared.searchList[indexPath.row]["text"] as! String
+        SearchManager.shared.addSearch(text: text)
+        selectBlock?(text)
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
