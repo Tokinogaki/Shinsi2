@@ -318,8 +318,6 @@ extension GalleryVC: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let visibleItems = collectionView.indexPathsForVisibleItems.sorted()
         let contentSizeHeight = scrollView.contentSize.height
-        let frameSizeHeight = scrollView.frame.size.height
-        let contentOffsetY = scrollView.contentOffset.y
         
         if contentSizeHeight == 0 || visibleItems.count == 0 {
             return
@@ -327,14 +325,16 @@ extension GalleryVC: UIScrollViewDelegate {
         
         // Up loading
         if let indexPath = visibleItems.first,
-           let itemHeight = collectionView.cellForItem(at: indexPath)?.bounds.height,
-           contentOffsetY < (itemHeight * 2 - 70) {
+           let cell = collectionView.cellForItem(at: indexPath) as? ImageCell,
+           let showPage = cell.showModel,
+           self.galleryModel.shows.firstIndex(of: showPage) == 0 {
             self.galleryModel.loadGalleryModel(direction: "up")
         }
         // down loading
         else if let indexPath = visibleItems.last,
-                let itemHeight = collectionView.cellForItem(at: indexPath)?.bounds.height,
-                contentOffsetY > (contentSizeHeight - frameSizeHeight - itemHeight * 2) {
+                let cell = collectionView.cellForItem(at: indexPath) as? ImageCell,
+                let showPage = cell.showModel,
+                self.galleryModel.shows.lastIndex(of: showPage) == self.galleryModel.shows.count - 1 {
             self.galleryModel.loadGalleryModel(direction: "down")
         }
     }
