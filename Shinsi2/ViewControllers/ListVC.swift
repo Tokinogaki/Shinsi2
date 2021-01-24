@@ -14,7 +14,6 @@ class ListVC: BaseViewController {
     private var galleryModelArray: [GalleryModel] = []
     private var currentPage = -1
     private var loadingPage = -1
-    private var backGesture: InteractiveBackGesture?
     private var rowCount: Int { return min(5, max(2, Int(floor(collectionView.bounds.width / Defaults.List.cellWidth)))) }
     @IBOutlet weak var loadingView: LoadingView!
     
@@ -57,7 +56,6 @@ class ListVC: BaseViewController {
             searchController.searchBar.text = Defaults.List.lastSearchKeyword
         } else {
             Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
-            backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         }
 
         searchHistoryVC.searchController = searchController
@@ -282,9 +280,6 @@ extension ListVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let galleryModel = galleryModelArray[indexPath.item]
         galleryModel.downloadCover()
         cell.galleryModel = galleryModel
-        cell.containerView.hero.modifiers = [.arc(intensity: 1), .fade, .source(heroID: "image_\(galleryModel.gid)_0")]
-        cell.imageView.hero.id = "image_\(galleryModel.gid)_0"
-        cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.contentMode = .scaleAspectFill
         cell.imageView.image = galleryModel.cover ?? UIImage(named: "placeholder")
 

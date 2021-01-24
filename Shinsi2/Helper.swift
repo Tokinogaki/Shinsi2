@@ -1,5 +1,4 @@
 import UIKit
-import Hero
 
 extension String {    
     func matches(for regex: String) -> [String] {
@@ -150,75 +149,3 @@ extension HTTPCookieStorage {
         return cookies.isEmpty ? nil : cookies
     }
 }
-
-class InteractiveBackGesture: NSObject, UIGestureRecognizerDelegate {
-    
-    weak var viewController: UIViewController!
-    weak var view: UIView!
-    enum Mode {
-        case push
-        case modal
-    }
-    var mode: Mode
-    var isSimultaneously = true
-    
-    init(viewController: UIViewController, toView: UIView, mode: Mode = .push, isSimultaneously: Bool = true ) {
-        self.viewController = viewController
-        self.view = toView
-        self.mode = mode
-        self.isSimultaneously = isSimultaneously
-        super.init()
-        let ges = UIPanGestureRecognizer(target: self, action: #selector(pan(gesture:)))
-        toView.addGestureRecognizer(ges)
-        ges.delegate = self
-    }
-    
-    @objc func pan(gesture: UIPanGestureRecognizer) {
-        let v = gesture.velocity(in: nil)
-        let t = gesture.translation(in: nil)
-        let progress = mode == .push ? t.x / (viewController.view.bounds.width * 0.8) : t.y / (viewController.view.bounds.height * 0.8)
-        switch gesture.state {
-        case .began:
-            viewController.hero.dismissViewController()
-        case .changed:
-            Hero.shared.update(progress)
-        case .ended:
-            //Hero Bug fix
-            DispatchQueue.main.async {
-                let isFinished = self.mode == .push ? progress + v.x / self.viewController.view.bounds.width > 0.3 : progress + v.y / self.viewController.view.bounds.height > 0.3
-                if isFinished {
-                    Hero.shared.finish()
-                } else {
-                    Hero.shared.cancel()
-                }
-            }
-        default:
-            break
-        }
-    }
-    
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return isSimultaneously
-    }
-    
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
-            switch mode {
-            case .push:
-                let p = gestureRecognizer.location(in: nil)
-                let v = gestureRecognizer.velocity(in: nil)
-                return p.x < 44 && v.x > 0
-            case .modal:
-                let v = gestureRecognizer.velocity(in: nil) 
-                if let scrollView = view as? UIScrollView {
-                    if let vc = viewController as? BaseViewController, vc.isPopover { return false }
-                    return scrollView.contentOffset.y <= -view.safeAreaInsets.top && v.y > 0
-                } else {
-                    return v.y > abs(v.x) && v.y > 0
-                }
-            }
-        }
-        return true
-    }
-}
-

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fD2-PE-NKt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fD2-PE-NKt">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -238,14 +238,8 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="black" id="hg5-gx-xCt">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="string" keyPath="heroModifierString" value="translate(0, -44) fade"/>
-                        </userDefinedRuntimeAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="isHeroEnabled" value="YES"/>
-                    </userDefinedRuntimeAttributes>
                     <connections>
                         <segue destination="ex9-dI-nnx" kind="relationship" relationship="rootViewController" id="5l2-Nz-uEe"/>
                     </connections>
@@ -384,9 +378,6 @@
                         </connections>
                     </collectionView>
                     <toolbarItems/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="isHeroEnabled" value="YES"/>
-                    </userDefinedRuntimeAttributes>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IUZ-do-TQS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -489,11 +480,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <navigationItem key="navigationItem" title="Setting" largeTitleDisplayMode="always" id="ScW-hc-BwV">
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="0Uc-P4-yRg">
-                            <connections>
-                                <action selector="hero_dismissViewController" destination="Wnt-nP-MuR" id="kTZ-td-3lV"/>
-                            </connections>
-                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="0Uc-P4-yRg"/>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="loZ-Al-Xkm" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -511,9 +498,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="isHeroEnabled" value="NO"/>
-                    </userDefinedRuntimeAttributes>
                     <connections>
                         <segue destination="amt-22-JIX" kind="relationship" relationship="rootViewController" id="AvH-DP-dQY"/>
                     </connections>
@@ -533,9 +517,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="isHeroEnabled" value="NO"/>
-                    </userDefinedRuntimeAttributes>
                     <connections>
                         <segue destination="Wnt-nP-MuR" kind="relationship" relationship="rootViewController" id="B5u-Pf-3gv"/>
                     </connections>
@@ -555,11 +536,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <navigationItem key="navigationItem" title="Tag" largeTitleDisplayMode="always" id="hVf-DL-5sb">
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="r6f-UU-3f3">
-                            <connections>
-                                <action selector="hero_dismissViewController" destination="amt-22-JIX" id="Zjw-gI-IDy"/>
-                            </connections>
-                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="r6f-UU-3f3"/>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9ev-bi-0sd" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -688,11 +665,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Comment" largeTitleDisplayMode="always" id="EOQ-Am-tI1">
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="6Pk-aJ-Tcz">
-                            <connections>
-                                <action selector="hero_dismissViewController" destination="P6X-AM-Ewv" id="z6C-yb-FlG"/>
-                            </connections>
-                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="6Pk-aJ-Tcz"/>
                     </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="AXm-OY-6JE" id="MMv-1l-RRE"/>
@@ -713,9 +686,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="isHeroEnabled" value="NO"/>
-                    </userDefinedRuntimeAttributes>
                     <connections>
                         <segue destination="P6X-AM-Ewv" kind="relationship" relationship="rootViewController" id="08z-R4-8OQ"/>
                     </connections>

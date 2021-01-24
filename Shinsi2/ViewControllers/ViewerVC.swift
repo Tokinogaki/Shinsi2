@@ -1,11 +1,13 @@
 import UIKit
-import Hero
 import Photos
 import UIColor_Hex_Swift
 
 class ViewerVC: UICollectionViewController {
     
     private var _readLabel: InsetLabel?
+    
+    private var bigin: CGPoint = CGPoint.init()
+    
     var readLabel: InsetLabel {
         if _readLabel == nil {
             _readLabel = InsetLabel()
@@ -165,26 +167,45 @@ class ViewerVC: UICollectionViewController {
     }
     
     @objc func pan(ges: UIPanGestureRecognizer) {
-        guard mode != .vertical else {return}
         let translation = ges.translation(in: nil)
-        let progress = translation.y / collectionView!.bounds.height
         switch ges.state {
         case .began:
-            hero.dismissViewController()
+            self.bigin = translation
         case .changed:
-            Hero.shared.update(progress)
-            for indexPath in collectionView!.indexPathsForVisibleItems {
-                let cell = collectionView!.cellForItem(at: indexPath) as! ScrollingImageCell
-                let currentPos = CGPoint(x: translation.x + view.center.x, y: translation.y + view.center.y)
-                Hero.shared.apply(modifiers: [.position(currentPos)], to: cell.imageView)
-            }
-        default:
-            if progress + ges.velocity(in: nil).y / collectionView!.bounds.height > 0.3 {
-                Hero.shared.finish()
+            if self.mode == .vertical {
+                if abs(self.bigin.y - translation.y) < 20 &&
+                    abs(self.bigin.x - translation.x) > 80 {
+                    Defaults.Viewer.mode = .horizontal
+                    self.viewDidLayoutSubviews()
+                    self.selectedIndex()
+                }
             } else {
-                Hero.shared.cancel()
+                if abs(self.bigin.y - translation.y) > 80 &&
+                    abs(self.bigin.x - translation.x) < 20 {
+                    Defaults.Viewer.mode = .vertical
+                    self.viewDidLayoutSubviews()
+                    self.selectedIndex()
+                }
+            }
+        @unknown default:
+            break
+        }
+    }
+    
+    func selectedIndex() {
+        for (i, showPage) in self.galleryModel.shows.enumerated() {
+            if showPage.index == self.galleryModel.readPage {
+                let selectedIndex = IndexPath(item: i, section: 0)
+                switch mode {
+                case .horizontal:
+                    collectionView!.scrollToItem(at: selectedIndex, at: .right, animated: false)
+                case .vertical:
+                    collectionView!.scrollToItem(at: selectedIndex, at: .top, animated: false)
+                }
+                break
             }
         }
+        
     }
 }
 
@@ -200,16 +221,10 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         
         cell.showModel = showModel
         cell.image = showModel.image ?? showModel.thumb ?? UIImage(named: "placeholder")
-        cell.imageView.hero.id = heroID(for: indexPath)
-        cell.imageView.hero.modifiers = [.arc(intensity: 1), .forceNonFade]
         cell.imageView.isOpaque = true
         self.galleryModel.downloadImages(for: indexPath.item)
         
         return cell
-    }
-    
-    func heroID(for indexPath: IndexPath) -> String {
-        return "image_\(galleryModel.gid)_\(indexPath.item)"
     }
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -230,13 +245,19 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
 
 extension ViewerVC: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard mode != .vertical else {return false}
-        guard let panGR = gestureRecognizer as? UIPanGestureRecognizer else {return false}
-        guard collectionView.visibleCells.count > 0 else {return false}
-        guard let cell = collectionView.visibleCells[0] as? ScrollingImageCell, cell.scrollView.zoomScale == 1 else {return false}
+        guard mode != .vertical else {return true}
+        guard let panGR = gestureRecognizer as? UIPanGestureRecognizer else {return true}
+        guard collectionView.visibleCells.count > 0 else {return true}
+        guard let cell = collectionView.visibleCells[0] as? ScrollingImageCell, cell.scrollView.zoomScale == 1 else {return true}
+        let t = panGR.translation(in: nil)
+        guard t.x != 0 else { return true }
         let v = panGR.velocity(in: nil)
         return v.y > abs(v.x)
-    } 
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
 }
 
 extension ViewerVC {

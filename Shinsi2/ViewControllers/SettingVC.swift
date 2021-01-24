@@ -1,7 +1,6 @@
 import UIKit
 import AloeStackView
 import SVProgressHUD
-import Hero
 import WebKit
 
 extension Notification.Name {

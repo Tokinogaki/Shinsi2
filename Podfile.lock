@@ -1,7 +1,6 @@
 PODS:
   - Alamofire (5.4.0)
   - AloeStackView (1.2.0)
-  - Hero (1.5.0)
   - Kanna (5.2.3)
   - KSCrash (1.15.21):
     - KSCrash/Installations (= 1.15.21)
@@ -73,7 +72,6 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - AloeStackView
-  - Hero
   - Kanna
   - KSCrash
   - SVProgressHUD
@@ -84,7 +82,6 @@ SPEC REPOS:
   trunk:
     - Alamofire
     - AloeStackView
-    - Hero
     - Kanna
     - KSCrash
     - SVProgressHUD
@@ -94,13 +91,12 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
   AloeStackView: 8a4ce0efa08128dd78d538372f60c76c224034bb
-  Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   Kanna: 113d111e95d7e903efe0c3eb7221f7635716084c
   KSCrash: 47bc2f48bb5537f112432cfbea9a359aaf7a6cc5
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftLint: c585ebd615d9520d7fbdbe151f527977b0534f1e
   UIColor_Hex_Swift: 8be7432edacb7fa91c78aa05ef3c30b66e4f9415
 
-PODFILE CHECKSUM: 4230bdcd70c2e4d23fbca69f33d419142fce995c
+PODFILE CHECKSUM: ab2147a9019df15dbe3fe500561740c418c37a5e
 
 COCOAPODS: 1.10.0

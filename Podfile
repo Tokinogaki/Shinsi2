@@ -7,7 +7,6 @@ target 'Shinsi2' do
     pod 'Alamofire'
     pod 'Kanna'
     pod 'SVProgressHUD'
-    pod 'Hero'
     pod 'AloeStackView'
     pod 'SwiftLint'
     pod 'UIColor_Hex_Swift'

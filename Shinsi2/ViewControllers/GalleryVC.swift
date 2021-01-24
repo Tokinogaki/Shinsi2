@@ -1,12 +1,10 @@
 import UIKit
-import Hero
 import SVProgressHUD
 import SafariServices
 
 class GalleryVC: BaseViewController {
     var galleryModel: GalleryModel!
     private var didScrollToHistory = false
-    private var backGesture: InteractiveBackGesture!
     private var rowCount: Int { return min(5, max(2, Int(floor(collectionView.bounds.width / Defaults.Gallery.cellWidth)))) }
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tagButton: UIBarButtonItem!
@@ -21,7 +19,6 @@ class GalleryVC: BaseViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
 
-        backGesture = InteractiveBackGesture(viewController: self, toView: collectionView)
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinch(ges:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
@@ -255,8 +252,6 @@ extension GalleryVC: UICollectionViewDataSource,
         
         cell.showModel = showModel
         cell.imageView.image = showModel.thumb ?? UIImage(named: "placeholder")
-        cell.imageView.hero.id = "image_\(galleryModel.gid)_\(indexPath.item)"
-        cell.imageView.hero.modifiers = [.arc(intensity: 1)]
         
         cell.layer.shouldRasterize = true
         cell.layer.rasterizationScale = UIScreen.main.scale
@@ -282,6 +277,7 @@ extension GalleryVC: UICollectionViewDataSource,
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard galleryModel.shows.count > 1 else {return}
         let vc = storyboard!.instantiateViewController(withIdentifier: "ViewerVC") as! ViewerVC
+        self.galleryModel.readPage = self.galleryModel.shows[indexPath.item].index
         vc.selectedIndexPath = indexPath
         vc.galleryModel = self.galleryModel
         vc.modalPresentationStyle = .fullScreen
@@ -292,25 +288,6 @@ extension GalleryVC: UICollectionViewDataSource,
         let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
         let width = (collectionView.bounds.width - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * CGFloat((rowCount - 1))) / CGFloat(rowCount)
         return CGSize(width: width, height: width * paperRatio)
-    }
-}
-
-extension GalleryVC: HeroViewControllerDelegate {
-    func heroWillStartAnimatingFrom(viewController: UIViewController) {
-        if let vc = viewController as? ViewerVC, var originalCellIndex = vc.selectedIndexPath, var currentCellIndex = vc.collectionView?.indexPathsForVisibleItems.first {
-            view.hero.modifiers = nil
-            originalCellIndex = IndexPath(item: min(originalCellIndex.item, galleryModel.shows.count - 1), section: originalCellIndex.section)
-            currentCellIndex = IndexPath(item: min(currentCellIndex.item, galleryModel.shows.count - 1), section: currentCellIndex.section)
-            if !collectionView.indexPathsForVisibleItems.contains(currentCellIndex) {
-                collectionView.scrollToItem(at: currentCellIndex, at: originalCellIndex < currentCellIndex ? .bottom : .top, animated: false)
-            }
-        }
-    }
-
-    func heroDidEndAnimatingFrom(viewController: UIViewController) {
-        if viewController is ViewerVC {
-            collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
-        }
     }
 }
 

@@ -1,5 +1,4 @@
 import UIKit
-import Hero
 import AloeStackView
 
 class TagVC: BaseViewController {
