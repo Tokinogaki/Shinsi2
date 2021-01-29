@@ -32,8 +32,9 @@ let kUDViewerMode = "kUDViewerMode"
 let kUDUpPrefetch = "kUDUpPrefetch"
 let kUDDownPrefetch = "kUDDownPrefetch"
 
-let kUDSettingUseBiometrics = "kUDSettingUseBiometrics"
-let kUDSettingUsePasscpde = "kUDSettingUsePasswcode"
+let kUDGeneralSettingUseBiometrics = "kUDGeneralSettingUseBiometrics"
+let kUDGeneralSettingUsePasscpde = "kUDGeneralSettingUsePasscpde"
+let kUDGeneralSettingAutorotate = "kUDGeneralSettingAutorotate"
 
 //Color
 let kMainColor = UIApplication.shared.keyWindow?.tintColor ?? #colorLiteral(red: 0.8459790349, green: 0.2873021364, blue: 0.2579272389, alpha: 1)
@@ -133,14 +134,18 @@ class Defaults {
             set { UserDefaults.standard.set(newValue, forKey: kUDDownPrefetch) }
         }
     }
-    class Setting {
+    class GeneralSetting {
         static var isUseBiometrics: Bool {
-            get { return UserDefaults.standard.bool(forKey: kUDSettingUseBiometrics) }
-            set { UserDefaults.standard.set(newValue, forKey: kUDSettingUseBiometrics) }
+            get { return UserDefaults.standard.bool(forKey: kUDGeneralSettingUseBiometrics) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDGeneralSettingUseBiometrics) }
         }
         static var isUsePasscode: Bool {
-            get { return UserDefaults.standard.bool(forKey: kUDSettingUsePasscpde) }
-            set { UserDefaults.standard.set(newValue, forKey: kUDSettingUsePasscpde) }
+            get { return UserDefaults.standard.bool(forKey: kUDGeneralSettingUsePasscpde) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDGeneralSettingUsePasscpde) }
+        }
+        static var isAutorotate: Bool {
+            get { return UserDefaults.standard.bool(forKey: kUDGeneralSettingAutorotate) }
+            set { UserDefaults.standard.set(newValue, forKey: kUDGeneralSettingAutorotate) }
         }
     }
     

@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
-        guard Defaults.Setting.isUseBiometrics else {
+        guard Defaults.GeneralSetting.isUseBiometrics else {
             return
         }
         BiometricsManager.isLock = true
@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
-        guard Defaults.Setting.isUseBiometrics else {
+        guard Defaults.GeneralSetting.isUseBiometrics else {
             window?.makeKeyAndVisible()
             return
         }

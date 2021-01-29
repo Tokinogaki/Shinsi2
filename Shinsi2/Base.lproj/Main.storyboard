@@ -230,10 +230,10 @@
             </objects>
             <point key="canvasLocation" x="797.60000000000002" y="122.78860569715144"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Base Navigation Controller-->
         <scene sceneID="Tsg-Yp-yRQ">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="fD2-PE-NKt" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="fD2-PE-NKt" customClass="BaseNavigationController" customModule="Shinsi2" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="black" id="hg5-gx-xCt">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>

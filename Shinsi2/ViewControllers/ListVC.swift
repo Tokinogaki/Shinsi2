@@ -259,6 +259,7 @@ class ListVC: BaseViewController {
     
     @objc func settingChanged(notification: Notification) {
         collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+        UIViewController.attemptRotationToDeviceOrientation()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

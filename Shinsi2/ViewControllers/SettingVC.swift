@@ -150,17 +150,23 @@ class SettingVC: BaseViewController {
         downPrefetchSeg.addTarget(self, action: #selector(downPrefetchSegmentedControlVauleChanged(sender:)), for: .valueChanged)
         stackView.addRow(downPrefetchSeg)
         
+        addTitle("General Settings")
+        let autorotateLabel = createSubTitleLabel("Autorotate")
+        let autorotateSwitch = UISwitch()
+        autorotateSwitch.isOn = Defaults.GeneralSetting.isAutorotate
+        autorotateSwitch.addTarget(self, action: #selector(generalSettingAutorotateSwitchVauleChanged(sender:)), for: .valueChanged)
+        stackView.addRow(createStackView([autorotateLabel, autorotateSwitch]))
+        
         if BiometricsManager.canSupported() {
-            addTitle("Settings")
             let touchLabel = createSubTitleLabel(BiometricsManager.getBiometryType())
             let touchSwitch = UISwitch()
-            touchSwitch.isOn = Defaults.Setting.isUseBiometrics
+            touchSwitch.isOn = Defaults.GeneralSetting.isUseBiometrics
             touchSwitch.addTarget(self, action: #selector(listTouchSwitchVauleChanged(sender:)), for: .valueChanged)
             stackView.addRow(createStackView([touchLabel, touchSwitch]))
             
             let passcodeLabel = createSubTitleLabel("Passcode Fallback")
-            passcodeSwitch.isOn = Defaults.Setting.isUsePasscode
-            passcodeSwitch.isEnabled = Defaults.Setting.isUseBiometrics
+            passcodeSwitch.isOn = Defaults.GeneralSetting.isUsePasscode
+            passcodeSwitch.isEnabled = Defaults.GeneralSetting.isUseBiometrics
             passcodeSwitch.addTarget(self, action: #selector(listPasscodeSwitchVauleChanged(sender:)), for: .valueChanged)
             stackView.addRow(createStackView([passcodeLabel, passcodeSwitch]))
         }
@@ -259,13 +265,18 @@ class SettingVC: BaseViewController {
         NotificationCenter.default.post(name: .settingChanged, object: nil)
     }
     
+    @objc func generalSettingAutorotateSwitchVauleChanged(sender: UISwitch) {
+        Defaults.GeneralSetting.isAutorotate = sender.isOn
+        NotificationCenter.default.post(name: .settingChanged, object: nil)
+    }
+    
     @objc func listTouchSwitchVauleChanged(sender: UISwitch) {
-        Defaults.Setting.isUseBiometrics = sender.isOn
-        passcodeSwitch.isEnabled = Defaults.Setting.isUseBiometrics
+        Defaults.GeneralSetting.isUseBiometrics = sender.isOn
+        passcodeSwitch.isEnabled = Defaults.GeneralSetting.isUseBiometrics
     }
     
     @objc func listPasscodeSwitchVauleChanged(sender: UISwitch) {
-        Defaults.Setting.isUsePasscode = sender.isOn
+        Defaults.GeneralSetting.isUsePasscode = sender.isOn
     }
     
     @objc func listFavoriteSwitchVauleChanged(sender: UISwitch) {

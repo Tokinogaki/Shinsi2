@@ -14,7 +14,7 @@ class BiometricsManager: NSObject {
     
     static func canSupported() -> Bool {
         var error: NSError?
-        if Defaults.Setting.isUsePasscode && context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+        if Defaults.GeneralSetting.isUsePasscode && context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             return true
         } else if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
             return true
@@ -29,7 +29,7 @@ class BiometricsManager: NSObject {
     
     static func authenticate(for reason: String, completion: @escaping (Bool) -> Void) {
         guard canSupported() else { return }
-        if Defaults.Setting.isUsePasscode {
+        if Defaults.GeneralSetting.isUsePasscode {
             context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, err) in
                 if success {
                     print("Authenticated with \(getBiometryType())")
