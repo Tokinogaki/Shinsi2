@@ -48,6 +48,8 @@ class ViewerVC: UICollectionViewController {
         super.viewDidLoad()
         view.layoutIfNeeded()
         collectionView?.reloadData()
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
         
         if let selectedIndex = selectedIndexPath {
             switch mode {
