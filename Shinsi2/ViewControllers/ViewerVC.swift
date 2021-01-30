@@ -44,13 +44,17 @@ class ViewerVC: UICollectionViewController {
         return Defaults.Viewer.mode
     }
     
+    override var shouldAutorotate: Bool {
+        return Defaults.GeneralSetting.isAutorotate
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layoutIfNeeded()
         collectionView?.reloadData()
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         if let selectedIndex = selectedIndexPath {
             switch mode {
             case .horizontal:
@@ -165,7 +169,8 @@ class ViewerVC: UICollectionViewController {
     }
     
     @objc func tapToClose(ges: UITapGestureRecognizer) {
-        dismiss(animated: true, completion: nil)
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
+        self.navigationController?.popViewController(animated: false)
     }
     
     @objc func pan(ges: UIPanGestureRecognizer) {

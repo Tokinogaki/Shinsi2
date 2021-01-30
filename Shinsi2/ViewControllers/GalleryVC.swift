@@ -281,7 +281,7 @@ extension GalleryVC: UICollectionViewDataSource,
         vc.selectedIndexPath = indexPath
         vc.galleryModel = self.galleryModel
         vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true)
+        self.navigationController?.pushViewController(vc, animated: false)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
