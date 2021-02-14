@@ -1,4 +1,5 @@
 import UIKit
+import Gifu
 
 class ImageCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
@@ -55,18 +56,9 @@ class CommentCell: UITableViewCell {
 
 class ScrollingImageCell: UICollectionViewCell {
     var showModel: ShowModel?
-    var imageView: UIImageView = UIImageView()
+    var imageView: GIFImageView = GIFImageView()
     var scrollView: UIScrollView = UIScrollView()
     var dTapGR: UITapGestureRecognizer!
-    var image: UIImage? {
-        get {
-            return imageView.image
-        }
-        set {
-            imageView.image = newValue
-            setNeedsLayout()
-        }
-    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -135,6 +127,10 @@ class ScrollingImageCell: UICollectionViewCell {
         scrollView.setZoomScale(1, animated: false)
     }
     
+    func setImageData(_ data: Data) {
+        imageView.animate(withGIFData: data)
+    }
+    
     func centerIfNeeded() {
         var inset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         if scrollView.contentSize.height < scrollView.bounds.height {
@@ -156,7 +152,9 @@ class ScrollingImageCell: UICollectionViewCell {
             showModel.imageKey == page.imageKey else {
             return
         }
-        self.image = self.showModel?.image ?? self.showModel?.thumb
+        
+        let data = self.showModel?.imageData ?? self.showModel?.thumbData
+        setImageData(data ?? Data())
     }
 }
 

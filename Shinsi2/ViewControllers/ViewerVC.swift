@@ -227,7 +227,7 @@ extension ViewerVC: UICollectionViewDelegateFlowLayout {
         let showModel = self.galleryModel.shows[indexPath.item]
         
         cell.showModel = showModel
-        cell.image = showModel.image ?? showModel.thumb ?? UIImage(named: "placeholder")
+        cell.setImageData(showModel.imageData ?? showModel.thumbData ?? UIImage(named: "placeholder")!.pngData()!)
         cell.imageView.isOpaque = true
         self.galleryModel.downloadImages(for: indexPath.item)
         

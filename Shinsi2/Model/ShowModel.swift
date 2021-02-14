@@ -79,6 +79,22 @@ class ShowModel: NSObject {
         return nil
     }
     
+    var imageData: Data? {
+        if self.hasImage {
+            guard let data = try? Data(contentsOf: self.localImage) else { return nil }
+            return data
+        }
+        return nil
+    }
+    
+    var thumbData: Data? {
+        if self.hasImage {
+            guard let data = try? Data(contentsOf: self.localThumb) else { return nil }
+            return data
+        }
+        return nil
+    }
+    
     var url: String {
         get {
             return self._url
