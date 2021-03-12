@@ -6,7 +6,9 @@ import UIColor_Hex_Swift
 class ListVC: BaseViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     private(set) lazy var searchController: UISearchController = {
-        return UISearchController(searchResultsController: searchHistoryVC)
+        let searchController = UISearchController(searchResultsController: searchHistoryVC)
+        searchHistoryVC.searchController = searchController
+        return searchController
     }()
     private lazy var searchHistoryVC: SearchHistoryVC = {
         return self.storyboard!.instantiateViewController(withIdentifier: "SearchHistoryVC") as! SearchHistoryVC
@@ -74,7 +76,6 @@ class ListVC: BaseViewController {
         definesPresentationContext = true
         
         loadNextPage()
-        SearchManager.shared.addSearch(text: searchController.searchBar.text)
     }
     
     deinit {
@@ -133,7 +134,7 @@ class ListVC: BaseViewController {
             guard loadingPage != currentPage + 1 else {return}
             loadingPage = currentPage + 1
             if loadingPage == 0 { loadingView.show() }
-            RequestManager.shared.getIndexPage(page: loadingPage, search: searchController.searchBar.text) {[weak self] galleryModelArray in
+            RequestManager.shared.getIndexPage(page: loadingPage, search: SearchManager.shared.searchText) {[weak self] galleryModelArray in
                 guard let self = self else {return}
                 self.loadingView.hide()
                 guard galleryModelArray.count > 0 else {return}
@@ -172,13 +173,11 @@ class ListVC: BaseViewController {
             let sheet = UIAlertController(title: "Favorites", message: nil, preferredStyle: .actionSheet)
             let all = UIAlertAction(title: "ALL", style: .default, handler: { (_) in
                 self.showSearch(with: "favorites")
-                Defaults.List.lastSearchKeyword = self.searchController.searchBar.text ?? ""
             })
             sheet.addAction(all)
             Defaults.List.favoriteTitles.enumerated().forEach { f in
                 let a = UIAlertAction(title: f.element, style: .default, handler: { (_) in
                     self.showSearch(with: "favorites\(f.offset)")
-                    Defaults.List.lastSearchKeyword = self.searchController.searchBar.text ?? ""
                 })
                 sheet.addAction(a)
             }
@@ -187,7 +186,6 @@ class ListVC: BaseViewController {
             present(sheet, animated: true, completion: nil)
         } else {
             showSearch(with: "favorites")
-            Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
         } 
     }
     
@@ -369,12 +367,13 @@ extension ListVC: UISearchBarDelegate, UISearchControllerDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         navigationItem.rightBarButtonItems?.forEach { $0.isEnabled = true }
         searchController.dismiss(animated: true, completion: nil)
+        SearchManager.shared.addSearch(text: SearchManager.shared.searchText)
         reloadData()
-        SearchManager.shared.addSearch(text: searchBar.text)
-        Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        SearchManager.shared.searchText = searchText
+        searchHistoryVC.tableView.reloadData()
         DispatchQueue.main.async {
             self.searchController.searchResultsController?.view.isHidden = false
         }
@@ -393,7 +392,6 @@ extension ListVC: UISearchBarDelegate, UISearchControllerDelegate {
     
     func didDismissSearchController(_ searchController: UISearchController) {
         navigationItem.rightBarButtonItems?.forEach { $0.isEnabled = true }
-        Defaults.List.lastSearchKeyword = searchController.searchBar.text ?? ""
     }
 }
 

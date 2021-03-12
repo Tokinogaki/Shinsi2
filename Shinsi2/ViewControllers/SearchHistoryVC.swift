@@ -18,7 +18,8 @@ class SearchHistoryVC: UITableViewController {
     }
     
     @IBAction private func shortcutButtonDidClick(sender: UIButton) {
-        selectBlock?(sender.titleLabel?.text ?? "")
+        SearchManager.shared.searchText = sender.titleLabel?.text ?? ""
+        selectBlock?(SearchManager.shared.searchText)
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -28,24 +29,17 @@ class SearchHistoryVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let r = SearchManager.shared.searchList[indexPath.row]
-        cell.textLabel?.text = r["text"] as? String
+        cell.textLabel?.text = "\(r.namespaceT):\(r.text)"
+        cell.detailTextLabel?.text = "\(r.namespace):\(r.origin)"
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let text = SearchManager.shared.searchList[indexPath.row]["text"] as! String
-        SearchManager.shared.addSearch(text: text)
-        selectBlock?(text)
+        let search = SearchManager.shared.searchList[indexPath.row]
+        SearchManager.shared.addKeywords(search: search)
+        selectBlock?(SearchManager.shared.searchText)
+        tableView.reloadData()
     }
-    
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == UITableViewCell.EditingStyle.delete {
-            SearchManager.shared.deleteSearch(index: indexPath.row)
-        }
-    }
+
 }

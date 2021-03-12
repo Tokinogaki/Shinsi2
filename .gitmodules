@@ -1,0 +1,3 @@
+[submodule "EhTagTranslation"]
+	path = EhTagTranslation
+	url = https://github.com/EhTagTranslation/DatabaseReleases.git
