@@ -36,6 +36,7 @@
 		7C9AFE7D2551962E00A08312 /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9AFE7C2551962E00A08312 /* HistoryManager.swift */; };
 		7C9F965625EFBD2A00F3917F /* db.text.json in Resources */ = {isa = PBXBuildFile; fileRef = 7C9F964625EFBD2A00F3917F /* db.text.json */; };
 		7CA55F7025503B280080C6FC /* SearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CA55F6F25503B280080C6FC /* SearchManager.swift */; };
+		7CAE5D0A26176BC200BD0C11 /* Tools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CAE5D0926176BC200BD0C11 /* Tools.m */; };
 		7CF08F57254DB38E00402204 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF08F56254DB38E00402204 /* TagModel.swift */; };
 		7CF08F5A254DB3B000402204 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF08F59254DB3B000402204 /* CommentModel.swift */; };
 		7CF08F5D254DB3CC00402204 /* CategoryOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF08F5C254DB3CC00402204 /* CategoryOptions.swift */; };
@@ -77,6 +78,9 @@
 		7C9AFE7C2551962E00A08312 /* HistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryManager.swift; sourceTree = "<group>"; };
 		7C9F964625EFBD2A00F3917F /* db.text.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = db.text.json; sourceTree = "<group>"; };
 		7CA55F6F25503B280080C6FC /* SearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchManager.swift; sourceTree = "<group>"; };
+		7CAE5D0726176BC100BD0C11 /* Shinsi2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Shinsi2-Bridging-Header.h"; sourceTree = "<group>"; };
+		7CAE5D0826176BC200BD0C11 /* Tools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tools.h; sourceTree = "<group>"; };
+		7CAE5D0926176BC200BD0C11 /* Tools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tools.m; sourceTree = "<group>"; };
 		7CF08F56254DB38E00402204 /* TagModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagModel.swift; sourceTree = "<group>"; };
 		7CF08F59254DB3B000402204 /* CommentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
 		7CF08F5C254DB3CC00402204 /* CategoryOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryOptions.swift; sourceTree = "<group>"; };
@@ -156,6 +160,7 @@
 				546663731F1DE3B8003B9E36 /* Assets.xcassets */,
 				546663751F1DE3B8003B9E36 /* LaunchScreen.storyboard */,
 				546663781F1DE3B8003B9E36 /* Info.plist */,
+				7CAE5D0726176BC100BD0C11 /* Shinsi2-Bridging-Header.h */,
 			);
 			path = Shinsi2;
 			sourceTree = "<group>";
@@ -197,6 +202,8 @@
 				7C69AD6D24A5E7E20016839E /* BiometricsManager.swift */,
 				7CA55F6F25503B280080C6FC /* SearchManager.swift */,
 				7C9AFE7C2551962E00A08312 /* HistoryManager.swift */,
+				7CAE5D0826176BC200BD0C11 /* Tools.h */,
+				7CAE5D0926176BC200BD0C11 /* Tools.m */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -253,7 +260,7 @@
 				TargetAttributes = {
 					546663681F1DE3B8003B9E36 = {
 						CreatedOnToolsVersion = 9.0;
-						LastSwiftMigration = 1020;
+						LastSwiftMigration = 1240;
 					};
 				};
 			};
@@ -377,6 +384,7 @@
 				7C15042E25C45A970072948A /* BaseNavigationController.swift in Sources */,
 				7CF08F60254DB3ED00402204 /* FavoriteEnum.swift in Sources */,
 				7CF71FE024B9A1AF00733B9C /* KeywordsModel.swift in Sources */,
+				7CAE5D0A26176BC200BD0C11 /* Tools.m in Sources */,
 				5466638D1F1DE509003B9E36 /* RequestManager.swift in Sources */,
 				546663961F1DE511003B9E36 /* Cells.swift in Sources */,
 				546663951F1DE511003B9E36 /* ViewerVC.swift in Sources */,
@@ -532,11 +540,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 2DM9265XNV;
 				CURRENT_PROJECT_VERSION = 2;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Shinsi2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.shinsi.Shinsi;
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Shinsi2/Shinsi2-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -549,11 +560,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 2DM9265XNV;
 				CURRENT_PROJECT_VERSION = 2;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Shinsi2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.shinsi.Shinsi;
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Shinsi2/Shinsi2-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

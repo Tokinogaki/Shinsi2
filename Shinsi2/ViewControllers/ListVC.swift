@@ -4,6 +4,18 @@ import SVProgressHUD
 import UIColor_Hex_Swift
 
 class ListVC: BaseViewController {
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        if Defaults.GeneralSetting.isAutorotate {
+            return .all
+        }
+        return [.portrait, .portraitUpsideDown]
+    }
+
     @IBOutlet weak var collectionView: UICollectionView!
     private(set) lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: searchHistoryVC)
@@ -258,6 +270,11 @@ class ListVC: BaseViewController {
     @objc func settingChanged(notification: Notification) {
         collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
         UIViewController.attemptRotationToDeviceOrientation()
+        if Defaults.GeneralSetting.isAutorotate {
+            Tools.orientation(UIInterfaceOrientation.landscapeLeft)
+        } else {
+            Tools.orientation(UIInterfaceOrientation.portrait)
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
