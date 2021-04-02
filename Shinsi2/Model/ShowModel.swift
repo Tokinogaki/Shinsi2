@@ -88,7 +88,7 @@ class ShowModel: NSObject {
     }
     
     var thumbData: Data? {
-        if self.hasImage {
+        if self.hasThumb {
             guard let data = try? Data(contentsOf: self.localThumb) else { return nil }
             return data
         }
