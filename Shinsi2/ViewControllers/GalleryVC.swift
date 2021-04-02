@@ -136,6 +136,7 @@ class GalleryVC: BaseViewController {
     func pushToListVC(with tag: String) {
         let vc = storyboard!.instantiateViewController(withIdentifier: "ListVC") as! ListVC
         vc.searchController.searchBar.text = tag
+        SearchManager.shared.searchText = tag
         navigationController?.pushViewController(vc, animated: true)
     }
 
