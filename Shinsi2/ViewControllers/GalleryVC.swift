@@ -22,7 +22,6 @@ class GalleryVC: BaseViewController {
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinch(ges:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
-        scrollToLastReadingPage()
         updateNavigationItems()
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleLoadCalleryPageNotification(notification:)), name: .loadGalleryModel, object: nil)
@@ -45,17 +44,10 @@ class GalleryVC: BaseViewController {
         
         self.galleryModel.loadGalleryModel(direction: "down")
     }
-
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        guard UIApplication.shared.applicationState == .active else {return}
-        let indexPath = collectionView.indexPathsForVisibleItems.first
-        super.viewWillTransition(to: size, with: coordinator)
-        collectionView.collectionViewLayout.invalidateLayout()
-        coordinator.animate(alongsideTransition: { _ in
-            if let indexPath = indexPath {
-                self.collectionView!.scrollToItem(at: indexPath, at: .top, animated: false)
-            }
-        })
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.scrollToLastReadingPage()
     }
 
     private var initCellWidth = Defaults.Gallery.defaultCellWidth
@@ -84,8 +76,11 @@ class GalleryVC: BaseViewController {
     private func scrollToLastReadingPage() {
         guard Defaults.Gallery.isAutomaticallyScrollToHistory else {return}
         guard self.galleryModel.readPage > 0 else { return }
+        guard self.galleryModel.shows.count > 0 else { return }
         DispatchQueue.main.async {
-            self.collectionView.scrollToItem(at: IndexPath(row: self.galleryModel.readPage - 1, section: 0), at: .top, animated: true)
+            let raadPage = self.galleryModel.readPage - 1 - self.galleryModel.shows.first!.index
+            let readIndexPath = IndexPath(row: raadPage, section: 0)
+            self.collectionView.scrollToItem(at: readIndexPath, at: .top, animated: false)
         }
     }
 
@@ -290,6 +285,12 @@ extension GalleryVC: UICollectionViewDataSource,
         let width = (collectionView.bounds.width - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * CGFloat((rowCount - 1))) / CGFloat(rowCount)
         return CGSize(width: width, height: width * paperRatio)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let showModel = self.galleryModel.shows[indexPath.item]
+        self.galleryModel.readPage = showModel.index
+    }
+
 }
 
 extension GalleryVC: UIScrollViewDelegate {
